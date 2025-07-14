@@ -1,0 +1,78 @@
+## Compilação
+bin/
+obj/
+out/
+
+## Arquivos de log
+*.log
+
+## Configurações do usuário
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Arquivos do Visual Studio
+.vscode/
+.vs/
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+
+## Build do Rider/JetBrains
+.idea/
+
+## Arquivos temporários
+*.tmp
+*.bak
+*.swp
+*~
+
+## Dados locais de dependência (NuGet etc.)
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+## Cache do NuGet
+.nuget/
+
+## Arquivos de publicação
+publish/
+App_Data/
+
+## Configurações sensíveis ou locais
+appsettings.Development.json
+secrets.json
+
+## Diretórios de Teste
+TestResults/
+
+## Coverage / Code Analysis
+coverage/
+*.coverage
+*.coveragexml
+*.codecoverage
+
+## Arquivos do ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+## Arquivos do SonarQube
+.sonar/
+.scannerwork/
+
+## Arquivos do Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## DLLs e executáveis gerados
+*.dll
+*.exe
+*.pdb
+
+## Arquivos do Mac (caso use)
+.DS_Store

@@ -1,0 +1,26 @@
+## Compilação
+back-end/bin/
+back-end/obj/
+back-end/out/
+
+## Arquivos do Visual Studio
+.vscode/
+.vs/
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+
+back-end/.vscode/
+back-end/.vs/
+back-end/*.ncb
+back-end/*.sdf
+back-end/*.opensdf
+back-end/*.cachefile
+
+## Arquivos temporários
+back-end/*.tmp
+back-end/*.bak
+back-end/*.swp
+back-end/*~
+front-end/node_modules/
