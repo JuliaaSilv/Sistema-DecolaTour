@@ -1,12 +1,20 @@
 import React from 'react';
-import Layout from './components/layout/Layout';
+import Layout from './layouts/Layout';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Packages from './pages/Packages';
 
 function App() {
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
-      </div>
-    </Layout>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/packages" element={<Packages />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 }
 
