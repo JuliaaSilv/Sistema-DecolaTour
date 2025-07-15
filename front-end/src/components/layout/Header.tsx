@@ -28,15 +28,15 @@ export default function Header() {
           <div className="flex items-center justify-between gap-28">
             <div className="flex flex-col items-center">
               <PackageIcon width={25} height={25} onClick={() => navigate("/packages")}/>
-              <p className="font-medium">Pacotes</p>
+              <p className="font-medium text-white">Pacotes</p>
             </div>
             <div className="flex flex-col items-center">
               <OffersIcon />
-             <p className="font-medium"> Promoções </p>
+             <p className="font-medium text-white"> Promoções </p>
             </div>
             <div className="flex flex-col items-center relative">
               <ProfileIcon />
-              <p className="font-medium"> Perfil </p>
+              <p className="font-medium text-white"> Perfil </p>
             </div>
           </div>
         </div>
