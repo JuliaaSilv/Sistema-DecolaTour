@@ -1,9 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using agencia.Models;
 using agencia.Data;
+using agencia.Dto.Write;
+using agencia.Interfaces.Services;
+using agencia.Models;
 using agencia.Response;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using agencia.Service;
 using InterfaceService;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace agencia.Controller
 {
@@ -11,36 +15,96 @@ namespace agencia.Controller
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private IUserService UserService { get; }
 
-        public UserController(IUserService userService)
+
+        private readonly IAutenticador _autenticadorService;
+        private IUserService _userService;
+
+        public UserController(IAutenticador autenticadorService, IUserService userService)
         {
-            UserService = userService;
+            _autenticadorService = autenticadorService;
+            _userService = userService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ApiResponseFormat>> Post([FromBody] Usuario usuario)
+        [HttpPost("registrar")]
+        public async Task<ActionResult<UserToken>> Incluir(Usuario usuarioDTO)
         {
-            var response = await UserService.RegisterAsync(usuario);
-            return StatusCode(response.StatusCode, response);
+            if (usuarioDTO == null)
+            {
+                return BadRequest("Usuário não pode ser nulo.");
+            }
 
+            var emailExists = await _autenticadorService.UserExiste(usuarioDTO.Email);
+            if (emailExists)
+            {
+                return BadRequest("Email já cadastrado.");
+            }
+
+
+          //  usuarioDTO.TipoUsuarioId = 3;
+
+            var response = await _userService.RegisterAsync(usuarioDTO);
+            if (response.Error != null)
+            {
+                return StatusCode(response.StatusCode, response.Error);
+            }
+
+            var novoUsuario = (Usuario)response.Data;
+            var token = _autenticadorService.GerarToken(
+                novoUsuario.Email,
+                novoUsuario.Id,
+                novoUsuario.TipoUsuarioId
+
+            );
+
+            return Ok(new UserToken
+            {
+                Token = token
+            });
         }
 
+      
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetById(int id)
-    {
-        var usuario = await UserService.GetByIdAsync(id);
-        if (usuario == null)
-        return NotFound();
-        return Ok(usuario);
-    }
+        {
+            var usuario = await _userService.GetByIdAsync(id);
+            if (usuario == null)
+                return NotFound();
+            return Ok(usuario);
+        }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
-    {
-    var usuarios = await UserService.GetAllAsync();
-    return Ok(usuarios);
-    }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
+        { 
+            var usuarios = await _userService.GetAllAsync();
+            return Ok(usuarios);
+        }
+        [HttpPost("login")]
+        public async Task<ActionResult<UserToken>> Selecionar(Login login)
+        {
+
+
+            var existeUsuario = await _autenticadorService.UserExiste(login.Email);
+            if (!existeUsuario)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
+
+            var result = await _autenticadorService.AutenticarAsync(login.Email, login.Senha);
+            if (!result)
+            {
+                return Unauthorized("Email ou senha inválidos.");
+            }
+
+            var usuario = await _autenticadorService.GetUserByEmail(login.Email);
+
+            var token = _autenticadorService.GerarToken(usuario.Email, usuario.Id, usuario.TipoUsuarioId);
+
+            return Ok(new UserToken
+            {
+                Token = token
+            });
+        }
     }
 }

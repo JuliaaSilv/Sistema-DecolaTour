@@ -41,7 +41,38 @@ namespace agencia.Models
 
         [ForeignKey("TipoUsuarioId")]
         [System.Text.Json.Serialization.JsonIgnore]
-        public TipoUsuario? TipoUsuario { get; set; } 
+        public TipoUsuario? TipoUsuario { get; set; }
+
+        public Usuario(string nome, string cpf, string telefone, DateTime dataNascimento, string email, string senha, TipoUsuario tipo)
+        {
+            Nome = nome;
+            Cpf = cpf;
+            Telefone = telefone;
+            DataNascimento = dataNascimento;
+            Email = email;
+            Senha = senha;
+            TipoUsuario = TipoUsuario;
+        }
+
+        public Usuario(string email, string senha)
+        {
+            Email = email;
+            Senha = senha;
+
+        }
+
+        public Usuario()
+        {
+        }
+
+        public void AlterarSenha(string senha)
+        {
+            Senha = senha;
+        }
+
+
 
     }
 }
+    
+    

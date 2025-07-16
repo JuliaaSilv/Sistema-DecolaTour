@@ -1,13 +1,16 @@
 using agencia.Models;
+using agencia.Response;
+using InterfaceService;
 namespace agencia.Repository
 {
-    public interface IUserRepository
+    public interface IUserRepository 
     {
-        Task<bool> CpfExistsAsync(string cpf);
-        Task<Usuario?> GetByCpfAsync(string cpf);
-        Task<Usuario> AddAsync(Usuario usuario);
 
-        Task<Usuario?> GetByIdAsync(int id);
+        Task<bool> CpfExistsAsync(string cpf);
+        Task<Usuario> AddAsync(Usuario usuario);
         Task<IEnumerable<Usuario>> GetAllAsync();
+        Task<Usuario?> GetByIdAsync(int id);
+ 
+
     }
 }
