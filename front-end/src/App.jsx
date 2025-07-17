@@ -1,19 +1,30 @@
 import React from 'react';
-import Layout from './layouts/Layout';
+import Layout from './layouts/Layout.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Packages from './pages/Packages';
+import Home from './pages/Home.jsx';
+import Packages from './pages/Packages.jsx';
+import Login from './pages/Login';
+import Cadastro from './pages/Cadastro';
 
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/packages" element={<Packages />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Páginas sem header/footer */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
+        
+        {/* Páginas com header/footer */}
+        <Route path="*" element={
+          <Layout>
+            <Routes>
+              <Route path="/home" element={<Home />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/packages" element={<Packages />} />
+            </Routes>
+          </Layout>
+        } />
+      </Routes>
     </BrowserRouter>
   );
 }

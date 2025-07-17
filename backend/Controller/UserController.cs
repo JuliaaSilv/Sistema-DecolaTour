@@ -31,17 +31,17 @@ namespace agencia.Controller
         {
             if (usuarioDTO == null)
             {
-                return BadRequest("Usuário não pode ser nulo.");
+                return BadRequest("Usuï¿½rio nï¿½o pode ser nulo.");
             }
 
             var emailExists = await _autenticadorService.UserExiste(usuarioDTO.Email);
             if (emailExists)
             {
-                return BadRequest("Email já cadastrado.");
+                return BadRequest("Email jÃ¡ cadastrado.");
             }
 
-
-          //  usuarioDTO.TipoUsuarioId = 3;
+            // Define o tipo de usuÃ¡rio padrÃ£o como "Cliente" (ID = 1)
+            usuarioDTO.TipoUsuarioId = 1;
 
             var response = await _userService.RegisterAsync(usuarioDTO);
             if (response.Error != null)
@@ -88,13 +88,13 @@ namespace agencia.Controller
             var existeUsuario = await _autenticadorService.UserExiste(login.Email);
             if (!existeUsuario)
             {
-                return NotFound("Usuário não encontrado.");
+                return NotFound("Usuï¿½rio nï¿½o encontrado.");
             }
 
             var result = await _autenticadorService.AutenticarAsync(login.Email, login.Senha);
             if (!result)
             {
-                return Unauthorized("Email ou senha inválidos.");
+                return Unauthorized("Email ou senha invï¿½lidos.");
             }
 
             var usuario = await _autenticadorService.GetUserByEmail(login.Email);
