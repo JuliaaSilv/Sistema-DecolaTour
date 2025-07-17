@@ -11,7 +11,7 @@
  * - ~300 linhas de código duplicado
  * 
  * SOLUÇÃO IMPLEMENTADA:
- * - ✅ Criação de tipagem TypeScript (type Destino)
+ * - ✅ Criação de estrutura de dados organizada
  * - ✅ Centralização dos dados em array estruturado
  * - ✅ Substituição de código duplicado por loop map()
  * - ✅ Uso de CSS Grid para layout responsivo
@@ -38,16 +38,11 @@ import inglaterra from "../assets/inglaterra.jpg";
 import monaco from "../assets/monaco.png";
 
 /**
- * ALTERAÇÃO 1: Criação de tipagem para os destinos
- * - Adicionada interface TypeScript para garantir consistência dos dados
- * - Melhora a manutenibilidade e previne erros de tipagem
+ * ALTERAÇÃO 1: Estrutura de dados para os destinos
+ * - Array de objetos com as propriedades necessárias
+ * - Mantém a consistência dos dados sem TypeScript
+ * - Melhora a manutenibilidade do código
  */
-type Destino = {
-  id: number;
-  nome: string;
-  imagem: string;
-  preco: string;
-};
 
 /**
  * ALTERAÇÃO 2: Centralização dos dados em um array
@@ -55,7 +50,7 @@ type Destino = {
  * - Depois: Array centralizado com todos os destinos
  * - Benefícios: Fácil adição/remoção de destinos, código mais limpo
  */
-const destinos: Destino[] = [
+const destinos = [
   { id: 1, nome: "Paris", imagem: paris, preco: "3.500" },
   { id: 2, nome: "Roma", imagem: roma, preco: "4.500" },
   { id: 3, nome: "Las Vegas", imagem: lasVegas, preco: "2.500" },
