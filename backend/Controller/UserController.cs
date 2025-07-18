@@ -1,5 +1,5 @@
 using agencia.Data;
-using agencia.Dto.Write;
+using agencia.DTOs;
 using agencia.Interfaces.Services;
 using agencia.Models;
 using agencia.Response;
@@ -15,96 +15,113 @@ namespace agencia.Controller
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-
-
-        private readonly IAutenticador _autenticadorService;
-        private IUserService _userService;
+        private IAutenticador AutenticadorService { get; }
+        private IUserService UserService;
 
         public UserController(IAutenticador autenticadorService, IUserService userService)
         {
-            _autenticadorService = autenticadorService;
-            _userService = userService;
+            AutenticadorService = autenticadorService;
+            UserService = userService;
         }
 
         [HttpPost("registrar")]
-        public async Task<ActionResult<UserToken>> Incluir(Usuario usuarioDTO)
+        public async Task<ActionResult> Incluir(UsuarioDTO usuarioDTO)
         {
             if (usuarioDTO == null)
-            {
-                return BadRequest("Usu·rio n„o pode ser nulo.");
-            }
+                return BadRequest("Usuario n√£o pode ser nulo.");
 
-            var emailExists = await _autenticadorService.UserExiste(usuarioDTO.Email);
+            var emailExists = await AutenticadorService.UserExiste(usuarioDTO.Email);
             if (emailExists)
-            {
-                return BadRequest("Email j· cadastrado.");
-            }
+                return BadRequest("Email ja cadastrado.");
 
-
-          //  usuarioDTO.TipoUsuarioId = 3;
-
-            var response = await _userService.RegisterAsync(usuarioDTO);
+            var response = await UserService.RegisterAsync(usuarioDTO);
             if (response.Error != null)
-            {
                 return StatusCode(response.StatusCode, response.Error);
-            }
 
-            var novoUsuario = (Usuario)response.Data;
-            var token = _autenticadorService.GerarToken(
+            dynamic resultado = response.Data;
+            var novoUsuario = resultado.Usuario;
+            var Mensagem = resultado.Mensagem;
+
+            var token = AutenticadorService.GerarToken(
                 novoUsuario.Email,
                 novoUsuario.Id,
                 novoUsuario.TipoUsuarioId
-
             );
 
-            return Ok(new UserToken
+            return Ok(new
             {
+                Mensagem = Mensagem,
+                Usuario = novoUsuario,
                 Token = token
             });
         }
 
-      
         [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> GetById(int id)
+        public async Task<ActionResult<UsuarioDTO>> GetById(int id)
         {
-            var usuario = await _userService.GetByIdAsync(id);
+            var usuario = await UserService.GetByIdAsync(id);
             if (usuario == null)
                 return NotFound();
             return Ok(usuario);
         }
 
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
-        { 
-            var usuarios = await _userService.GetAllAsync();
+        public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetAll()
+        {
+            var usuarios = await UserService.GetAllAsync();
             return Ok(usuarios);
         }
+
         [HttpPost("login")]
         public async Task<ActionResult<UserToken>> Selecionar(Login login)
         {
-
-
-            var existeUsuario = await _autenticadorService.UserExiste(login.Email);
+            var existeUsuario = await AutenticadorService.UserExiste(login.Email);
             if (!existeUsuario)
-            {
-                return NotFound("Usu·rio n„o encontrado.");
-            }
+                return NotFound("Usuario n√£o encontrado.");
 
-            var result = await _autenticadorService.AutenticarAsync(login.Email, login.Senha);
+            var result = await AutenticadorService.AutenticarAsync(login.Email, login.Senha);
             if (!result)
-            {
-                return Unauthorized("Email ou senha inv·lidos.");
-            }
+                return Unauthorized("Email ou senha inv√°lidos.");
 
-            var usuario = await _autenticadorService.GetUserByEmail(login.Email);
+            var usuario = await AutenticadorService.GetUserByEmail(login.Email);
 
-            var token = _autenticadorService.GerarToken(usuario.Email, usuario.Id, usuario.TipoUsuarioId);
+            var token = AutenticadorService.GerarToken(usuario.Email, usuario.Id, usuario.TipoUsuarioId);
 
             return Ok(new UserToken
             {
                 Token = token
             });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UsuarioDTO usuarioDTO)
+        {
+            if (id != usuarioDTO.Id)
+                return BadRequest("ID do usu√°rio n√£o corresponde.");
+
+            var response = await UserService.UpdateAsync(usuarioDTO);
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            dynamic resultado = response.Data;
+            var novoUsuario = resultado.Usuario;
+            var Mensagem = resultado.Mensagem;
+
+            return Ok(new
+            {
+                Mensagem = Mensagem,
+                Usuario = novoUsuario
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var response = await UserService.DeleteAsync(id);
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            return StatusCode(response.StatusCode, response.Data);
         }
     }
 }
