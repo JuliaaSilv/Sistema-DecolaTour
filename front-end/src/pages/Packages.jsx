@@ -1,151 +1,147 @@
 import React from "react";
-import foz from "../assets/inglaterra.jpg";
-import rio from "../assets/monaco.png";
-import florianopolis from "../assets/paris.png";
-import maceio from "../assets/roma.png";
-import puntaCana from "../assets/Tokyo.png";
-import santiago from "../assets/Veneza.png";
-import buenosAires from "../assets/lasVegas.png";
-import maragogi from "../assets/Dortmund.jpg";
-import fundo from "../assets/fundoHome.png"
+import foz from "../assets/packages_images/foz_do_iguacu.avif";
+import rio from "../assets/packages_images/rio_de_janeiro.jpg";
+import florianopolis from "../assets/packages_images/florianopolis.jpg";
+import maceio from "../assets/packages_images/maceio.jpeg";
+import puntaCana from "../assets/packages_images/punta_cana.jpg";
+import santiago from "../assets/packages_images/santiago.jpg";
+import buenosAires from "../assets/packages_images/buenos_aires.jpg";
+import portoDeGalinhas from "../assets/packages_images/porto_de_galinhas.jpg";
+import fundo from "../assets/fundoHome.jpg";
+import DestinationCard from "../components/common/DestinationCard";
+import Button from "../components/common/Button";
+
+// Dados dos pacotes organizados por categoria
+const pacotesCompletos = [
+  { id: 1, nome: "Foz do Iguaçu", imagem: foz, preco: "2.110" },
+  { id: 2, nome: "Rio de Janeiro", imagem: rio, preco: "1.355" },
+  { id: 3, nome: "Florianópolis", imagem: florianopolis, preco: "807" },
+];
+
+const pacotes2em1 = [
+  { id: 4, nome: "Maragogi + Porto de Galinhas", imagem: portoDeGalinhas, preco: "2.554" },
+  { id: 5, nome: "Maceió + Maragogi", imagem: maceio, preco: "3.333" },
+];
+
+const pacotesInternacionais = [
+  { id: 6, nome: "Punta Cana", imagem: puntaCana, preco: "5.542" },
+  { id: 7, nome: "Santiago", imagem: santiago, preco: "3.960" },
+  { id: 8, nome: "Buenos Aires", imagem: buenosAires, preco: "3.103" },
+];
 
 export default function Packages() {
   return (
-    <main className="bg-[#E6E6EB] min-h-screen flex flex-col pb-8">
-      <div>
-        <img src={fundo} alt="Fundo" className="w-full h-[312px] object-cover" />
-      </div>
-      <section className="mt-12 flex flex-col items-center gap-8">
-        <h2 className="text-[#6A4C93] text-2xl font-bold font-roboto">Pacotes Completos</h2>
-        <div className="flex flex-wrap justify-center gap-8 w-full">
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={foz} alt="Foz do Iguaçu" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Foz do Iguaçu</h3>
-              <p className="text-gray-700 text-sm mt-2">6 Dias / 5 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel 4 estrelas, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 2.110</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={rio} alt="Rio de Janeiro" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Rio de Janeiro</h3>
-              <p className="text-gray-700 text-sm mt-2">6 Dias / 5 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel 3 estrelas, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 1.355</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={florianopolis} alt="Florianópolis" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Florianópolis</h3>
-              <p className="text-gray-700 text-sm mt-2">5 Dias / 4 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel 3 estrelas, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 807</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
+    <main className="min-h-screen bg-[#E6E6EB]">
+      {/* Banner de fundo com mesmo tamanho da Home */}
+      <section className="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh]">
+        <div className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] overflow-hidden bg-blue-400">
+          <img 
+            src={fundo} 
+            alt="Banner Pacotes - Decola Tour" 
+            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 opacity-60"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          {/* Overlay com gradiente */}
+          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/30 via-blue-400/10 to-transparent"></div>
+        </div>
+        
+        {/* Título centralizado no banner */}
+        <div className="absolute top-1/2 left-0 right-0 flex items-center justify-center px-4 transform -translate-y-1/2">
+          <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center font-standard">
+            Nossos Pacotes
+          </h1>
+        </div>
+      </section>
+      {/* Seção Pacotes Completos */}
+      <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12 relative z-10">
+          <h2 className="text-blue-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center lg:text-left lg:ml-[5%] leading-tight"> 
+            Pacotes Completos 
+          </h2>
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-2 sm:mt-3 text-center lg:text-left lg:ml-[5%] max-w-2xl font-medium">
+            Destinos nacionais com tudo incluído para sua comodidade
+          </p>
+        </div>
+        
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-6 xl:gap-8 justify-items-center">
+            {pacotesCompletos.map((pacote) => (
+              <DestinationCard
+                key={pacote.id}
+                nome={pacote.nome}
+                imagem={pacote.imagem}
+                preco={pacote.preco}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mt-16 flex flex-col items-center gap-8">
-        <h2 className="text-[#6A4C93] text-2xl font-bold font-roboto">Pacotes 2 em 1</h2>
-        <div className="flex flex-wrap justify-center gap-8 w-full">
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img
-              src={maragogi}
-              alt="Maragogi + Porto de Galinhas"
-              className="w-full h-[200px] rounded-t-lg object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Maragogi + Porto de Galinhas</h3>
-              <p className="text-gray-700 text-sm mt-2">8 Dias / 7 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotéis, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 2.554</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={maceio} alt="Maceió + Maragogi" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Maceió + Maragogi</h3>
-              <p className="text-gray-700 text-sm mt-2">7 Dias / 6 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotéis, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 3.333</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
+      {/* Seção Pacotes 2 em 1 */}
+      <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12 relative z-10">
+          <h2 className="text-blue-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center lg:text-left lg:ml-[5%] leading-tight"> 
+            Pacotes 2 em 1 
+          </h2>
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-2 sm:mt-3 text-center lg:text-left lg:ml-[5%] max-w-2xl font-medium">
+            Combine dois destinos incríveis em uma única viagem
+          </p>
+        </div>
+        
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-6 xl:gap-8 justify-items-center">
+            {pacotes2em1.map((pacote) => (
+              <DestinationCard
+                key={pacote.id}
+                nome={pacote.nome}
+                imagem={pacote.imagem}
+                preco={pacote.preco}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mt-16 flex flex-col items-center gap-8">
-        <h2 className="text-[#6A4C93] text-2xl font-bold font-roboto">Clássicos Internacionais</h2>
-        <div className="flex flex-wrap justify-center gap-8 w-full">
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={puntaCana} alt="Punta Cana" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Punta Cana</h3>
-              <p className="text-gray-700 text-sm mt-2">8 Dias / 7 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel all inclusive, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 5.542</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
+      {/* Seção Clássicos Internacionais */}
+      <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12 relative z-10">
+          <h2 className="text-blue-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center lg:text-left lg:ml-[5%] leading-tight"> 
+            Clássicos Internacionais 
+          </h2>
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-2 sm:mt-3 text-center lg:text-left lg:ml-[5%] max-w-2xl font-medium">
+            Destinos internacionais para experiências inesquecíveis
+          </p>
+        </div>
+        
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-6 xl:gap-8 justify-items-center">
+            {pacotesInternacionais.map((pacote) => (
+              <DestinationCard
+                key={pacote.id}
+                nome={pacote.nome}
+                imagem={pacote.imagem}
+                preco={pacote.preco}
+              />
+            ))}
           </div>
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={santiago} alt="Santiago" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Santiago</h3>
-              <p className="text-gray-700 text-sm mt-2">6 Dias / 5 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel 4 estrelas, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 3.960</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col bg-white w-[305px] rounded-lg shadow-lg hover:scale-105 transition-transform duration-300">
-            <img src={buenosAires} alt="Buenos Aires" className="w-full h-[200px] rounded-t-lg object-cover" />
-            <div className="p-4">
-              <h3 className="text-[#6A4C93] text-xl font-bold">Buenos Aires</h3>
-              <p className="text-gray-700 text-sm mt-2">6 Dias / 5 Noites</p>
-              <p className="text-gray-500 text-xs">Inclui: Voo direto, hotel 3 estrelas, transfer</p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-[#F28C38] text-lg font-bold">R$ 3.103</span>
-                <button className="bg-[#F28C38E5] text-white rounded-md px-4 py-2 hover:bg-[#5a3f7b] transition-colors duration-300">
-                  Ver mais
-                </button>
-              </div>
-            </div>
-          </div>
+        </div>
+      </section>
+
+      {/* Seção adicional */}
+      <section className="relative py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 font-medium">
+            Quer um pacote personalizado? Entre em contato conosco!
+          </p>
+          <Button 
+            variant="primary" 
+            size="large" 
+            className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Solicitar Orçamento
+          </Button>
         </div>
       </section>
     </main>

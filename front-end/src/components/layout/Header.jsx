@@ -16,11 +16,14 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-blue-900 shadow-lg">
+    <header className="bg-blue-400 shadow-lg">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center justify-between h-12 ml-8 mr-17">
-          <div>
-            <img src={logo} alt="Logo" sizes="200px" className="cursor-pointer" onClick={() => navigate("/home")} />
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/home")}>
+            <img src={logo} alt="Logo" className="h-12 w-auto" />
+            <h1 className="text-white text-2xl font-bold font-standard tracking-wide">
+              Decola Tour
+            </h1>
           </div>
           <div className="flex items-center justify-between gap-16">
             <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/home")}>
@@ -47,7 +50,7 @@ export default function Header() {
                 {showProfileMenu && (
                   <div className="absolute right-0 top-12 bg-white shadow-lg rounded-md py-2 w-40 z-50">
                     <button 
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center"
+                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                       onClick={() => {
                         navigate('/perfil');
                         setShowProfileMenu(false);
@@ -57,7 +60,7 @@ export default function Header() {
                       Ver Perfil
                     </button>
                     <button 
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center"
+                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                       onClick={handleLogout}
                     >
                       <FaSignOutAlt className="mr-2" size={14} />

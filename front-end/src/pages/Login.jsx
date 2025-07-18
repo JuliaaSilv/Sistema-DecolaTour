@@ -11,12 +11,14 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   // Função para enviar o formulário
   const enviarFormulario = async (e) => {
     e.preventDefault(); // Impede o reload da página
     setErro(''); // Limpa erros anteriores
+    setSucesso(''); // Limpa mensagem de sucesso anterior
     setCarregando(true); // Mostra loading
 
     // Validações simples
@@ -36,9 +38,11 @@ export default function Login() {
 
     if (resultado.sucesso) {
       // Mostra mensagem de sucesso
-      alert('Login realizado com sucesso! 🎉');
-      // Deu certo! Vai para a home
-      navigate('/home');
+      setSucesso('Login realizado com sucesso! 🎉');
+      // Aguarda um pouco para mostrar a mensagem antes de navegar
+      setTimeout(() => {
+        navigate('/home');
+      }, 2000);
     } else {
       // Deu erro, mostra a mensagem
       setErro(resultado.erro);
@@ -85,6 +89,13 @@ export default function Login() {
             {erro && (
               <div className="p-4 bg-red-500/30 border border-red-400/60 text-white rounded-lg backdrop-blur-sm">
                 <span className="font-semibold">{erro}</span>
+              </div>
+            )}
+
+            {/* Mostrar sucesso se houver */}
+            {sucesso && (
+              <div className="p-4 bg-green-500/30 border border-green-400/60 text-white rounded-lg backdrop-blur-sm">
+                <span className="font-semibold">{sucesso}</span>
               </div>
             )}
 

@@ -1,158 +1,114 @@
-/**
- * HOME PAGE - DecolaTour
- * 
- * REFATORAÇÃO REALIZADA:
- * =====================
- * 
- * PROBLEMA ORIGINAL:
- * - Código altamente repetitivo com 9 divs duplicadas para cada destino
- * - Dados hardcoded em cada card individual
- * - Difícil manutenção e adição de novos destinos
- * - ~300 linhas de código duplicado
- * 
- * SOLUÇÃO IMPLEMENTADA:
- * - ✅ Criação de estrutura de dados organizada
- * - ✅ Centralização dos dados em array estruturado
- * - ✅ Substituição de código duplicado por loop map()
- * - ✅ Uso de CSS Grid para layout responsivo
- * - ✅ Redução de 90% no código duplicado
- * 
- * BENEFÍCIOS:
- * - Código mais limpo e profissional
- * - Fácil adição de novos destinos
- * - Melhor manutenibilidade
- * - Pronto para futuras integrações com APIs
- */
+
+// HOME PAGE - DecolaTour
+
 
 // Imports das imagens dos destinos
-import fundo from "../assets/fundoHome.png";
-import paris from "../assets/paris.png";
-import lasVegas from "../assets/lasVegas.png";
-import roma from "../assets/roma.png";
-import milao from "../assets/Milao.png";
+import fundo from "../assets/fundoHome.jpg";
+import paris from "../assets/home_images/paris.png";
+import lasVegas from "../assets/home_images/lasVegas.png";
+import roma from "../assets/home_images/roma.png";
+import milao from "../assets/home_images/milao.jpg";
 import React from "react";
-import veneza from "../assets/Veneza.png";
-import tokyo from "../assets/Tokyo.png";
-import dortmund from "../assets/dortmund.jpg";
-import inglaterra from "../assets/inglaterra.jpg";
-import monaco from "../assets/monaco.png";
+import veneza from "../assets/home_images/veneza.jpg";
+import toquio from "../assets/home_images/toquio.jpg";
+import dortmund from "../assets/home_images/dortmund.jpg";
+import inglaterra from "../assets/home_images/inglaterra.jpg";
+import monaco from "../assets/home_images/monaco.png";
 
-/**
- * ALTERAÇÃO 1: Estrutura de dados para os destinos
- * - Array de objetos com as propriedades necessárias
- * - Mantém a consistência dos dados sem TypeScript
- * - Melhora a manutenibilidade do código
- */
+// Imports dos componentes
+import FunctionalSearchBar from "../components/common/FunctionalSearchBar";
+import Button from "../components/common/Button";
+import DestinationCard from "../components/common/DestinationCard";
 
-/**
- * ALTERAÇÃO 2: Centralização dos dados em um array
- * - Antes: Dados hardcoded em cada card individual (muito repetitivo)
- * - Depois: Array centralizado com todos os destinos
- * - Benefícios: Fácil adição/remoção de destinos, código mais limpo
- */
+// Dados dos destinos populares
+// (exemplo, você pode substituir por dados reais ou de uma API)
 const destinos = [
   { id: 1, nome: "Paris", imagem: paris, preco: "3.500" },
   { id: 2, nome: "Roma", imagem: roma, preco: "4.500" },
   { id: 3, nome: "Las Vegas", imagem: lasVegas, preco: "2.500" },
   { id: 4, nome: "Milão", imagem: milao, preco: "4.500" },
   { id: 5, nome: "Veneza", imagem: veneza, preco: "5.500" },
-  { id: 6, nome: "Tokyo", imagem: tokyo, preco: "4.500" },
+  { id: 6, nome: "Tóquio", imagem: toquio, preco: "4.500" },
   { id: 7, nome: "Dortmund", imagem: dortmund, preco: "3.500" },
   { id: 8, nome: "Monaco", imagem: monaco, preco: "6.500" },
-  { id: 9, nome: "Inglaterra", imagem: inglaterra, preco: "2.500" },
+  { id: 9, nome: "Londres", imagem: inglaterra, preco: "2.500" },
 ];
 
+// Componente principal da página Home
 export default function Home() {
-  return (
-    <main className="bg-[#E6E6EB] h-auto flex flex-col gap-25 pb-8">
-      {/* Seção do banner principal */}
-      <div className="w-full overflow-hidden">
-        <img src={fundo} alt="Fundo" className="w-full h-[312px] object-cover object-center" />
-      </div>
+  // Função para lidar com a busca
+  const handleSearch = (searchData) => {
+    console.log('Realizando busca com:', searchData);
+    // Aqui você implementaria a lógica de busca/navegação
+    // Por exemplo: navegar para página de resultados com os filtros
+  };
 
-      {/* Seção de busca sobreposta ao banner */}
-      <div className="w-[676px] h-[134px] bg-[#6A4C93] absolute top-[350px] justify-center flex-col left-[50%] transform -translate-x-1/2 flex rounded-lg gap-2">
-        <h1 className="text-white text-xl font-semibold px-6 font-roboto">Busque seu destino</h1>
-        <div className="flex items-center justify-between w-full px-6">
-          {/* Campo de origem/destino */}
-          <div className="w-[236px] h-[42px] bg-white rounded-md flex px-3 gap-2">
-            <div className="w-full h-full flex-col justify-center border-r-2 border-r-[#00000099]">
-              <p className="text-sm text-black font-normal">Origem</p>
-              <p className="text-xs text-gray-500">De</p>
-            </div>
-            <div className="w-full h-full flex-col justify-center">
-              <p className="text-sm text-black font-normal">Destino</p>
-              <p className="text-xs text-gray-500">Para</p>
-            </div>
-          </div>
-          {/* Campo de calendário */}
-          <div className="w-[236px] h-[42px] bg-white rounded-md flex px-3 gap-2">
-            <div className="w-full h-full flex-col justify-center border-r-2 border-r-[#00000099]">
-              <p className="text-sm text-black font-normal">Calendário</p>
-              <p className="text-xs text-gray-500">Ida</p>
-            </div>
-            <div className="w-full h-full flex-col justify-center">
-              <p className="text-xs text-gray-500 mt-[20%]">Volta</p>
-            </div>
-          </div>
-          {/* Campo de pessoas */}
-          <div className="w-[130px] h-[42px] bg-white rounded-md flex px-3 gap-2">
-            <div className="w-full h-full flex-col justify-center">
-              <p className="text-sm text-black font-normal">Pessoas</p>
-              <p className="text-xs text-gray-500">02</p>
-            </div>
+  return (
+    <main className="min-h-screen bg-[#E6E6EB]">
+      {/* Seção do banner principal com busca integrada */}
+      <section className="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh]">
+        {/* Banner de fundo */}
+        <div className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] overflow-hidden bg-blue-400">
+          <img 
+            src={fundo} 
+            alt="Banner principal - Decola Tour" 
+            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 opacity-60"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          {/* Overlay com gradiente da identidade visual */}
+          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/30 via-blue-400/10 to-transparent"></div>
+        </div>
+        
+        {/* Barra de busca sobreposta - Posicionamento centralizado */}
+        <div className="absolute top-1/2 left-0 right-0 flex items-center justify-center px-4 transform -translate-y-1/2">
+          <div className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px] mx-auto">
+            <FunctionalSearchBar onSearch={handleSearch} />
           </div>
         </div>
-        <button className="bg-[#F28C38E5] text-white w-[75px] h-[28px] rounded-lg hover:bg-[#5a3f7b] transition-colors duration-300 ml-auto mx-4">
-          <span className="text-base font-normal">Buscar</span>
-        </button>
-      </div>
+      </section>
 
-      {/* 
-        ALTERAÇÃO 3: Seção de destinos populares refatorada
-        - Antes: 3 divs separadas com código duplicado para cada linha
-        - Depois: Uma única div com CSS Grid e loop map()
-        - Redução de ~90% no código duplicado
-      */}
-      <div className="flex flex-col gap-10">
-        <h1 className="text-[#6A4C93] text-3xl font-bold ml-[20%]"> Destinos Populares </h1>
-        <div className="flex flex-col items-center justify-center gap-10">
-          {/* 
-            ALTERAÇÃO 4: Uso de CSS Grid em vez de flexbox manual
-            - grid-cols-3: Cria automaticamente 3 colunas
-            - justify-items-center: Centraliza os itens
-            - gap-4: Espaçamento uniforme entre os cards
-          */}
-          <div className="grid grid-cols-3 gap-4 w-[80%] justify-items-center">
-            {/* 
-              ALTERAÇÃO 5: Loop único em vez de código duplicado
-              - Antes: 9 divs individuais (uma para cada destino)
-              - Depois: Um único map() que itera sobre o array de destinos
-              - Vantagem: Adicionar novos destinos é só incluir no array
-            */}
+      {/* Seção de Destinos Populares */}
+      <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
+        {/* Título da seção - Tipografia responsiva com cores da identidade */}
+        <div className="max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-12 relative z-10">
+          <h1 className="text-blue-900 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center lg:text-left lg:ml-[5%] leading-tight"> 
+            Destinos Populares 
+          </h1>
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-2 sm:mt-3 text-center lg:text-left lg:ml-[5%] max-w-2xl font-medium">
+            Explore os melhores destinos selecionados especialmente para você
+          </p>
+        </div>
+        
+        {/* Container principal dos cards */}
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-6 xl:gap-8 justify-items-center">
             {destinos.map((destino) => (
-              <div key={destino.id} className="flex flex-col bg-[#FFFFFF] w-[305px] h-auto items-center rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 overflow-hidden">
-                <div className="w-full h-[200px] overflow-hidden rounded-t-lg bg-gray-100 relative">
-                  <img
-                    src={destino.imagem}
-                    alt={destino.nome}
-                    className="absolute inset-0 w-full h-full object-cover object-center hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4 w-full">
-                  <h1 className="text-black text-2xl font-bold mb-2"> {destino.nome} </h1>
-                  <div className="flex justify-between items-center gap-2 w-full">
-                    <h1 className="text-[#F28C38] text-xl font-bold"> A partir de R$ {destino.preco} </h1>
-                    <button className="bg-[#F28C38E5] text-white px-4 py-2 rounded-md hover:bg-[#5a3f7b] transition-colors duration-300">
-                      <span className="text-base font-normal">VER MAIS</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <DestinationCard
+                key={destino.id}
+                nome={destino.nome}
+                imagem={destino.imagem}
+                preco={destino.preco}
+              />
             ))}
           </div>
         </div>
-      </div>
+
+        {/* Seção adicional */}
+        <div className="max-w-4xl mx-auto mt-12 sm:mt-16 lg:mt-20 text-center relative z-10">
+          <p className="text-blue-700 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 font-medium">
+            Não encontrou o destino ideal? Temos muito mais opções para você!
+          </p>
+          <Button 
+            variant="primary" 
+            size="large" 
+            className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Ver Todos os Destinos
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }

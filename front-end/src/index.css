@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Configuração da fonte Standard CT EXT Medium (usando Inter como substituta) */
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 500; /* Medium weight */
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

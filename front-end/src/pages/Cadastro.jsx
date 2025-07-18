@@ -16,6 +16,7 @@ export default function Cadastro() {
   const [telefone, setTelefone] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
   const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   // Funções para formatar CPF e telefone
@@ -50,6 +51,7 @@ export default function Cadastro() {
   const enviarFormulario = async (e) => {
     e.preventDefault(); // Impede o reload da página
     setErro(''); // Limpa erros anteriores
+    setSucesso(''); // Limpa mensagem de sucesso anterior
     setCarregando(true); // Mostra loading
 
     // Validações simples
@@ -98,8 +100,12 @@ export default function Cadastro() {
     const resultado = await fazerCadastro(nome, email, senha, cpf, telefone, dataNascimento);
 
     if (resultado.sucesso) {
-      // Deu certo! Vai para a home
-      navigate('/home');
+      // Mostra mensagem de sucesso
+      setSucesso('Cadastro realizado com sucesso! 🎉');
+      // Aguarda um pouco para mostrar a mensagem antes de navegar
+      setTimeout(() => {
+        navigate('/home');
+      }, 2000);
     } else {
       // Deu erro, mostra a mensagem
       setErro(resultado.erro);
@@ -144,6 +150,13 @@ export default function Cadastro() {
               {erro && (
                 <div className="bg-red-500/20 border border-red-400/50 text-red-100 px-4 py-3 rounded-lg backdrop-blur-sm">
                   {erro}
+                </div>
+              )}
+
+              {/* Sucesso */}
+              {sucesso && (
+                <div className="bg-green-500/20 border border-green-400/50 text-green-100 px-4 py-3 rounded-lg backdrop-blur-sm">
+                  {sucesso}
                 </div>
               )}
 
