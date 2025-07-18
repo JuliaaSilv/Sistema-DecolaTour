@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace agencia.Dto.Read
+namespace agencia.DTOs
 {
     public class MidiaDTO
     {
@@ -14,7 +14,5 @@ namespace agencia.Dto.Read
         public string Descricao { get; set; } = string.Empty;
 
         public string Url { get; set; } = string.Empty;
-
-
     }
 }

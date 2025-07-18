@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using agencia.Data;
 using agencia.Models;
+using agencia.Response;
 
 namespace agencia.Repository
 {
@@ -42,6 +43,24 @@ namespace agencia.Repository
         public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
             return await Context.Usuarios.ToListAsync();
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var usuario = await Context.Usuarios.FindAsync(id);
+            if (usuario == null)
+                return false;
+
+            Context.Usuarios.Remove(usuario);
+            await Context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<Usuario> UpdateAsync(Usuario usuario)
+        {
+            Context.Usuarios.Update(usuario);
+            await Context.SaveChangesAsync();
+            return usuario;
         }
     }
 }
