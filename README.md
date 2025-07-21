@@ -10,7 +10,12 @@ class Usuario {
   +dataNascimento: date
   +email: string
   +senha: string
-  +tipo: string <<enum>> // "administrador", "atendente", "cliente"
+
+}
+
+class TipoUsuario {
++idTipoUsuario: int
++nome: string // "administrador", "atendente", "cliente"
 }
 
 class TipoDocumento {
@@ -84,6 +89,7 @@ class Promocao {
 
 Usuario "1" --> "N" Reserva : faz
 Usuario "1" --> "1" TipoDocumento : possui
+Usuario "1" --> "1" TipoUsuario: possui
 
 Reserva "1" --> "1" Avaliacao : possui
 Reserva "1" --> "1" Pagamento : gera
