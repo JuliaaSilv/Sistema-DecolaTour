@@ -1,4 +1,5 @@
 using agencia.Configuration;
+using agencia.Mapper;
 using agencia.Configurations.Identity;
 using agencia.Data;
 using agencia.Interfaces.Services;
@@ -19,6 +20,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAutenticador, AutenticadorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+//AutoMapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 

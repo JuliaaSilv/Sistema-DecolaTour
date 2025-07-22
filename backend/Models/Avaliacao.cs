@@ -12,6 +12,7 @@ namespace agencia.Models
         [Required]
         [Column("NOTA")]    
         public int Nota { get; set; } 
+        
         [Required]
         [Column("COMENTARIO")]
         public string Comentario { get; set; } = string.Empty;

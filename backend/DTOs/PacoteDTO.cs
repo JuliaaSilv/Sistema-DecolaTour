@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace agencia.Dto.Read
+namespace agencia.DTOs
 {
     public class PacoteDTO
     {
@@ -18,8 +18,8 @@ namespace agencia.Dto.Read
         public int Duracao { get; set; }
 
         public DateTime DataDisponivel { get; set; }
-        
+
         public float ValorTotal { get; set; }
-        
+
     }
 }
