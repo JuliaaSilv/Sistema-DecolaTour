@@ -17,24 +17,23 @@ export default function Header() {
 
   return (
     <header className="bg-blue-400 shadow-lg">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
-        <div className="flex items-center justify-between h-12 ml-8 mr-17">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/home")}>
-            <img src={logo} alt="Logo" className="h-12 w-auto" />
-            <h1 className="text-white text-2xl font-bold font-standard tracking-wide">
+      <div className="w-full px-2 sm:px-4 md:px-8 py-2">
+        <div className="flex flex-col md:flex-row items-center justify-between h-auto md:h-16 gap-2 md:gap-0">
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer mb-2 md:mb-0" onClick={() => navigate("/home")}> 
+            <img src={logo} alt="Logo" className="h-10 sm:h-12 w-auto" />
+            <h1 className="text-white text-lg sm:text-2xl font-bold font-standard tracking-wide">
               Decola Tour
             </h1>
           </div>
-          <div className="flex items-center justify-between gap-16">
-            <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/home")}>
-              <FaHome size={20} color="white" />
-              <p className="text-sm text-white mt-1">Início</p>
+          <div className="flex items-center justify-between gap-6 sm:gap-10 md:gap-16 w-full md:w-auto">
+            <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/home")}> 
+              <FaHome size={18} className="sm:w-5 sm:h-5" color="white" />
+              <p className="text-xs sm:text-sm text-white mt-1">Início</p>
             </div>
-            <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/packages")}>
-              <FaBox size={20} color="white" />
-              <p className="text-sm text-white mt-1">Pacotes</p>
+            <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/packages")}> 
+              <FaBox size={18} className="sm:w-5 sm:h-5" color="white" />
+              <p className="text-xs sm:text-sm text-white mt-1">Pacotes</p>
             </div>
-            
             {/* Condicional: Perfil se logado, Login se não logado */}
             {usuarioLogado ? (
               <div className="relative">
@@ -42,10 +41,9 @@ export default function Header() {
                   className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" 
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                 >
-                  <FaUser size={20} color="white" />
-                  <p className="text-sm text-white mt-1">Perfil</p>
+                  <FaUser size={18} className="sm:w-5 sm:h-5" color="white" />
+                  <p className="text-xs sm:text-sm text-white mt-1">Perfil</p>
                 </div>
-                
                 {/* Menu dropdown */}
                 {showProfileMenu && (
                   <div className="absolute right-0 top-12 bg-white shadow-lg rounded-md py-2 w-40 z-50">
@@ -70,9 +68,9 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/login")}>
-                <FaSignInAlt size={20} color="white" />
-                <p className="text-sm text-white mt-1">Entrar</p>
+              <div className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/login")}> 
+                <FaSignInAlt size={18} className="sm:w-5 sm:h-5" color="white" />
+                <p className="text-xs sm:text-sm text-white mt-1">Entrar</p>
               </div>
             )}
           </div>
