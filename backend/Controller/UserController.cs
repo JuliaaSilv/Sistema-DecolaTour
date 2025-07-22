@@ -28,30 +28,16 @@ namespace agencia.Controller
         public async Task<ActionResult> Incluir(UsuarioDTO usuarioDTO)
         {
             if (usuarioDTO == null)
-<<<<<<< HEAD
-            {
-                return BadRequest("Usu�rio n�o pode ser nulo.");
-            }
-=======
                 return BadRequest("Usuario não pode ser nulo.");
->>>>>>> 70221af498e5a28d23a31cbcf9e6ff08ebb6b317
 
             var emailExists = await AutenticadorService.UserExiste(usuarioDTO.Email);
             if (emailExists)
-<<<<<<< HEAD
-            {
                 return BadRequest("Email já cadastrado.");
-            }
 
             // Define o tipo de usuário padrão como "Cliente" (ID = 1)
             usuarioDTO.TipoUsuarioId = 1;
 
-            var response = await _userService.RegisterAsync(usuarioDTO);
-=======
-                return BadRequest("Email ja cadastrado.");
-
             var response = await UserService.RegisterAsync(usuarioDTO);
->>>>>>> 70221af498e5a28d23a31cbcf9e6ff08ebb6b317
             if (response.Error != null)
                 return StatusCode(response.StatusCode, response.Error);
 
@@ -94,23 +80,11 @@ namespace agencia.Controller
         {
             var existeUsuario = await AutenticadorService.UserExiste(login.Email);
             if (!existeUsuario)
-<<<<<<< HEAD
-            {
-                return NotFound("Usu�rio n�o encontrado.");
-            }
-=======
                 return NotFound("Usuario não encontrado.");
->>>>>>> 70221af498e5a28d23a31cbcf9e6ff08ebb6b317
 
             var result = await AutenticadorService.AutenticarAsync(login.Email, login.Senha);
             if (!result)
-<<<<<<< HEAD
-            {
-                return Unauthorized("Email ou senha inv�lidos.");
-            }
-=======
                 return Unauthorized("Email ou senha inválidos.");
->>>>>>> 70221af498e5a28d23a31cbcf9e6ff08ebb6b317
 
             var usuario = await AutenticadorService.GetUserByEmail(login.Email);
 
