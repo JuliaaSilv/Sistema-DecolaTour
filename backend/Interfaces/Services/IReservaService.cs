@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using agencia.Response;
+using agencia.DTOs;
+
+namespace agencia.Interfaces.Services
+{
+    public interface IReservaService
+    {
+        Task<IEnumerable<ReservaDTO>> ListarReservasAsync();
+
+        Task<ReservaDTO?> BuscarReservaPorIdAsync(int id);
+
+        Task<ApiResponse> CriarReservaAsync(ReservaDTO reservaDTO);
+
+        Task<ApiResponse> AtualizarStatusAsync(int reservaId, string novoStatus);
+        
+        Task<ApiResponse> DeletarReservaAsync(int id);
+    }
+}
