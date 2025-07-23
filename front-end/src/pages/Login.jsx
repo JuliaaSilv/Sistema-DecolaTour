@@ -132,9 +132,13 @@ export default function Login() {
                 </label>
               </div>
               <div className="text-sm">
-                <a href="#" className="text-white/90 hover:text-white underline font-medium">
+                <button
+                  type="button"
+                  className="text-white/90 hover:text-white underline font-medium cursor-pointer"
+                  onClick={() => navigate('/recuperar-senha')}
+                >
                   Esqueceu a senha?
-                </a>
+                </button>
               </div>
             </div>
 

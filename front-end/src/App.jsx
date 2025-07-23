@@ -6,6 +6,7 @@ import Packages from "./pages/Packages.jsx";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import PackageDetails from "./pages/PackageDetails.jsx";
+import RecuperarSenha from "./pages/RecuperarSenha";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         {/* Páginas sem header/footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenha />} />
 
         {/* Páginas com header/footer */}
         <Route
