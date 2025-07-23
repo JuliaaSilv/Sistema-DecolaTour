@@ -14,11 +14,13 @@ namespace agencia.Configurations.Identity
     {
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
+        private readonly string _secretKey;
 
-        public AutenticadorService(IConfiguration configuration, AppDbContext context)
+        public AutenticadorService(IConfiguration configuration, AppDbContext context, string secretKey)
         {
             _configuration = configuration;
             _context = context;
+            _secretKey = secretKey;
         }
 
         public async Task<bool> AutenticarAsync(string email, string senha)
@@ -48,39 +50,42 @@ namespace agencia.Configurations.Identity
             return usuario != null;
         }
 
-        public string GerarToken(string email, int id, int TipoUsuario )
+        public string GerarToken(Usuario usuario)
         {
-            var secretKey = _configuration["Jwt:SecretKey"];
-            var issuer = _configuration["Jwt:Issuer"];
-            var audience = _configuration["Jwt:Audience"];
+            var key = Encoding.ASCII.GetBytes(_secretKey);
 
-            var usuario = _context.Usuarios.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
-            if (usuario == null)
-                throw new Exception("Usuário não encontrado para gerar token.");
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, email),
-        new Claim("id", id.ToString()),
-        new Claim("TIPO_USUARIO_ID", usuario.TipoUsuarioId.ToString()), 
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+                new Claim(ClaimTypes.Role, usuario.TipoUsuarioId.ToString()),
+                new Claim(ClaimTypes.Email, usuario.Email),
+                new Claim(ClaimTypes.Name, usuario.Nome)
+            };
 
-            var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: "http://decolatour.com",
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(3),
-                signingCredentials: credentials
-            );
+            
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims), 
+                Expires = DateTime.UtcNow.AddDays(1), 
+                SigningCredentials = new SigningCredentials(
+                                      new SymmetricSecurityKey(key), 
+                                      SecurityAlgorithms.HmacSha256Signature 
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+                                      ) 
+
+            }; 
+
+            
+            var tokenHandler = new JwtSecurityTokenHandler();
 
            
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            
+            return tokenHandler.WriteToken(token); 
         }
+
     }
+}
+    
 

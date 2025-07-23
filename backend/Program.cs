@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Injeção de dependência
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAutenticador, AutenticadorService>();
+//builder.Services.AddScoped<IAutenticador, AutenticadorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -27,8 +27,11 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 
 // Configuração do banco de dados
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DB_DecolaTuor;Trusted_Connection=True;"));
+
+
 
 // Adiciona controladores e Swagger
 builder.Services.AddControllers();
@@ -38,38 +41,44 @@ builder.Services.AddInfrastrutureSwagger();
 
 // Configuração de autenticação JWT
 
-
-
-builder.Services.AddAuthentication(opt =>
+builder.Services.AddScoped<IAutenticador>(provider =>
 {
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    var jwtSettings = builder.Configuration.GetSection("Jwt");
-    var secretKey = jwtSettings["SecretKey"];
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
-    };
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var context = provider.GetRequiredService<AppDbContext>();
+    var secretKey = configuration["Jwt:SecretKey"];
+    return new AutenticadorService(configuration, context, secretKey);
 });
 
 
-// Configuração de autorização
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("Administrador", policy => policy.RequireClaim("TipoUsuarioId", "1"));
-//    options.AddPolicy("GerenteOuAdmin", policy => policy.RequireClaim("TipoUsuarioId", "1", "2"));
-//});
+
+var secretKey = builder.Configuration["Jwt:SecretKey"];
+
+var key = Encoding.ASCII.GetBytes(secretKey);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}
+    )
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false; 
+
+        options.SaveToken = true; 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true, 
+            IssuerSigningKey = new SymmetricSecurityKey(key), 
+            ValidateIssuer = false,
+            ValidateAudience = false, 
+            ClockSkew = TimeSpan.Zero 
+        };
+    }
+
+    );
+
+
 
 
 

@@ -6,7 +6,7 @@ namespace agencia.Interfaces.Services
     {
         Task<bool> AutenticarAsync(string email, string senha);
         Task<bool> UserExiste(string email);
-        public string GerarToken(string email, int id,  int  TipoUsuario);
+        public string GerarToken(Usuario usuario);
         public Task<Usuario> GetUserByEmail(string email);
 
     }

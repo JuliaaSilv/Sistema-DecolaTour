@@ -1,13 +1,10 @@
-using agencia.Data;
 using agencia.DTOs;
 using agencia.Interfaces.Services;
-using agencia.Models;
-using agencia.Response;
-using agencia.Service;
 using InterfaceService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace agencia.Controller
 {
@@ -15,112 +12,56 @@ namespace agencia.Controller
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private IAutenticador AutenticadorService { get; }
-        private IUserService UserService;
+        private readonly IUserService _userService;
 
-        public UserController(IAutenticador autenticadorService, IUserService userService)
+        public UserController(IUserService userService)
         {
-            AutenticadorService = autenticadorService;
-            UserService = userService;
+            _userService = userService;
         }
 
-        [HttpPost("registrar")]
-        public async Task<ActionResult> Incluir(UsuarioDTO usuarioDTO)
+        [Authorize(Roles = "1,2")]
+        [HttpGet("Listar Todos Usuário")]
+        public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetAll()
         {
-            if (usuarioDTO == null)
-                return BadRequest("Usuario não pode ser nulo.");
-
-            var emailExists = await AutenticadorService.UserExiste(usuarioDTO.Email);
-            if (emailExists)
-                return BadRequest("Email já cadastrado.");
-
-            // Define o tipo de usuário padrão como "Cliente" (ID = 1)
-            usuarioDTO.TipoUsuarioId = 1;
-
-            var response = await UserService.RegisterAsync(usuarioDTO);
-            if (response.Error != null)
-                return StatusCode(response.StatusCode, response.Error);
-
-            dynamic resultado = response.Data;
-            var novoUsuario = resultado.Usuario;
-            var Mensagem = resultado.Mensagem;
-
-            var token = AutenticadorService.GerarToken(
-                novoUsuario.Email,
-                novoUsuario.Id,
-                novoUsuario.TipoUsuarioId
-            );
-
-            return Ok(new
-            {
-                Mensagem = Mensagem,
-                Usuario = novoUsuario,
-                Token = token
-            });
+            var usuarios = await _userService.GetAllAsync();
+            return Ok(usuarios);
         }
 
+        [Authorize(Roles = "1,2")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UsuarioDTO>> GetById(int id)
         {
-            var usuario = await UserService.GetByIdAsync(id);
+            var usuario = await _userService.GetByIdAsync(id);
             if (usuario == null)
                 return NotFound();
             return Ok(usuario);
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetAll()
-        {
-            var usuarios = await UserService.GetAllAsync();
-            return Ok(usuarios);
-        }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<UserToken>> Selecionar(Login login)
-        {
-            var existeUsuario = await AutenticadorService.UserExiste(login.Email);
-            if (!existeUsuario)
-                return NotFound("Usuario não encontrado.");
-
-            var result = await AutenticadorService.AutenticarAsync(login.Email, login.Senha);
-            if (!result)
-                return Unauthorized("Email ou senha inválidos.");
-
-            var usuario = await AutenticadorService.GetUserByEmail(login.Email);
-
-            var token = AutenticadorService.GerarToken(usuario.Email, usuario.Id, usuario.TipoUsuarioId);
-
-            return Ok(new UserToken
-            {
-                Token = token
-            });
-        }
-
+        [Authorize(Roles = "1,2")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UsuarioDTO usuarioDTO)
         {
             if (id != usuarioDTO.Id)
                 return BadRequest("ID do usuário não corresponde.");
 
-            var response = await UserService.UpdateAsync(usuarioDTO);
+            var response = await _userService.UpdateAsync(usuarioDTO);
             if (response.Error != null)
                 return StatusCode(response.StatusCode, response.Error);
 
             dynamic resultado = response.Data;
             var novoUsuario = resultado.Usuario;
-            var Mensagem = resultado.Mensagem;
+            var mensagem = resultado.Mensagem;
 
             return Ok(new
             {
-                Mensagem = Mensagem,
+                Mensagem = mensagem,
                 Usuario = novoUsuario
             });
         }
-
+        [Authorize(Roles = "1,2")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await UserService.DeleteAsync(id);
+            var response = await _userService.DeleteAsync(id);
             if (response.Error != null)
                 return StatusCode(response.StatusCode, response.Error);
 

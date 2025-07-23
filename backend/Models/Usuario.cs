@@ -43,7 +43,7 @@ namespace agencia.Models
         [System.Text.Json.Serialization.JsonIgnore]
         public TipoUsuario? TipoUsuario { get; set; }
 
-        public Usuario(string nome, string cpf, string telefone, DateTime dataNascimento, string email, string senha, TipoUsuario tipo)
+        public Usuario(string nome, string cpf, string telefone, DateTime dataNascimento, string email, string senha, TipoUsuario tipoUsuario)
         {
             Nome = nome;
             Cpf = cpf;
