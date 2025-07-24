@@ -8,6 +8,7 @@ import Cadastro from "./pages/Cadastro";
 import PackageDetails from "./pages/PackageDetails.jsx";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
+import Pagamento from "./pages/Pagamento.jsx";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
+        
+
         {/* Páginas com header/footer */}
         <Route
           path="*"
@@ -28,6 +31,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/packages" element={<Packages />} />
                 <Route path="/packages/:id" element={<PackageDetails />} />
+                <Route path="/pagamento" element={<Pagamento />} />
               </Routes>
             </Layout>
           }

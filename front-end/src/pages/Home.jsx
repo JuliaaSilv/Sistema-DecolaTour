@@ -1,7 +1,3 @@
-
-// HOME PAGE - DecolaTour
-
-
 // Imports das imagens dos destinos
 import fundo from "../assets/fundoHome.jpg";
 import paris from "../assets/home_images/paris.png";
@@ -46,9 +42,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#E6E6EB]">
       {/* Seção do banner principal com busca integrada */}
-      <section className="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh]">
+      <section className="relative w-full min-h-[35vh] sm:min-h-[40vh] lg:min-h-[45vh]">
         {/* Banner de fundo */}
-        <div className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] overflow-hidden bg-blue-400">
+        <div className="w-full h-[35vh] sm:h-[40vh] md:h-[45vh] lg:h-[45vh] overflow-hidden bg-blue-400">
           <img 
             src={fundo} 
             alt="Banner principal - Decola Tour" 
@@ -61,13 +57,15 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-blue-600/30 via-blue-400/10 to-transparent"></div>
         </div>
         
-        {/* Barra de busca sobreposta - Posicionamento centralizado */}
-        <div className="absolute top-1/2 left-0 right-0 flex items-center justify-center px-4 transform -translate-y-1/2">
-          <div className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px] mx-auto">
+        {/* Barra de busca sobreposta, flutuando entre banner e main */}
+        <div className="absolute left-0 right-0 bottom-[-5rem] flex items-center justify-center z-10 px-4">
+          <div className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px] mx-auto bg-white rounded-xl border border-gray-200" style={{ borderWidth: "0.5px" }}>
             <FunctionalSearchBar onSearch={handleSearch} />
           </div>
         </div>
       </section>
+      {/* Espaço para não sobrepor a barra de busca */}
+      <div className="h-8 sm:h-12 md:h-16"></div>
 
       {/* Seção de Destinos Populares */}
       <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
