@@ -1,13 +1,16 @@
 using agencia.Configuration;
-using agencia.Mapper;
 using agencia.Configurations.Identity;
 using agencia.Data;
+using agencia.Interfaces.Repository;
 using agencia.Interfaces.Services;
+using agencia.Mapper;
+using agencia.Models;
 using agencia.Repository;
 using agencia.Service;
 using InterfaceService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,9 +20,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Injeção de dependência
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPacoteRepository, PacoteRepository>();
+builder.Services.AddScoped<IPacoteService, PacoteService>();
 //builder.Services.AddScoped<IAutenticador, AutenticadorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+
+
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -28,8 +40,11 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 // Configuração do banco de dados
 
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DB_DecolaTuor;Trusted_Connection=True;"));
+    options.UseSqlServer("Server=AVAPC-969694123;Database=DB_DecolaTuor;Trusted_Connection=True;Encrypt=False"));
+
+
 
 
 
@@ -46,9 +61,9 @@ builder.Services.AddScoped<IAutenticador>(provider =>
     var configuration = provider.GetRequiredService<IConfiguration>();
     var context = provider.GetRequiredService<AppDbContext>();
     var secretKey = configuration["Jwt:SecretKey"];
-    return new AutenticadorService(configuration, context, secretKey);
+    var emailService = provider.GetRequiredService<IEmailService>();
+    return new AutenticadorService(configuration, context, secretKey, emailService);
 });
-
 
 
 var secretKey = builder.Configuration["Jwt:SecretKey"];
@@ -115,7 +130,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

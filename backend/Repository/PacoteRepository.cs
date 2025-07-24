@@ -1,0 +1,33 @@
+﻿using agencia.Data;
+using agencia.Interfaces.Repository;
+using agencia.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace agencia.Repository
+{
+    public class PacoteRepository : IPacoteRepository
+    {
+        private readonly AppDbContext _context;
+
+        public PacoteRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<Pacote>> ListarAsync()
+        {
+            return await _context.Pacotes.ToListAsync();
+        }
+
+        public async Task<Pacote?> BuscarPorIdAsync(int id)
+        {
+            return await _context.Pacotes.FindAsync(id);
+        }
+
+        public async Task CadastrarAsync(Pacote pacote)
+        {
+            _context.Pacotes.Add(pacote);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

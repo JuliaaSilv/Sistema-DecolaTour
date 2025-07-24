@@ -1,8 +1,10 @@
-﻿using agencia.DTOs;
+﻿using agencia.Data;
+using agencia.DTOs;
 using agencia.Interfaces.Services;
 using agencia.Models;
 using InterfaceService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace agencia.Controller
@@ -13,11 +15,13 @@ namespace agencia.Controller
     {
         private readonly IAutenticador _autenticadorService;
         private readonly IUserService _userService;
+        private readonly AppDbContext _context;
 
-        public AuthController(IAutenticador autenticadorService, IUserService userService)
+        public AuthController(IAutenticador autenticadorService, IUserService userService, AppDbContext context)
         {
             _autenticadorService = autenticadorService;
             _userService = userService;
+            _context = context;
         }
 
         [HttpPost("registrar")]
@@ -30,8 +34,6 @@ namespace agencia.Controller
             if (emailExists)
                 return BadRequest("Email já cadastrado.");
 
-          
-
             var response = await _userService.RegisterAsync(usuarioDTO);
             if (response.Error != null)
                 return StatusCode(response.StatusCode, response.Error);
@@ -40,15 +42,46 @@ namespace agencia.Controller
             var mensagem = resultado.Mensagem;
 
             var novoUsuario = await _autenticadorService.GetUserByEmail(usuarioDTO.Email);
+            await _autenticadorService.GerarTokenConfirmacaoEmailAsync(novoUsuario);
             var token = _autenticadorService.GerarToken(novoUsuario);
 
             return Ok(new
             {
                 Mensagem = mensagem,
                 Usuario = novoUsuario,
+                Email = usuarioDTO.Email,
                 Token = token
             });
         }
+
+
+
+        [HttpGet("confirmar-email")]
+        public async Task<IActionResult> ConfirmarEmailAsync(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return BadRequest(new { sucesso = false, mensagem = "Token não pode ser vazio." });
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.TokenConfirmacaoEmail == token);
+
+            if (usuario == null || usuario.ExpiracaoTokenConfirmacao < DateTime.UtcNow)
+                return BadRequest(new { sucesso = false, mensagem = "Token inválido ou expirado." });
+
+            if (usuario.EmailConfirmado)
+                return Ok(new { sucesso = true, mensagem = "E-mail já confirmado." });
+
+            usuario.EmailConfirmado = true;
+            usuario.TokenConfirmacaoEmail = token;
+            usuario.ExpiracaoTokenConfirmacao = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { sucesso = true, mensagem = "E-mail confirmado com sucesso!" });
+        }
+
+
+
+
 
         [HttpPost("login")]
         public async Task<ActionResult<UserToken>> Login(Login login)
@@ -69,5 +102,28 @@ namespace agencia.Controller
                 Token = token
             });
         }
+
+        [HttpPost("solicitar-recuperacao")]
+        public async Task<IActionResult> SolicitarRecuperacao([FromBody] string email)
+        {
+            var usuario = await _autenticadorService.GetUserByEmail(email);
+            if (usuario == null)
+                return NotFound("Usuário não encontrado.");
+
+            await _autenticadorService.GerarTokenRecuperacaoSenhaAsync(usuario);
+
+            return Ok("Email de recuperação enviado.");
+        }
+
+        [HttpPost("resetar-senha")]
+        public async Task<IActionResult> ResetarSenha([FromBody] ResetarSenhaDTO dto)
+        {
+            var resultado = await _autenticadorService.ResetarSenhaAsync(dto.Token, dto.NovaSenha);
+            if (!resultado)
+                return BadRequest("Token inválido ou expirado.");
+
+            return Ok("Senha alterada com sucesso!");
+        }
     }
 }
+

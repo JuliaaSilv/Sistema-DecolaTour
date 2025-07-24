@@ -30,7 +30,29 @@ namespace agencia.Models
         [Required]
         [Column("EMAIL")]
         public string Email { get; set; } = string.Empty;
+
         
+        [Column("EMAIL_COMFIRMADO")]
+        public bool EmailConfirmado { get; set; } = false;
+
+        
+        [Column("TOKEN_EMAILCONFIRMADO")]
+        public string? TokenConfirmacaoEmail { get; set; }
+
+        
+        [Column("TOKEN_EXPIRACAO_EMAILCONFIRMADO")]
+        public DateTime? ExpiracaoTokenConfirmacao { get; set; }
+
+        
+        [Column("TOKEN_RECUPERACAO_SENHA")]
+        public string? TokenRecuperacaoSenha { get; set; }
+
+        
+        [Column("TOKEN_EXPIRACAO_RECUPERACAO_SENHA")]
+        public DateTime? ExpiracaoTokenRecuperacao { get; set; }
+
+
+
         [Required]
         [Column("SENHA")]
         public string Senha { get; set; } = string.Empty;

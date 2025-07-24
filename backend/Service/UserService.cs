@@ -50,14 +50,23 @@ namespace agencia.Service
             {
                 return new ApiResponse(null, new ErrorResponse("CPF já cadastrado."), 409);
             }
+
+           
             var usuario = _mapper.Map<Usuario>(usuarioDTO);
             usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDTO.Senha);
+            usuario.EmailConfirmado = false;
+            usuario.TokenConfirmacaoEmail = Guid.NewGuid().ToString();
+            usuario.ExpiracaoTokenConfirmacao = DateTime.UtcNow.AddHours(24);
 
-            var novoUsuario = await Repository.AddAsync(usuario);
-            var novoUsuarioDTO = _mapper.Map<UsuarioDTO>(novoUsuario);
+            
+            await Repository.AddAsync(usuario);
+
+
+            
+            var usuarioDTOResposta = _mapper.Map<UsuarioDTO>(usuario);
 
             return new ApiResponse(
-                new { Mensagem = "Usuário criado com sucesso", Usuario = novoUsuarioDTO },
+                new { Mensagem = "Usuário criado com sucesso", Usuario = usuarioDTOResposta },
                 null,
                 201
             );

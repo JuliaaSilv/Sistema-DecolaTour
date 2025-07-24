@@ -19,6 +19,10 @@ namespace agencia.Models
         public string Descricao { get; set; } = string.Empty;
 
         [Required]
+        [Column("ORIGEM")]
+        public string Origem { get; set; } = string.Empty;
+
+        [Required]
         [Column("DESTINO")]
         public string Destino { get; set; } = string.Empty;
 
@@ -32,6 +36,13 @@ namespace agencia.Models
 
         [Required]
         [Column("VALOR_TOTAL")]
-        public float ValorTotal { get; set; } 
+        public float ValorTotal { get; set; }
+        [Required]
+        [Column("QUANTIDADE_MAXIMA")]
+        
+        public int QuantidadeMaximaPessoas { get; set; }
+
+        public ICollection<ImagemPacote> Imagens { get; set; } = new List<ImagemPacote>();
+        public ICollection<VideoPacote> Videos { get; set; } = new List<VideoPacote>();
     }
 }

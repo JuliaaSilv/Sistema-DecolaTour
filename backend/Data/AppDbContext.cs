@@ -18,6 +18,9 @@ namespace agencia.Data
         public DbSet<TipoDocumento> TipoDocumento { get; set; }
         public DbSet<Promocao> Promocoes { get; set; }
 
+        public DbSet<ImagemPacote> ImagensPacote { get; set; }
+        public DbSet<VideoPacote> VideosPacote { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 

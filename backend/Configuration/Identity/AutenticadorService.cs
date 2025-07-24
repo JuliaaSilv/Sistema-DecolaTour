@@ -15,8 +15,17 @@ namespace agencia.Configurations.Identity
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
         private readonly string _secretKey;
+        private readonly IEmailService _emailService;
 
-        public AutenticadorService(IConfiguration configuration, AppDbContext context, string secretKey)
+        public AutenticadorService(IConfiguration configuration, AppDbContext context, string secretKey, IEmailService emailService)
+        {
+            _configuration = configuration;
+            _context = context;
+            _secretKey = secretKey;
+            _emailService = emailService;
+        }
+
+        public AutenticadorService(IConfiguration configuration, AppDbContext context, string? secretKey)
         {
             _configuration = configuration;
             _context = context;
@@ -85,7 +94,75 @@ namespace agencia.Configurations.Identity
             return tokenHandler.WriteToken(token); 
         }
 
+        public async Task<string> GerarTokenConfirmacaoEmailAsync(Usuario usuario)
+        {
+
+            var link = $"http://localhost:5173/confirmar-email?token={usuario.TokenConfirmacaoEmail}";
+            var html = await File.ReadAllTextAsync("Templates/confirmacao_email.html");
+            html = html.Replace("{{NOME}}", usuario.Nome)
+                       .Replace("{{LINK}}", link);
+
+            await _emailService.EnviarEmailAsync(usuario.Email, "Confirmação de E-mail", html);
+
+            return usuario.TokenConfirmacaoEmail;
+        }
+
+        public async Task<bool> ConfirmarEmailAsync(string token)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u =>
+                u.TokenConfirmacaoEmail == token);
+            
+            if (usuario == null)
+                return false;
+
+            
+            if (usuario.ExpiracaoTokenConfirmacao < DateTime.UtcNow)
+                return false;
+
+            usuario.EmailConfirmado = true;
+            usuario.TokenConfirmacaoEmail = null;
+            usuario.ExpiracaoTokenConfirmacao = null;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<string> GerarTokenRecuperacaoSenhaAsync(Usuario usuario)
+        {
+            usuario.TokenRecuperacaoSenha = Guid.NewGuid().ToString();
+            usuario.ExpiracaoTokenRecuperacao = DateTime.UtcNow.AddHours(2);
+
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            var link = $"http://localhost:3000/resetar-senha?token={usuario.TokenRecuperacaoSenha}";
+            var assunto = "Recuperação de senha - DecolaTour";
+            var mensagem = $"Clique <a href='{link}'>aqui</a> para resetar sua senha.";
+
+            await _emailService.EnviarEmailAsync(usuario.Email, assunto, mensagem);
+            return usuario.TokenRecuperacaoSenha;
+        }
+
+        public async Task<bool> ResetarSenhaAsync(string token, string novaSenha)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u =>
+                u.TokenRecuperacaoSenha == token &&
+                u.ExpiracaoTokenRecuperacao > DateTime.Now);
+
+            if (usuario == null)
+                return false;
+
+            
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(novaSenha);
+
+            usuario.TokenRecuperacaoSenha = null;
+            usuario.ExpiracaoTokenRecuperacao = null;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
+
 }
-    
+
 
