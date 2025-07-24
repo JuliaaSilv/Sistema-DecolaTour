@@ -114,12 +114,16 @@ var app = builder.Build();
 // Usa CORS
 app.UseCors("AllowAll");
 
-// Gera o banco se não existir (sem migrations)
+// Gera o banco se não existir
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // context.Database.EnsureDeleted(); // Use com cuidado
+    context.Database.EnsureDeleted(); // Use com cuidado
     context.Database.EnsureCreated();
+
+    // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
+    string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
+    context.Database.ExecuteSqlRaw(script);    
 }
 
 // Middleware padrão

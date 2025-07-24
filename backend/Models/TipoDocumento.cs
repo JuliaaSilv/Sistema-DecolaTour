@@ -18,9 +18,6 @@ namespace agencia.Models
         public string NumeroDocumento { get; set; }
 
         [Required]
-        [Column("USUARIO_ID")]
-        public int UsuarioId { get; set; }
-
         [ForeignKey("USUARIO_ID")]
         public Usuario Usuario { get; set; }
     }

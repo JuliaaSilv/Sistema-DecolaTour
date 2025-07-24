@@ -25,9 +25,6 @@ namespace agencia.Models
         public StatusPagamento StatusPagamento { get; set; } = StatusPagamento.Pendente;
 
         [Required]
-        [Column("ID_RESERVA")]
-        public int IdReserva { get; set; }
-        
         [ForeignKey("ID_RESERVA")]
         public Reserva Reserva { get; set; }
     }
