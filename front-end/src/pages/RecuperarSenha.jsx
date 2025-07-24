@@ -14,11 +14,23 @@ export default function RecuperarSenha() {
     setMensagem('');
     setCarregando(true);
 
-    // Simulação de envio de email
-    setTimeout(() => {
-      setMensagem('Se o email estiver cadastrado, você receberá instruções para recuperar sua senha.');
+    try {
+      const response = await fetch('http://localhost:5295/api/auth/solicitar-recuperacao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(email), // envia string pura no body
+      });
+
+      const texto = await response.text();
+      setMensagem(texto);
+    } catch (error) {
+      console.error(error);
+      setMensagem('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+    } finally {
       setCarregando(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -32,7 +44,7 @@ export default function RecuperarSenha() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-full blur-3xl"></div>
         <div className="absolute top-20 right-1/3 w-36 h-36 bg-sky-200 rounded-full blur-2xl"></div>
       </div>
-      
+
       {/* Botão Voltar */}
       <div className="absolute top-6 left-6 z-10">
         <button

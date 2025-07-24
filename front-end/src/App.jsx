@@ -9,6 +9,8 @@ import PackageDetails from "./pages/PackageDetails.jsx";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 import AdminPainel from "./pages/AdminPainel";
+import Pagamento from "./pages/Pagamento.jsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -19,6 +21,12 @@ function App() {
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
         <Route path="/admin" element={<AdminPainel />} />
+=======
+        
+        
+        
+
+
         {/* Páginas com header/footer */}
         <Route
           path="*"
@@ -30,6 +38,7 @@ function App() {
                 <Route path="/packages" element={<Packages />} />
                 <Route path="/packages/:id" element={<PackageDetails />} />
                 <Route path="/pagamento" element={<Pagamento />} />
+                
               </Routes>
             </Layout>
           }
