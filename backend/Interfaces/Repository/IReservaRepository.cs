@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using agencia.Models;
@@ -17,4 +17,4 @@ namespace agencia.Interfaces.Repository
         
         Task<bool> DeletarReservaAsync(int id);
     }
-}
+} */

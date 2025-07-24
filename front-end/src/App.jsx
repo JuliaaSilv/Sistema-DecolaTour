@@ -8,8 +8,7 @@ import Cadastro from "./pages/Cadastro";
 import PackageDetails from "./pages/PackageDetails.jsx";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
-import Pagamento from "./pages/Pagamento.jsx";
-
+import AdminPainel from "./pages/AdminPainel";
 function App() {
   return (
     <BrowserRouter>
@@ -19,8 +18,7 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
-        
-
+        <Route path="/admin" element={<AdminPainel />} />
         {/* Páginas com header/footer */}
         <Route
           path="*"
