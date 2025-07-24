@@ -29,9 +29,6 @@ namespace agencia.Models
         public Usuario Usuario { get; set; } 
 
         [Required]
-        [Column("PACOTE_ID")]
-        public int PacoteId { get; set; } 
-
         [ForeignKey("PACOTE_ID")]
         public Pacote Pacote { get; set; }
 
