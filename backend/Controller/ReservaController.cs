@@ -14,7 +14,7 @@ namespace agencia.Controller
     [ApiController]
     [Route("api/[controller]")]
     public class ReservaController : ControllerBase
-    {
+    {/*
         private IReservaService ReservaService { get; }
         private IPacoteService PacoteService { get; }
 
@@ -92,5 +92,6 @@ namespace agencia.Controller
 
             return Ok(response);
         }
+        */
     }
 }
