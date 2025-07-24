@@ -18,7 +18,6 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
-
         {/* Páginas com header/footer */}
         <Route
           path="*"
