@@ -11,7 +11,7 @@ const API_URL = 'http://localhost:5295/api';
  */
 export async function fazerLogin(email, senha) {
   try {
-    const response = await fetch(`${API_URL}/User/login`, {
+    const response = await fetch(`${API_URL}/Auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export async function fazerLogin(email, senha) {
  */
 export async function fazerCadastro(nome, email, senha, cpf, telefone, dataNascimento) {
   try {
-    const response = await fetch(`${API_URL}/User/registrar`, {
+    const response = await fetch(`${API_URL}/Auth/registrar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

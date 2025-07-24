@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import PackageDetails from "./pages/PackageDetails.jsx";
 import RecuperarSenha from "./pages/RecuperarSenha";
+import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
 
         {/* Páginas com header/footer */}
         <Route
