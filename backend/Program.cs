@@ -42,7 +42,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer("Server=AVAPC-969694123;Database=DB_DecolaTuor;Trusted_Connection=True;Encrypt=False"));
+    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DB_DecolaTuor;Trusted_Connection=True;Encrypt=False"));
 
 
 
@@ -118,12 +118,12 @@ app.UseCors("AllowAll");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-   // context.Database.EnsureDeleted(); // Use com cuidado
+    context.Database.EnsureDeleted(); // Use com cuidado
     context.Database.EnsureCreated();
 
     // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
-   // string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
-   // context.Database.ExecuteSqlRaw(script);    
+    string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
+    context.Database.ExecuteSqlRaw(script);    
 }
 
 // Middleware padrão
