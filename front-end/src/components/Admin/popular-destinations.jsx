@@ -38,9 +38,10 @@ export default function PopularDestinations() {
                 dataKey="bookings"
                 label={({ name, percentage }) => `${name}: ${percentage}%`}
                 labelLine={false}
+                style={{ cursor: 'pointer' }}
               >
                 {destinationsData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} style={{ cursor: 'pointer' }} />
                 ))}
               </Pie>
               <Tooltip formatter={(value) => [`${value} reservas`, "Reservas"]} />
@@ -49,7 +50,7 @@ export default function PopularDestinations() {
 
           <div className="space-y-4">
             {destinationsData.map((destination, index) => (
-              <div key={destination.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={destination.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                   <span className="font-medium text-gray-800">{destination.name}</span>

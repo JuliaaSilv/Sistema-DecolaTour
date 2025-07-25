@@ -51,7 +51,7 @@ export default function ActivePromotions() {
             <Gift className="w-5 h-5 mr-2" />
             Promoções Ativas
           </CardTitle>
-          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center">
             <Plus className="w-4 h-4 mr-2" />
             Nova Promoção
           </Button>
@@ -62,7 +62,7 @@ export default function ActivePromotions() {
           {activePromotions.map((promo) => (
             <div
               key={promo.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">

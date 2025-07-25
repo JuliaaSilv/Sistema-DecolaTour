@@ -56,12 +56,14 @@ export default function RevenueChart() {
 							fill="#e5e7eb"
 							radius={[4, 4, 0, 0]}
 							name="Meta"
+							style={{ cursor: 'pointer' }}
 						/>
 						<Bar
 							dataKey="revenue"
 							fill="#FF6B35"
 							radius={[4, 4, 0, 0]}
 							name="Receita"
+							style={{ cursor: 'pointer' }}
 						/>
 					</BarChart>
 				</ResponsiveContainer>

@@ -10,6 +10,7 @@ import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 import AdminPainel from "./pages/AdminPainel";
 import Pagamento from "./pages/Pagamento.jsx";
+import AdminLogin from "./pages/AdminLogin.jsx";
 
 function App() {
   return (
@@ -20,13 +21,8 @@ function App() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
-        <Route path="/admin" element={<AdminPainel />} />
-=======
+        <Route path="/admin-login" element={<AdminLogin />} />
         
-        
-        
-
-
         {/* Páginas com header/footer */}
         <Route
           path="*"
@@ -38,7 +34,7 @@ function App() {
                 <Route path="/packages" element={<Packages />} />
                 <Route path="/packages/:id" element={<PackageDetails />} />
                 <Route path="/pagamento" element={<Pagamento />} />
-                
+                <Route path="/admin" element={<AdminPainel />} />
               </Routes>
             </Layout>
           }

@@ -81,7 +81,7 @@ export default function FrequentClients() {
 					{frequentClients.map((client, index) => (
 						<div
 							key={client.id}
-							className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+							className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
 						>
 							<div className="flex items-center space-x-4">
 								<div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-600 rounded-full font-bold">

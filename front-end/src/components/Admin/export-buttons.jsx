@@ -14,15 +14,15 @@ export default function ExportButtons() {
             <p className="text-sm text-gray-600">Baixe relatórios detalhados em diferentes formatos</p>
           </div>
           <div className="flex space-x-3">
-            <Button className="bg-green-600 hover:bg-green-700 text-white">
+            <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center">
               <FileText className="w-4 h-4 mr-2" />
               Excel
             </Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white">
+            <Button className="bg-red-600 hover:bg-red-700 text-white flex items-center justify-center">
               <Download className="w-4 h-4 mr-2" />
               PDF
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center">
               <CalendarIcon className="w-4 h-4 mr-2" />
               Mensal
             </Button>

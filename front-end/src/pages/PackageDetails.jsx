@@ -16,7 +16,7 @@ import LocationMap from "../components/package-details/LocationMap";
 import PackageInclusions from "../components/package-details/PackageInclusions";
 import CheckInOutInfo from "../components/package-details/CheckInOutInfo";
 import HotelGallery from "../components/package-details/HotelGallery";
-import CouplesHighlights from "../components/package-details/CouplesHighlights";
+
 
 export default function PackageDetails() {
   // Estados simplificados
@@ -89,8 +89,6 @@ export default function PackageDetails() {
       {/* Mapa componentizado */}
       <LocationMap />
 
-      {/* Highlights para casais componentizado */}
-      <CouplesHighlights />
 
       {/* Inclusões do pacote componentizadas */}
       <PackageInclusions pacote={pacote} />

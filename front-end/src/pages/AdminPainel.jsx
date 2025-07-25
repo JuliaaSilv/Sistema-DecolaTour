@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AdminHeader from "../components/Admin/admin-header";
 import AdminSidebar from "../components/Admin/admin-sidebar";
 import DashboardMetrics from "../components/Admin/dashboard-metrics";
 import RevenueChart from "../components/Admin/revenue-chart";
@@ -13,22 +12,18 @@ export default function AdminPainel() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600">
-      <AdminHeader />
-
+    <div className="min-h-screen bg-gray-50">
       <div className="flex">
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <main className="flex-1 p-6 space-y-6 overflow-x-hidden">
+        <main className="flex-1 p-6 space-y-6 overflow-x-hidden min-h-screen">
           {activeTab === "dashboard" && (
             <>
               <ExportButtons />
               <DashboardMetrics />
 
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <RevenueChart />
-                <PopularDestinations />
-              </div>
+              <RevenueChart />
+              <PopularDestinations />
 
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <ActivePromotions />

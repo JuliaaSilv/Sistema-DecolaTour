@@ -48,7 +48,7 @@ export default function DashboardMetrics() {
       {metrics.map((metric) => (
         <Card
           key={metric.title}
-          className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow"
+          className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
