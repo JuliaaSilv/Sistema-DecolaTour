@@ -29,5 +29,18 @@ namespace agencia.Repository
             _context.Pacotes.Add(pacote);
             await _context.SaveChangesAsync();
         }
+
+        public async Task AtualizarAsync(Pacote pacote)
+        {
+            _context.Pacotes.Update(pacote);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverAsync(Pacote pacote)
+        {
+            _context.Pacotes.Remove(pacote);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

@@ -5,6 +5,7 @@ using agencia.Models;
 using InterfaceService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
 
 namespace agencia.Controller
@@ -25,6 +26,7 @@ namespace agencia.Controller
         }
 
         [HttpPost("registrar")]
+        [SwaggerOperation(Summary = "Registra um novo usuário")]
         public async Task<ActionResult> Registrar(UsuarioDTO usuarioDTO)
         {
             if (usuarioDTO == null)
@@ -57,6 +59,7 @@ namespace agencia.Controller
 
 
         [HttpGet("confirmar-email")]
+        [SwaggerOperation(Summary = "Confirma o e-mail do usuário")]
         public async Task<IActionResult> ConfirmarEmailAsync(string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -83,7 +86,9 @@ namespace agencia.Controller
 
 
 
+
         [HttpPost("login")]
+        [SwaggerOperation(Summary = "Realiza login do usuário")]
         public async Task<ActionResult<UserToken>> Login(Login login)
         {
             var existeUsuario = await _autenticadorService.UserExiste(login.Email);
@@ -95,6 +100,10 @@ namespace agencia.Controller
                 return Unauthorized("Email ou senha inválidos.");
 
             var usuario = await _autenticadorService.GetUserByEmail(login.Email);
+
+            if (!usuario.EmailConfirmado)
+                return Unauthorized("Confirmação de e-mail pendente. Verifique sua caixa de entrada.");
+
             var token = _autenticadorService.GerarToken(usuario);
 
             return Ok(new UserToken
@@ -103,7 +112,9 @@ namespace agencia.Controller
             });
         }
 
+
         [HttpPost("solicitar-recuperacao")]
+        [SwaggerOperation(Summary = "Solicita recuperação de senha")]
         public async Task<IActionResult> SolicitarRecuperacao([FromBody] string email)
         {
             var usuario = await _autenticadorService.GetUserByEmail(email);
@@ -116,6 +127,7 @@ namespace agencia.Controller
         }
 
         [HttpPost("resetar-senha")]
+        [SwaggerOperation(Summary = "Reseta a senha do usuário")]
         public async Task<IActionResult> ResetarSenha([FromBody] ResetarSenhaDTO dto)
         {
             var resultado = await _autenticadorService.ResetarSenhaAsync(dto.Token, dto.NovaSenha);

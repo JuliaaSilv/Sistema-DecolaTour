@@ -1,5 +1,4 @@
 using agencia.Configuration;
-using agencia.Configurations.Identity;
 using agencia.Data;
 using agencia.Interfaces.Repository;
 using agencia.Interfaces.Services;
@@ -51,7 +50,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Adiciona controladores e Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.EnableAnnotations();
+});
+
 builder.Services.AddInfrastrutureSwagger();
 
 // Configuração de autenticação JWT

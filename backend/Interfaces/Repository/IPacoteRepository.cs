@@ -8,7 +8,10 @@ namespace agencia.Interfaces.Repository
             Task<List<Pacote>> ListarAsync();
             Task<Pacote?> BuscarPorIdAsync(int id);
             Task CadastrarAsync(Pacote pacote);
-            
+            Task AtualizarAsync(Pacote pacote);
+            Task RemoverAsync(Pacote pacote);
+
+
     }
-    }
+}
 

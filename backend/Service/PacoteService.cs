@@ -120,5 +120,33 @@ namespace agencia.Service
             }).ToList();
         }
 
+        public async Task AtualizarAsync(int id, PacoteUploadDTO dto)
+        {
+            var pacoteExistente = await _repository.BuscarPorIdAsync(id);
+            if (pacoteExistente == null)
+                throw new Exception("Pacote não encontrado");
+
+            pacoteExistente.Titulo = dto.Titulo;
+            pacoteExistente.Descricao = dto.Descricao;
+            pacoteExistente.Destino = dto.Destino;
+            pacoteExistente.Origem = dto.Origem;
+            pacoteExistente.Duracao = dto.Duracao;
+            pacoteExistente.DataDisponivel = dto.DataDisponivel;
+            pacoteExistente.ValorTotal = dto.ValorTotal;
+            pacoteExistente.QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas;
+
+            await _repository.AtualizarAsync(pacoteExistente);
+        }
+
+        public async Task RemoverAsync(int id)
+        {
+            var pacote = await _repository.BuscarPorIdAsync(id);
+            if (pacote == null)
+                throw new Exception("Pacote não encontrado");
+
+            await _repository.RemoverAsync(pacote);
+        }
+
+
     }
 }

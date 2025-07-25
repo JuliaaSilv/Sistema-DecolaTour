@@ -2,6 +2,36 @@ INSERT INTO TB_TIPO_USUARIO (Nome) VALUES ('Cliente');
 INSERT INTO TB_TIPO_USUARIO (Nome) VALUES ('Administrador');
 INSERT INTO TB_TIPO_USUARIO (Nome) VALUES ('Funcionário');
 
+INSERT INTO [dbo].[TB_USUARIOS] (
+    [NOME],
+    [CPF],
+    [TELEFONE],
+    [DATA_NASCIMENTO],
+    [EMAIL],
+    [EMAIL_COMFIRMADO],
+    [TOKEN_EMAILCONFIRMADO],
+    [TOKEN_EXPIRACAO_EMAILCONFIRMADO],
+    [TOKEN_RECUPERACAO_SENHA],
+    [TOKEN_EXPIRACAO_RECUPERACAO_SENHA],
+    [SENHA],
+    [TIPO_USUARIO_ID]
+)
+VALUES (
+    'Administrador',
+    '000.000.000-00',
+    '(00) 00000-0000',
+    '1990-01-01',
+    'admin@decolatour.com',
+    1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    '$2b$12$WrtmtdDa5Yd/g3bAnf09Tu4Q/7mh2wxpiclKhAhYUR5NQ1D5PMmiq',
+    1
+);
+
+
 INSERT INTO TB_PACOTES (TITULO, DESCRICAO, [ORIGEM], DESTINO, DURACAO, DATA_DISPONIVEL, VALOR_TOTAL, [QUANTIDADE_MAXIMA])
 VALUES 
 ('Pacote Cancún', 'Viagem completa para Cancún', 'Recife', 'Cancún', 7, '2025-08-01', 6000.00, 1 ),
