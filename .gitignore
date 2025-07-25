@@ -23,9 +23,16 @@ back-end/*.tmp
 back-end/*.bak
 back-end/*.swp
 back-end/*~
+
+## Node.js dependencies (NUNCA commitar)
 front-end/node_modules/
+node_modules/
 
 ## Arquivos de ambiente (NUNCA commitar)
 front-end/.env
 .env
 *.env
+
+## Build outputs
+front-end/dist/
+front-end/build/
