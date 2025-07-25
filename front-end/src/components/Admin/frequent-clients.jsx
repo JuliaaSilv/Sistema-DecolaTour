@@ -93,12 +93,12 @@ export default function FrequentClients() {
 											{client.name}
 										</h4>
 										<Badge
-											className={`${
-												getTierColor(client.tier)
-											} flex items-center space-x-1`}
+											className={`${getTierColor(client.tier)} px-2 py-1`}
 										>
-											{getTierIcon(client.tier)}
-											<span>{client.tier}</span>
+											<div className="flex items-center gap-1">
+												{getTierIcon(client.tier)}
+												<span className="text-xs font-medium">{client.tier}</span>
+											</div>
 										</Badge>
 									</div>
 									<p className="text-sm text-gray-600">

@@ -6,6 +6,9 @@ import PopularDestinations from "../components/Admin/popular-destinations";
 import ActivePromotions from "../components/Admin/active-promotions";
 import FrequentClients from "../components/Admin/frequent-clients";
 import ExportButtons from "../components/Admin/export-buttons";
+import PackageManagement from "../components/Admin/PackageManagement";
+import ReservationManagement from "../components/Admin/ReservationManagement";
+import UserManagement from "../components/Admin/UserManagement";
 
 // Exemplo de AdminPainel.jsx já adaptado para usar os novos componentes
 export default function AdminPainel() {
@@ -33,18 +36,23 @@ export default function AdminPainel() {
           )}
 
           {activeTab !== "dashboard" && (
-            <div className="bg-white/95 backdrop-blur-sm rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {activeTab === "packages" && "Gerenciamento de Pacotes"}
-                {activeTab === "reservations" && "Gerenciamento de Reservas"}
-                {activeTab === "users" && "Gerenciamento de Usuários"}
-                {activeTab === "promotions" && "Gerenciamento de Promoções"}
-                {activeTab === "destinations" && "Gerenciamento de Destinos"}
-                {activeTab === "reports" && "Relatórios Detalhados"}
-                {activeTab === "settings" && "Configurações do Sistema"}
-              </h2>
-              <p className="text-gray-600">Esta seção está em desenvolvimento.</p>
-            </div>
+            <>
+              {activeTab === "packages" && <PackageManagement />}
+              {activeTab === "reservations" && <ReservationManagement />}
+              {activeTab === "users" && <UserManagement />}
+              
+              {(activeTab === "promotions" || activeTab === "destinations" || activeTab === "reports" || activeTab === "settings") && (
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-8 text-center">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                    {activeTab === "promotions" && "Gerenciamento de Promoções"}
+                    {activeTab === "destinations" && "Gerenciamento de Destinos"}
+                    {activeTab === "reports" && "Relatórios Detalhados"}
+                    {activeTab === "settings" && "Configurações do Sistema"}
+                  </h2>
+                  <p className="text-gray-600">Esta seção está em desenvolvimento.</p>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>
