@@ -24,3 +24,8 @@ back-end/*.bak
 back-end/*.swp
 back-end/*~
 front-end/node_modules/
+
+## Arquivos de ambiente (NUNCA commitar)
+front-end/.env
+.env
+*.env
