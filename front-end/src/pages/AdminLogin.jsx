@@ -29,13 +29,13 @@ export default function AdminLogin() {
       return;
     }
 
-    // Chama a API (ajuste o endpoint para login de admin se necessário)
+    // Chama a API
     const resultado = await fazerLogin(usuario, senha);
 
     if (resultado.sucesso) {
       setSucesso('Login de administrador realizado com sucesso! 🎉');
       setTimeout(() => {
-        navigate('/admin/reservas'); // Redireciona para área administrativa
+        navigate('/admin-painel'); // Redireciona para área administrativa
       }, 2000);
     } else {
       setErro(resultado.erro);

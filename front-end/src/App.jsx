@@ -22,6 +22,7 @@ function App() {
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
         <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin-painel" element={<AdminPainel />} />
         
         {/* Páginas com header/footer */}
         <Route

@@ -87,7 +87,7 @@ export default function PackageDetails() {
         onToggle={() => setDescricaoExpandida(v => !v)}
       />
       {/* Mapa componentizado */}
-      <LocationMap />
+      <LocationMap location={pacote.destino} />
 
 
       {/* Inclusões do pacote componentizadas */}

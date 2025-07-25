@@ -42,12 +42,18 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#E6E6EB]">
       {/* Seção do banner principal com busca integrada */}
-      <section 
-        className="relative w-full h-[35vh] sm:h-[40vh] lg:h-[45vh] bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${fundo})`
-        }}
-      >
+      <section className="relative w-full min-h-[40vh] sm:min-h-[50vh] lg:min-h-[60vh] mb-10">
+        <div className="w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] overflow-hidden bg-blue-400">
+          <img
+            src={fundo}
+            alt="Banner Home - Decola Tour"
+            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 opacity-60"
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/30 via-blue-400/10 to-transparent"></div>
+        </div>
         
         {/* Barra de busca sobreposta, flutuando entre banner e main */}
         <div className="absolute left-0 right-0 bottom-[-5rem] flex items-center justify-center z-10 px-4">
@@ -56,8 +62,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* Espaço para não sobrepor a barra de busca */}
-      <div className="h-8 sm:h-12 md:h-16"></div>
 
       {/* Seção de Destinos Populares */}
       <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">

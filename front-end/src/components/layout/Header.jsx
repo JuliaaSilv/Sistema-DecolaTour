@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
-import { FaBox, FaUser, FaHome, FaSignInAlt, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaBox, FaUser, FaHome, FaSignInAlt, FaSignOutAlt, FaChevronDown, FaUserShield, FaUserTie } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { estaLogado, fazerLogout } from "../../api/auth";
 
@@ -94,26 +94,27 @@ export default function Header() {
                 </div>
                 {/* Menu dropdown para login */}
                 {showLoginMenu && (
-                  <div className="absolute right-0 top-12 bg-white shadow-lg rounded-md py-2 w-48 z-50">
+                  <div className="absolute right-0 top-12 bg-white shadow-lg rounded-md py-2 w-44 sm:w-48 z-50 border border-gray-200">
                     <button 
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                      className="w-full px-3 sm:px-4 py-2 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center cursor-pointer transition-colors duration-200"
                       onClick={() => {
                         navigate('/login');
                         setShowLoginMenu(false);
                       }}
                     >
-                      <FaUser className="mr-2" size={14} />
-                      Entrar como Cliente
+                      <FaUser className="mr-2 text-blue-600" size={14} />
+                      <span className="text-sm">Cliente</span>
                     </button>
+                    <div className="border-t border-gray-100 my-1"></div>
                     <button 
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                      className="w-full px-3 sm:px-4 py-2 text-left text-gray-700 hover:bg-orange-50 hover:text-orange-700 flex items-center cursor-pointer transition-colors duration-200"
                       onClick={() => {
                         navigate('/admin-login');
                         setShowLoginMenu(false);
                       }}
                     >
-                      <FaSignInAlt className="mr-2" size={14} />
-                      Entrar como Administrador
+                      <FaUserShield className="mr-2 text-orange-600" size={14} />
+                      <span className="text-sm">Administrador</span>
                     </button>
                   </div>
                 )}
