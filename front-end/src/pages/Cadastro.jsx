@@ -104,7 +104,7 @@ export default function Cadastro() {
       setSucesso('Cadastro realizado com sucesso! 🎉');
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {
-        navigate('/home');
+        navigate('/login');
       }, 2000);
     } else {
       // Deu erro, mostra a mensagem
@@ -120,7 +120,7 @@ export default function Cadastro() {
       {/* Botão Voltar */}
       <div className="absolute top-6 left-6 z-10">
         <button 
-          onClick={() => navigate('/home')}
+          onClick={() => navigate('/login')}
           className="flex items-center gap-2 px-4 py-2 text-white bg-white/20 backdrop-blur-md rounded-lg hover:bg-white/30 transition-all duration-200 cursor-pointer shadow-lg border border-white/20"
         >
           <FaArrowLeft size={16} />

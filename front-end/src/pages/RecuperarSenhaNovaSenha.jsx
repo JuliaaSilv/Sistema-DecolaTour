@@ -1,33 +1,53 @@
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaArrowLeft } from 'react-icons/fa';
 
-export default function RecuperarSenha() {
+export default function RedefinirSenha() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [carregando, setCarregando] = useState(false);
 
-  const enviarRecuperacao = async (e) => {
+  // Extrai o token da query string
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMensagem('');
+
+    if (!novaSenha || !confirmarSenha) {
+      setMensagem('Preencha todos os campos.');
+      return;
+    }
+    if (novaSenha !== confirmarSenha) {
+      setMensagem('As senhas não coincidem.');
+      return;
+    }
+    if (!token) {
+      setMensagem('Token inválido ou ausente.');
+      return;
+    }
+
     setCarregando(true);
-
     try {
-      const response = await fetch('http://localhost:5295/api/auth/solicitar-recuperacao', {
+      const response = await fetch('http://localhost:5295/api/auth/resetar-senha', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(email), 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, novaSenha }),
       });
-
       const texto = await response.text();
-      setMensagem(texto);
+      if (response.ok) {
+        setMensagem(texto);
+        setTimeout(() => navigate('/login'), 2500);
+      } else {
+        setMensagem(texto || 'Erro ao redefinir senha.');
+      }
     } catch (error) {
-      console.error(error);
-      setMensagem('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+      setMensagem('Erro ao conectar com o servidor.');
     } finally {
       setCarregando(false);
     }
@@ -58,36 +78,47 @@ export default function RecuperarSenha() {
 
       <div className="w-full max-w-md z-10">
         <div className="bg-blue-500/75 backdrop-blur-xl shadow-2xl rounded-2xl p-8 border border-blue-400/50 drop-shadow-lg">
-          <form onSubmit={enviarRecuperacao} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Logo */}
             <div className="text-center mb-8">
               <img src={logo} alt="logo" className="mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white">Esqueceu a senha?</h2>
+              <h2 className="text-2xl font-bold text-white">Redefinir senha</h2>
               <p className="text-white/90 mt-2 font-medium">
-                Informe seu email para receber instruções de recuperação.
+                Digite sua nova senha abaixo.
               </p>
             </div>
 
             {/* Mensagem de feedback */}
             {mensagem && (
-              <div className="p-4 bg-green-500/30 border border-green-400/60 text-white rounded-lg backdrop-blur-sm">
+              <div className={`p-4 ${mensagem.includes('sucesso') ? 'bg-green-500/30 border-green-400/60' : 'bg-red-500/30 border-red-400/60'} border text-white rounded-lg backdrop-blur-sm`}>
                 <span className="font-semibold">{mensagem}</span>
               </div>
             )}
 
-            {/* Campo Email */}
+            {/* Campo Nova Senha */}
             <div>
               <input
-                type="email"
-                placeholder="Seu email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="password"
+                placeholder="Nova senha"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                className="w-full px-4 py-3 bg-white/25 backdrop-blur-sm border border-white/40 rounded-lg placeholder-white/90 placeholder:font-medium text-white font-medium focus:outline-none focus:ring-2 focus:ring-white/60 focus:border-white/60"
+                required
+              />
+            </div>
+            {/* Campo Confirmar Senha */}
+            <div>
+              <input
+                type="password"
+                placeholder="Confirme a nova senha"
+                value={confirmarSenha}
+                onChange={(e) => setConfirmarSenha(e.target.value)}
                 className="w-full px-4 py-3 bg-white/25 backdrop-blur-sm border border-white/40 rounded-lg placeholder-white/90 placeholder:font-medium text-white font-medium focus:outline-none focus:ring-2 focus:ring-white/60 focus:border-white/60"
                 required
               />
             </div>
 
-            {/* Botão Recuperar Senha */}
+            {/* Botão Redefinir Senha */}
             <div>
               <button
                 type="submit"
@@ -98,7 +129,7 @@ export default function RecuperarSenha() {
                     : 'bg-orange-500 hover:bg-orange-600 hover:shadow-lg transform hover:scale-[1.02]'
                 }`}
               >
-                {carregando ? 'Enviando...' : 'Recuperar senha'}
+                {carregando ? 'Enviando...' : 'Redefinir senha'}
               </button>
             </div>
           </form>

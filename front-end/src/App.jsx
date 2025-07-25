@@ -11,6 +11,7 @@ import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 import AdminPainel from "./pages/AdminPainel";
 import Pagamento from "./pages/Pagamento.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
+import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin-painel" element={<AdminPainel />} />
+        <Route path="/redefinir-senha" element={<RecuperarSenhaNovaSenha />} />
         
         {/* Páginas com header/footer */}
         <Route
