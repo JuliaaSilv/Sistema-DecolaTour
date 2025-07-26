@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Material+Symbols+Rounded');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+.chatbot-popup {
+  position: fixed;
+    
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  
+
+  width: 420px;
+  background: linear-gradient(135deg, #fefefe, #fff3e0);
+  border-radius: 15px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+}
+
+.chatbot-popup.closed {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chatbot-header {
+  background: linear-gradient(90deg, #0077cc, #00aaff);
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatbot-header .logo-text {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  user-select: none;
+  font-family: 'Material Symbols Rounded', sans-serif;
+}
+
+.chatbot-body {
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: white;
+  flex-grow: 1;
+}
+
+.chatbot-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatbot-body::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.message {
+  padding: 10px 14px;
+  border-radius: 10px;
+  max-width: 80%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.bot-message {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  align-self: flex-start;
+}
+
+.user-message {
+  background-color: #ffe0b2;
+  color: #e65100;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.chatbot-footer {
+  padding: 12px 16px;
+  background-color: #fafafa;
+  border-top: 1px solid #eee;
+}
+
+.chatbot-form {
+  display: flex;
+  gap: 10px;
+}
+
+.chatbot-form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.chatbot-form button {
+  background: linear-gradient(135deg, #ff9800, #ffb74d);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: none;
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s ease;
+  font-family: 'Material Symbols Rounded', sans-serif;
+}
+
+.chatbot-form button:hover {
+  background-color: #fb8c00;
+}
+
+/* Botão bolinha flutuante */
+.floating-button {
+  font-family: 'Material Symbols Rounded', sans-serif;
+  font-size: 36px;
+  color: white;
+  background: linear-gradient(135deg, #0077cc, #00aaff);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  border: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-button:hover {
+  background: linear-gradient(135deg, #005fa3, #0089d1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .chatbot-popup {
+    width: 95%;
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .chatbot-body {
+    max-height: 250px;
+  }
+}

@@ -2,6 +2,8 @@
  * API SIMPLES - DecolaTour
  * Apenas funções básicas para login e cadastro
  */
+import { jwtDecode } from 'jwt-decode';
+
 
 // URL do seu backend
 const API_URL = 'http://localhost:5295/api';
@@ -83,4 +85,23 @@ export function fazerLogout() {
  */
 export function estaLogado() {
   return localStorage.getItem('token') !== null;
+}
+/**
+ * Função para obter o tipo de usuário a partir do token JWT
+ */
+export function obterTipoUsuario() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.role; // "role" vem do ClaimTypes.Role
+  } catch (error) {
+    return null;
+  }
+}
+
+export function temPermissao(rolesPermitidas) {
+  const role = obterTipoUsuario();
+  return role && rolesPermitidas.includes(role.toString());
 }

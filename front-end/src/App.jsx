@@ -12,10 +12,13 @@ import AdminPainel from "./pages/AdminPainel";
 import Pagamento from "./pages/Pagamento.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
+import ChatbotPopup from "./components/chatbot/ChatbotPopup.jsx";
+
 
 function App() {
   return (
     <BrowserRouter>
+      <ChatbotPopup />
       <Routes>
         {/* Páginas sem header/footer */}
         <Route path="/login" element={<Login />} />

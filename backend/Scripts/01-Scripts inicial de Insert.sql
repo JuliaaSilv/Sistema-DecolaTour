@@ -27,8 +27,37 @@ VALUES (
     NULL,
     NULL,
     NULL,
-    '$2b$12$WrtmtdDa5Yd/g3bAnf09Tu4Q/7mh2wxpiclKhAhYUR5NQ1D5PMmiq',
+    '$2b$12$D5ARIB.W7jXi5aOtGVSc8ecbLyv4ckX8/OhHx.JVWKVTMCZoAW0xm',
     1
+);
+
+INSERT INTO [dbo].[TB_USUARIOS] (
+    [NOME],
+    [CPF],
+    [TELEFONE],
+    [DATA_NASCIMENTO],
+    [EMAIL],
+    [EMAIL_COMFIRMADO],
+    [TOKEN_EMAILCONFIRMADO],
+    [TOKEN_EXPIRACAO_EMAILCONFIRMADO],
+    [TOKEN_RECUPERACAO_SENHA],
+    [TOKEN_EXPIRACAO_RECUPERACAO_SENHA],
+    [SENHA],
+    [TIPO_USUARIO_ID]
+)
+VALUES (
+    'Cliente',
+    '110.000.000-01',
+    '(00) 00000-0000',
+    '1990-01-01',
+    'cliente@decolatour.com',
+    1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    '$2b$12$rzXSc291A5pyvxg8E7wvWe9z2L0XLBxchx/BZz7JWTmKW9GUDVThC',
+    3
 );
 
 
