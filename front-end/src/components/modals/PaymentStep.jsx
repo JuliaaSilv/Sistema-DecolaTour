@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { CreditCard, Shield, QrCode, FileText, Check, ArrowLeft } from 'lucide-react';
 
+// Função para extrair valor numérico do preço
+const extractNumericPrice = (priceString) => {
+  if (!priceString) return 0;
+  const numericString = priceString.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+  return parseFloat(numericString) || 0;
+};
+
 const PaymentStep = ({ onNext, onBack, travelerData, pacote }) => {
   const [paymentMethod, setPaymentMethod] = useState('credit');
   const [isFlipped, setIsFlipped] = useState(false);
@@ -34,7 +41,7 @@ const PaymentStep = ({ onNext, onBack, travelerData, pacote }) => {
   };
 
   const calculateTotal = () => {
-    const basePrice = pacote.preco * travelerData.numeroViajantes;
+    const basePrice = extractNumericPrice(pacote.preco) * travelerData.numeroViajantes;
     const installmentFee = formData.installments > 1 ? basePrice * 0.02 : 0;
     return basePrice + installmentFee;
   };
@@ -78,16 +85,16 @@ const PaymentStep = ({ onNext, onBack, travelerData, pacote }) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>{pacote.nome}</span>
-            <span>R$ {pacote.preco?.toLocaleString('pt-BR')}</span>
+            <span>R$ {extractNumericPrice(pacote.preco).toLocaleString('pt-BR')}</span>
           </div>
           <div className="flex justify-between">
             <span>Viajantes: {travelerData.numeroViajantes}x</span>
-            <span>R$ {(pacote.preco * travelerData.numeroViajantes)?.toLocaleString('pt-BR')}</span>
+            <span>R$ {(extractNumericPrice(pacote.preco) * travelerData.numeroViajantes).toLocaleString('pt-BR')}</span>
           </div>
           {formData.installments > 1 && (
             <div className="flex justify-between text-orange-600">
               <span>Taxa de parcelamento (2%)</span>
-              <span>R$ {(pacote.preco * travelerData.numeroViajantes * 0.02)?.toLocaleString('pt-BR')}</span>
+              <span>R$ {(extractNumericPrice(pacote.preco) * travelerData.numeroViajantes * 0.02).toLocaleString('pt-BR')}</span>
             </div>
           )}
           <div className="border-t pt-2 flex justify-between font-bold text-lg">

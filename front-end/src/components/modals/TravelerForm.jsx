@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, Calendar, Users } from 'lucide-react';
 
+// Função para extrair valor numérico do preço
+const extractNumericPrice = (priceString) => {
+  if (!priceString) return 0;
+  const numericString = priceString.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+  return parseFloat(numericString) || 0;
+};
+
 const TravelerForm = ({ onNext, onCancel, pacote, initialData = {} }) => {
   const [formData, setFormData] = useState({
     nome: initialData.nome || '',
@@ -90,7 +97,7 @@ const TravelerForm = ({ onNext, onCancel, pacote, initialData = {} }) => {
           <div>
             <p className="font-semibold text-gray-800">{pacote.nome}</p>
             <p className="text-gray-600">{pacote.destino}</p>
-            <p className="text-[#F28C38] font-bold">R$ {pacote.preco?.toLocaleString('pt-BR')}</p>
+            <p className="text-[#F28C38] font-bold">R$ {extractNumericPrice(pacote.preco).toLocaleString('pt-BR')}</p>
           </div>
         </div>
       </div>

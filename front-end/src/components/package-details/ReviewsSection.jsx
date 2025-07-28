@@ -3,6 +3,7 @@ import { Star, ThumbsUp, Calendar, User } from 'lucide-react';
 
 const ReviewsSection = () => {
   const [filter, setFilter] = useState('all');
+  const [reviewHelpful, setReviewHelpful] = useState({});
 
   const reviews = [
     {
@@ -76,6 +77,17 @@ const ReviewsSection = () => {
     });
   };
 
+  const handleHelpfulClick = (reviewId) => {
+    setReviewHelpful(prev => ({
+      ...prev,
+      [reviewId]: (prev[reviewId] || 0) + 1
+    }));
+  };
+
+  const getHelpfulCount = (reviewId, originalCount) => {
+    return originalCount + (reviewHelpful[reviewId] || 0);
+  };
+
   return (
     <section className="max-w-full md:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 mb-12">
       <div className="bg-white rounded-2xl shadow-lg p-8">
@@ -101,7 +113,7 @@ const ReviewsSection = () => {
         <div className="flex gap-2 mb-6 overflow-x-auto">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 cursor-pointer ${
               filter === 'all' 
                 ? 'bg-[#F28C38] text-white' 
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -115,7 +127,7 @@ const ReviewsSection = () => {
               <button
                 key={rating}
                 onClick={() => setFilter(rating.toString())}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 cursor-pointer ${
                   filter === rating.toString() 
                     ? 'bg-[#F28C38] text-white' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -160,9 +172,12 @@ const ReviewsSection = () => {
               <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
               
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 text-gray-500 hover:text-[#F28C38] transition-colors duration-300">
+                <button 
+                  onClick={() => handleHelpfulClick(review.id)}
+                  className="flex items-center gap-2 text-gray-500 hover:text-[#F28C38] transition-colors duration-300 cursor-pointer"
+                >
                   <ThumbsUp size={16} />
-                  <span className="text-sm">Útil ({review.helpful})</span>
+                  <span className="text-sm">Útil ({getHelpfulCount(review.id, review.helpful)})</span>
                 </button>
               </div>
             </div>
@@ -174,7 +189,7 @@ const ReviewsSection = () => {
           <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white">
             <h3 className="text-xl font-semibold mb-2">Já se hospedou conosco?</h3>
             <p className="mb-4 opacity-90">Compartilhe sua experiência e ajude outros viajantes!</p>
-            <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300">
+            <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
               Deixar Avaliação
             </button>
           </div>

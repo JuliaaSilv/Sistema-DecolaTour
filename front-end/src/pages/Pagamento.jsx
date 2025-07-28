@@ -57,7 +57,7 @@ export default function Pagamento() {
   }
 
   const calculateTotal = () => {
-    const basePrice = pacote.preco * travelerData.numeroViajantes;
+    const basePrice = (pacote?.preco || 0) * (travelerData?.numeroViajantes || 1);
     const installmentFee = parcelas > 1 ? basePrice * 0.02 : 0;
     return basePrice + installmentFee;
   };
@@ -70,7 +70,25 @@ export default function Pagamento() {
   };
 
   const getFinalTotal = () => {
-    return calculateTotal() - calculateDiscount();
+    const total = calculateTotal() - calculateDiscount();
+    return isNaN(total) ? 0 : total;
+  };
+
+  const getInstallmentValue = (installments) => {
+    const baseTotal = calculateTotal();
+    const totalWithFee = installments > 1 ? baseTotal * 1.02 : baseTotal;
+    const discount = selected === 'pix' ? totalWithFee * 0.05 : 0;
+    const finalTotal = totalWithFee - discount;
+    return finalTotal / installments;
+  };
+
+  const getPaymentButtonText = () => {
+    const total = getFinalTotal();
+    if (selected === 'credito' && parcelas > 1) {
+      const installmentValue = getInstallmentValue(parcelas);
+      return `R$ ${total.toLocaleString('pt-BR')} (${parcelas}x de R$ ${installmentValue.toLocaleString('pt-BR')})`;
+    }
+    return `R$ ${total.toLocaleString('pt-BR')}`;
   };
 
   const handleFinalizarCompra = () => {
@@ -426,7 +444,7 @@ export default function Pagamento() {
                         >
                           {[...Array(12)].map((_, i) => (
                             <option key={i + 1} value={i + 1}>
-                              {i + 1}x de R$ {(4500 / (i + 1)).toFixed(2).replace('.', ',')} {i === 0 ? '(à vista)' : ''}
+                              {i + 1}x de R$ {getInstallmentValue(i + 1).toLocaleString('pt-BR')} {i === 0 ? '(à vista)' : ''}
                             </option>
                           ))}
                         </select>
@@ -556,11 +574,14 @@ export default function Pagamento() {
 
         {/* Botão de confirmação */}
         <div className="mt-8">
-          <button className="w-full bg-[#F28C38] text-white py-4 px-8 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl focus:ring-4 focus:ring-orange-200 focus:outline-none cursor-pointer">
+          <button 
+            onClick={handleFinalizarCompra}
+            className="w-full bg-[#F28C38] text-white py-4 px-8 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl focus:ring-4 focus:ring-orange-200 focus:outline-none cursor-pointer"
+          >
             <div className="flex items-center justify-center gap-3">
               <span>🔒</span>
               <span>Confirmar Pagamento Seguro</span>
-              <span className="text-sm opacity-90">- R$ 4.500,00</span>
+              <span className="text-sm opacity-90">- {getPaymentButtonText()}</span>
             </div>
           </button>
           

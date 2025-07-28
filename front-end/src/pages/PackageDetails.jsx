@@ -96,21 +96,10 @@ export default function PackageDetails() {
       {/* Inclusões do pacote componentizadas */}
       <PackageInclusions pacote={pacote} />
 
-      {/* Seção de avaliações */}
-      <ReviewsSection />
-
-      <section className="max-w-full md:max-w-6xl mx-auto mt-12 pb-12 text-center px-2 sm:px-4 md:px-8">
-        <p className="text-blue-700 text-base sm:text-lg mb-6 font-medium">
-          Tem dúvidas ou quer personalizar seu pacote? Fale com um de nossos especialistas!
-        </p>
-        <Button
-          variant="secondary"
-          size="large"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-base font-semibold rounded-xl transition-all duration-300"
-        >
-          Falar com especialista
-        </Button>
-      </section>
+      {/* Seção de avaliações com espaçamento maior */}
+      <div className="mt-16">
+        <ReviewsSection />
+      </div>
     </main>
   );
 }

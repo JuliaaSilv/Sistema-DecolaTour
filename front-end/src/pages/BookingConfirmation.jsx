@@ -12,6 +12,8 @@ const BookingConfirmation = () => {
   
   const formatPaymentMethod = (method) => {
     const methods = {
+      credito: 'Cartão de Crédito',
+      debito: 'Cartão de Débito',
       credit: 'Cartão de Crédito',
       debit: 'Cartão de Débito',
       pix: 'PIX',
@@ -63,7 +65,8 @@ const BookingConfirmation = () => {
             <CheckCircle className="text-green-500" size={40} />
           </div>
           <h1 className="text-3xl font-bold mb-2">Reserva Confirmada!</h1>
-          <p className="text-green-100 text-lg">Parabéns! Sua viagem foi reservada com sucesso.</p>
+          <p className="text-green-100 text-lg mb-1">Parabéns! Sua viagem foi reservada com sucesso.</p>
+          <p className="text-green-200 text-sm">Etapa 3 de 3 - Confirmação e Envio por Email</p>
         </div>
       </div>
 
@@ -76,6 +79,23 @@ const BookingConfirmation = () => {
             <div className="text-sm text-gray-600">
               Guarde este número para acompanhar sua reserva
             </div>
+          </div>
+        </div>
+
+        {/* Confirmação de envio de email */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <Mail className="text-blue-600" size={24} />
+            <h3 className="font-semibold text-blue-800 text-lg">Email de Confirmação Enviado</h3>
+          </div>
+          <p className="text-blue-700 mb-2">
+            Enviamos todos os detalhes da sua reserva para <strong>{travelerData.email}</strong>
+          </p>
+          <div className="text-blue-600 text-sm">
+            ✓ Voucher de viagem<br />
+            ✓ Detalhes do pagamento<br />
+            ✓ Informações de contato<br />
+            ✓ Instruções importantes
           </div>
         </div>
 
@@ -97,7 +117,7 @@ const BookingConfirmation = () => {
                 <span>{pacote.destino}</span>
               </div>
               <div className="text-[#F28C38] font-bold text-2xl">
-                R$ {paymentData.total?.toLocaleString('pt-BR')}
+                R$ {(paymentData.total && !isNaN(paymentData.total)) ? paymentData.total.toLocaleString('pt-BR') : '0,00'}
               </div>
             </div>
           </div>
@@ -186,7 +206,7 @@ const BookingConfirmation = () => {
           </div>
         )}
 
-        {(paymentData.method === 'credit' || paymentData.method === 'debit') && (
+        {(paymentData.method === 'credito' || paymentData.method === 'credit' || paymentData.method === 'debito' || paymentData.method === 'debit') && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
             <h3 className="font-semibold text-green-800 mb-3 text-lg">Pagamento Aprovado</h3>
             <p className="text-green-700">

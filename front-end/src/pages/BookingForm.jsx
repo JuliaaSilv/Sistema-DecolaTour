@@ -3,6 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Users } from 'lucide-react';
 import { getPackageById } from '../data/packages';
 
+// Função para extrair valor numérico do preço
+const extractNumericPrice = (priceString) => {
+  if (!priceString) return 0;
+  // Remove "R$", espaços e converte vírgulas em pontos para parsing
+  const numericString = priceString.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+  return parseFloat(numericString) || 0;
+};
+
 const BookingForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -78,11 +86,17 @@ const BookingForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      // Criar objeto pacote com preço numérico
+      const pacoteComPrecoNumerico = {
+        ...pacote,
+        preco: extractNumericPrice(pacote.preco)
+      };
+      
       // Navegar para a página de pagamento com os dados
       navigate('/pagamento', { 
         state: { 
           travelerData: formData, 
-          pacote: pacote 
+          pacote: pacoteComPrecoNumerico 
         } 
       });
     }
@@ -141,7 +155,7 @@ const BookingForm = () => {
             <div>
               <h3 className="font-semibold text-gray-800 text-lg">{pacote.nome}</h3>
               <p className="text-gray-600">{pacote.destino}</p>
-              <p className="text-[#F28C38] font-bold text-xl">R$ {pacote.preco?.toLocaleString('pt-BR')}</p>
+              <p className="text-[#F28C38] font-bold text-xl">R$ {extractNumericPrice(pacote.preco).toLocaleString('pt-BR')}</p>
             </div>
           </div>
         </div>
