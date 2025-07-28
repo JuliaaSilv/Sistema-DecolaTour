@@ -4,23 +4,21 @@ import fundo from "../assets/fundoHome.jpg";
 import Button from "../components/common/Button";
 import { useState } from "react";
 import { getPackageById, packageDetails, hotelServices } from "../data/packages";
-import Icon from "../components/common/Icon";
-import ImageGallery from "../components/common/ImageGallery";
 import HotelServices from "../components/common/HotelServices";
-import ExpandableDescription from "../components/common/ExpandableDescription";
 // Componentes de package-details
 import PackageHero from "../components/package-details/PackageHero";
 import HotelInfoCard from "../components/package-details/HotelInfoCard";
 import PricingCard from "../components/package-details/PricingCard";
 import LocationMap from "../components/package-details/LocationMap";
 import PackageInclusions from "../components/package-details/PackageInclusions";
-import CheckInOutInfo from "../components/package-details/CheckInOutInfo";
 import HotelGallery from "../components/package-details/HotelGallery";
+import PackageOverview from "../components/package-details/PackageOverview";
+import PackageHighlights from "../components/package-details/PackageHighlights";
+import ReviewsSection from "../components/package-details/ReviewsSection";
 
 
 export default function PackageDetails() {
   // Estados simplificados
-  const [descricaoExpandida, setDescricaoExpandida] = useState(false);
   const [galeriaAberta, setGaleriaAberta] = useState(false);
   const [fotoIndex, setFotoIndex] = useState(0);
   
@@ -30,6 +28,10 @@ export default function PackageDetails() {
 
   // Extraindo dados centralizados
   const { imagensGaleria, hotelInfo, descricoes } = packageDetails;
+
+  const handleReserva = () => {
+    navigate(`/booking-form/${id}`);
+  };
 
   // Validação de pacote
   if (!pacote) {
@@ -69,7 +71,11 @@ export default function PackageDetails() {
             <HotelInfoCard pacote={pacote} hotelInfo={hotelInfo} />
             
             {/* Card de preços componentizado */}
-            <PricingCard pacote={pacote} hotelInfo={hotelInfo} />
+            <PricingCard 
+              pacote={pacote} 
+              hotelInfo={hotelInfo} 
+              onReserve={handleReserva}
+            />
           </div>
         </div>
       </section>
@@ -78,23 +84,20 @@ export default function PackageDetails() {
       {/* Serviços do hotel componentizados */}
       <HotelServices services={hotelServices} />
 
-      {/* Descrição expandível componentizada */}
-      <ExpandableDescription 
-        title="Conheça um pouco mais"
-        shortDescription={descricoes.resumida}
-        fullDescription={descricoes.completa}
-        isExpanded={descricaoExpandida}
-        onToggle={() => setDescricaoExpandida(v => !v)}
-      />
+      {/* Overview do pacote */}
+      <PackageOverview pacote={pacote} />
+
+      {/* Destaques do pacote */}
+      <PackageHighlights pacote={pacote} />
+
       {/* Mapa componentizado */}
       <LocationMap location={pacote.destino} />
-
 
       {/* Inclusões do pacote componentizadas */}
       <PackageInclusions pacote={pacote} />
 
-      {/* Condições da hospedagem componentizadas */}
-      <CheckInOutInfo />
+      {/* Seção de avaliações */}
+      <ReviewsSection />
 
       <section className="max-w-full md:max-w-6xl mx-auto mt-12 pb-12 text-center px-2 sm:px-4 md:px-8">
         <p className="text-blue-700 text-base sm:text-lg mb-6 font-medium">

@@ -10,6 +10,8 @@ import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 import AdminPainel from "./pages/AdminPainel";
 import Pagamento from "./pages/Pagamento.jsx";
+import BookingForm from "./pages/BookingForm.jsx";
+import BookingConfirmation from "./pages/BookingConfirmation.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
 import ChatbotPopup from "./components/chatbot/ChatbotPopup.jsx";
@@ -39,7 +41,9 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/packages" element={<Packages />} />
                 <Route path="/packages/:id" element={<PackageDetails />} />
+                <Route path="/booking-form/:id" element={<BookingForm />} />
                 <Route path="/pagamento" element={<Pagamento />} />
+                <Route path="/booking-confirmation" element={<BookingConfirmation />} />
                 <Route path="/admin" element={<AdminPainel />} />
               </Routes>
             </Layout>

@@ -7,8 +7,9 @@ import Button from '../common/Button';
  * @param {object} hotelInfo - Info do hotel (nota, comentarios, resumoIA)
  * @param {string} savings - Valor da economia (ex: "R$650")
  * @param {string} bonusPoints - Pontos de bonus (ex: "2.442 Milhas LATAM Pass")
+ * @param {function} onReserve - Função chamada ao clicar em Reservar
  */
-const PricingCard = ({ pacote, hotelInfo, savings = "R$650", bonusPoints = "2.442 Milhas LATAM Pass" }) => {
+const PricingCard = ({ pacote, hotelInfo, savings = "R$650", bonusPoints = "2.442 Milhas LATAM Pass", onReserve }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-center bg-blue-50/80 rounded-xl p-6 mt-8 md:mt-0">
       {/* Seção de economia */}
@@ -30,28 +31,13 @@ const PricingCard = ({ pacote, hotelInfo, savings = "R$650", bonusPoints = "2.44
         variant="primary"
         size="large"
         className="w-full bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-base font-semibold rounded-xl shadow-lg transition-all duration-300"
+        onClick={onReserve}
       >
         Reservar agora
       </Button>
       
       {/* Milhas */}
       <div className="text-purple-700 text-xs mt-3">Ganhe {bonusPoints}</div>
-      
-      {/* Box de avaliação */}
-      <div className="bg-blue-50 rounded-lg p-4 mt-6 w-full">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-blue-900 font-bold text-lg">{hotelInfo.nota}</span>
-          <span className="text-blue-800 text-sm">Muito bom</span>
-          <span className="text-blue-700 underline cursor-pointer text-sm ml-2">
-            Ver {hotelInfo.comentarios} comentários
-          </span>
-        </div>
-        <p className="text-blue-900 text-sm">{hotelInfo.resumoIA}</p>
-        <div className="flex items-center gap-2 mt-2 text-gray-500 text-xs">
-          <i className="eva-3-icon-artificial-intelligence" />
-          <span>Resumo de comentários gerados por IA</span>
-        </div>
-      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import Florianopolis from "../assets/packages_images/florianopolis.jpg";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 // Estilos CSS customizados para o efeito 3D
 const customStyles = {
@@ -21,6 +22,11 @@ function getCardFlag(number) {
 }
 
 export default function Pagamento() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const { travelerData, pacote } = location.state || {};
+  
   const [card, setCard] = useState({
     number: "",
     name: "",
@@ -32,6 +38,61 @@ export default function Pagamento() {
   const [parcelas, setParcelas] = useState(1);
 
   const flag = getCardFlag(card.number.replace(/\s/g, ""));
+
+  // Verificar se temos os dados necessários
+  if (!travelerData || !pacote) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Dados da reserva não encontrados</h2>
+          <button 
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-[#F28C38] text-white rounded-xl"
+          >
+            Voltar ao Início
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const calculateTotal = () => {
+    const basePrice = pacote.preco * travelerData.numeroViajantes;
+    const installmentFee = parcelas > 1 ? basePrice * 0.02 : 0;
+    return basePrice + installmentFee;
+  };
+
+  const calculateDiscount = () => {
+    if (selected === 'pix') {
+      return calculateTotal() * 0.05;
+    }
+    return 0;
+  };
+
+  const getFinalTotal = () => {
+    return calculateTotal() - calculateDiscount();
+  };
+
+  const handleFinalizarCompra = () => {
+    const paymentData = {
+      method: selected,
+      total: getFinalTotal(),
+      installments: parcelas,
+      ...(selected === 'credito' || selected === 'debito' ? card : {})
+    };
+
+    navigate('/booking-confirmation', {
+      state: {
+        travelerData,
+        paymentData,
+        pacote
+      }
+    });
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,10 +134,69 @@ export default function Pagamento() {
   return (
     <section className="pt-6 pb-10 min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-orange-50">
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-[#F28C38] mb-2">Finalizar Pagamento</h1>
-          <p className="text-gray-600">Complete sua reserva de forma segura</p>
+        {/* Header com botão voltar */}
+        <div className="mb-6">
+          <div className="flex justify-start mb-4">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-[#F28C38] hover:text-orange-600 transition-colors duration-300 cursor-pointer"
+            >
+              <ArrowLeft size={20} />
+              Voltar aos dados do viajante
+            </button>
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl lg:text-4xl font-bold text-[#F28C38] mb-2">Finalizar Pagamento</h1>
+            <p className="text-gray-600">Etapa 2 de 3 - Complete sua reserva de forma segura</p>
+          </div>
+        </div>
+
+        {/* Resumo da reserva */}
+        <div className="mb-8 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 p-6">
+            <h2 className="text-xl font-bold text-white mb-2">Resumo da Reserva</h2>
+            <p className="text-orange-100">Verifique os detalhes antes de prosseguir</p>
+          </div>
+          <div className="p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <img 
+                src={pacote.imagem} 
+                alt={pacote.nome}
+                className="w-20 h-20 object-cover rounded-lg"
+              />
+              <div>
+                <h3 className="font-semibold text-gray-800 text-lg">{pacote.nome}</h3>
+                <p className="text-gray-600">{pacote.destino}</p>
+                <p className="text-gray-600">
+                  {travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'} • 
+                  {' '}{new Date(travelerData.dataViagem).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+            </div>
+            
+            <div className="border-t pt-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Pacote ({travelerData.numeroViajantes}x)</span>
+                <span>R$ {(pacote.preco * travelerData.numeroViajantes).toLocaleString('pt-BR')}</span>
+              </div>
+              {parcelas > 1 && (
+                <div className="flex justify-between text-sm mb-2 text-orange-600">
+                  <span>Taxa de parcelamento (2%)</span>
+                  <span>R$ {(pacote.preco * travelerData.numeroViajantes * 0.02).toLocaleString('pt-BR')}</span>
+                </div>
+              )}
+              {selected === 'pix' && (
+                <div className="flex justify-between text-sm mb-2 text-green-600">
+                  <span>Desconto PIX (5%)</span>
+                  <span>- R$ {calculateDiscount().toLocaleString('pt-BR')}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-lg border-t pt-2">
+                <span>Total</span>
+                <span className="text-[#F28C38]">R$ {getFinalTotal().toLocaleString('pt-BR')}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Detalhes da reserva */}
@@ -87,30 +207,34 @@ export default function Pagamento() {
           <div className="p-5 flex flex-col lg:flex-row items-center justify-between gap-5">
             {/* Imagem do destino */}
             <img
-              src={Florianopolis}
-              alt="Destino"
+              src={pacote.imagem}
+              alt={pacote.nome}
               className="w-28 h-28 lg:w-32 lg:h-32 object-cover rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
             />
             {/* Informações da reserva */}
             <div className="flex-1 space-y-2 text-center lg:text-left lg:ml-5">
               <div className="flex items-center justify-center lg:justify-start">
                 <span className="text-base font-semibold text-gray-700">📍 Destino:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">Florianópolis</span>
+                <span className="ml-2 text-base text-gray-900 font-medium">{pacote.destino}</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <span className="text-base font-semibold text-gray-700">📅 Data:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">23/07/2025</span>
+                <span className="ml-2 text-base text-gray-900 font-medium">
+                  {new Date(travelerData.dataViagem).toLocaleDateString('pt-BR')}
+                </span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <span className="text-base font-semibold text-gray-700">👥 Pessoas:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">2 adultos</span>
+                <span className="ml-2 text-base text-gray-900 font-medium">
+                  {travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'}
+                </span>
               </div>
             </div>
             {/* Valor à direita */}
             <div className="bg-[#F28C38] text-white px-6 py-3 rounded-xl shadow-lg">
               <div className="text-center">
                 <p className="text-sm font-medium opacity-90">Total</p>
-                <div className="text-2xl lg:text-3xl font-extrabold">R$ 4.500,00</div>
+                <div className="text-2xl lg:text-3xl font-extrabold">R$ {getFinalTotal().toLocaleString('pt-BR')}</div>
               </div>
             </div>
           </div>
