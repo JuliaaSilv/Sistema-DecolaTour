@@ -81,16 +81,16 @@ builder.Services.AddAuthentication(options =>
     )
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; 
+        options.RequireHttpsMetadata = false;
 
-        options.SaveToken = true; 
+        options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true, 
-            IssuerSigningKey = new SymmetricSecurityKey(key), 
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = false,
-            ValidateAudience = false, 
-            ClockSkew = TimeSpan.Zero 
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
         };
     }
 
@@ -121,12 +121,12 @@ app.UseCors("AllowAll");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.EnsureDeleted(); // Use com cuidado
-    context.Database.EnsureCreated();
+     context.Database.EnsureDeleted(); // Use com cuidado
+     context.Database.EnsureCreated();
 
     // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
     string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
-    context.Database.ExecuteSqlRaw(script);    
+    context.Database.ExecuteSqlRaw(script);
 }
 
 // Middleware padrão
@@ -135,7 +135,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();

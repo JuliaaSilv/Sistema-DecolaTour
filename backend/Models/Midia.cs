@@ -7,20 +7,20 @@ namespace agencia.Models
     public class Midia
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
         [Required]
         [Column("TIPO")]
         public string Tipo { get; set; } = string.Empty;
 
         [Required]
-        [Column("URL")]    
+        [Column("URL")]
         public string Url { get; set; } = string.Empty;
 
         [Required]
         [Column("PACOTE_ID")]
-        public int PacoteId { get; set; }   
-       
+        public int PacoteId { get; set; }
+
         [ForeignKey("PACOTE_ID")]
         public Pacote Pacote { get; set; }
 

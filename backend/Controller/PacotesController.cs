@@ -63,4 +63,14 @@ public class PacoteController : ControllerBase
         await _service.RemoverAsync(id);
         return Ok();
     }
+    [HttpGet("categorias")]
+    public async Task<IActionResult> ListarCategorias()
+    {
+        var pacotes = await _service.ListarPacotesAsync();
+        var categorias = pacotes
+            .SelectMany(p => p.Categorias.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .Distinct()
+            .ToList();
+        return Ok(categorias);
+    }
 }

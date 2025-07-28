@@ -16,12 +16,18 @@ namespace agencia.Repository
 
         public async Task<List<Pacote>> ListarAsync()
         {
-            return await _context.Pacotes.ToListAsync();
+            return await _context.Pacotes
+                .Include(p => p.Imagens)
+                .Include(p => p.Videos)
+                .ToListAsync();
         }
 
         public async Task<Pacote?> BuscarPorIdAsync(int id)
         {
-            return await _context.Pacotes.FindAsync(id);
+            return await _context.Pacotes
+                .Include(p => p.Imagens)
+                .Include(p => p.Videos)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task CadastrarAsync(Pacote pacote)

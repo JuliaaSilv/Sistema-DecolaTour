@@ -1,168 +1,247 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
+const dicas = [
+  "Dica do dia: Sempre leve protetor solar em viagens para praias.",
+  "Dica do dia: Conheça a culinária local para uma experiência autêntica.",
+  "Dica do dia: Verifique o clima antes de viajar para evitar surpresas.",
+  "Dica do dia: Use sapatos confortáveis para explorar cidades históricas.",
+];
+
 const ChatbotPopup = () => {
-  const [isOpen, setIsOpen] = useState(false); 
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
+    { sender: "bot", text: "Olá! Eu sou a TurIA. Como posso te ajudar hoje?" },
     {
-      sender: "bot",
-      text: "Olá! Eu sou a AVA, sua assistente de viagens da Decola Tour ✈️. Como posso te ajudar hoje?",
+      sender: "botSuggestions",
+      suggestions: [
+        "Quais são os pacotes disponíveis?",
+        "Qual é a melhor época para viajar para o nordeste?",
+        "Quais as praias mais populares no Brasil?",
+      ],
     },
   ]);
   const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [dicaDoDia, setDicaDoDia] = useState("");
+
+  type Pacote = {
+    id: number;
+    destino: string;
+    imagemUrl: string;
+    valorTotal?: number;
+    titulo: string;
+    Categorias?: string[];
+  };
+
+
 
   const GEMINI_API_KEY = "AIzaSyA8j4dMHgq2WGXXvs1OTbqNbC6ElAXtq2o";
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-
-    const userMessage = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsTyping(true);
-
-    try {
-      const response = await axios.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-        {
-          contents: [
-            {
-              parts: [
-                {
-                  text: `
-              Você é AVA, a assistente virtual da agência de viagens Decola Tour. Seu objetivo é ajudar o usuário a:
-
-              - Descobrir destinos turísticos no Brasil e no mundo.
-              - Sugerir roteiros de viagem personalizados com base nos interesses do usuário (natureza, praias, cidades históricas, gastronomia etc).
-              - Falar sobre pacotes e experiências que a Decola Tour oferece.
-              - Encaminhar para um agente humano, se necessário.
-
-              Se o usuário fizer perguntas fora do tema de turismo e viagens, responda educadamente que seu foco é turismo.
-              REGRAS:
-              1. NUNCA diga que é uma IA ou chatbot.
-              2. NÃO use asteriscos ou formatações como texto em negrito.
-              3. NÃO envie mensagens muito longas. Seja objetiva e simpática.
-              4. NÃO sugira pacotes diretamente. Se perguntarem, diga:
-                "Temos várias opções incríveis! Vou te encaminhar para um atendente que pode te ajudar melhor com isso."
-              5. Você pode sugerir destinos, dar dicas de viagem, clima, época ideal, atrações e montar ideias de roteiro.
-
-              Responda sempre com simpatia, em português e em tom amigável.
-`.trim(),
-                },
-                {
-                  text: input,
-                },
-              ],
-            },
-          ],
-        },
-        {
-          headers: {
-            "x-goog-api-key": GEMINI_API_KEY,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const candidate = response.data.candidates?.[0];
-      const botText = candidate?.content?.parts?.[0]?.text;
-
-      const botReply = {
-        sender: "bot",
-        text: botText || "Desculpe, não consegui entender sua pergunta 😕",
-      };
-
-      setMessages((prev) => [...prev, botReply]);
-    } catch (error) {
-      const botError = {
-        sender: "bot",
-        text: "Desculpe, ocorreu um erro ao buscar sua resposta. Tente novamente mais tarde.",
-      };
-      setMessages((prev) => [...prev, botError]);
-    } finally {
-      setIsTyping(false);
+  useEffect(() => {
+    if (isOpen) {
+      const dica = dicas[Math.floor(Math.random() * dicas.length)];
+      setDicaDoDia(dica);
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
+const handleSend = async (userText: string) => {
+  const userMessage = { sender: "user", text: userText };
+  setMessages((prev) =>
+    prev.filter((msg) => msg.sender !== "botSuggestions").concat(userMessage)
+  );
+  setInput(""); 
+  setIsTyping(true);
+
+  try {
+    const categoriasPossiveis = [
+      "praia", "aventura", "cultura", "gastronomia", "natureza",
+      "romântico", "familiar", "história", "cidade", "lazer",
+      "nordeste", "sul", "serra", "internacional", "ecoturismo"
+    ];
+
+    const categoriasDetectadas = categoriasPossiveis.filter((categoria) =>
+      userText.toLowerCase().includes(categoria)
+    );
+
+    let pacotesTexto = "";
+    let pacotes: Pacote[] = [];
+
+    if (categoriasDetectadas.length > 0) {
+      const response = await axios.post("http://localhost:5295/api/pacote/buscar", {
+        Categorias: categoriasDetectadas,
+        origem: "",
+        destino: "",
+        dataIda: null,
+        dataVolta: null,
+        valorTotal: ""
+      });
+
+      pacotes = response.data || [];
+
+      pacotesTexto =
+        pacotes.length > 0
+          ? `Você mencionou: ${categoriasDetectadas.join(", ")}. Veja alguns pacotes que combinam:\n\n` +
+            pacotes
+              .slice(0, 5)
+              .map(
+                (p) =>
+                  `✈️ ${p.titulo}\n📍 ${p.destino}\n💰 R$ ${p.valorTotal?.toFixed(2) || "N/A"}`
+              )
+              .join("\n\n")
+          : `Você mencionou: ${categoriasDetectadas.join(", ")}, mas nenhum pacote foi encontrado com essas preferências.`;
+    }
+
+    const promptParts = [
+      {
+        text: `Você é TurIA, a assistente virtual da agência de viagens Decola Tour, especializada em turismo, seja gentil, educada, e não use * nas mensagens...
+${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
+      },
+      ...messages.map((msg) => ({
+        text: `${msg.sender === "user" ? "Usuário" : "TurIA"}: ${msg.text}`
+      })),
+      { text: `Usuário: ${userText}` },
+      { text: "TurIA:" },
+    ];
+
+    const responseIA = await axios.post(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        contents: [{ parts: promptParts }],
+      },
+      {
+        headers: {
+          "x-goog-api-key": GEMINI_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const candidate = responseIA.data.candidates?.[0];
+    const botText = candidate?.content?.parts?.[0]?.text || "Desculpe, não entendi.";
+
+    setMessages((prev) => [...prev, { sender: "bot", text: botText.trim() }]);
+  } catch (error) {
+    console.error("Erro:", error);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: "Erro ao se comunicar com o servidor." },
+    ]);
+  }
+
+  setIsTyping(false);
+};
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    handleSend(input);
   };
 
   return (
-    <div
-      className={`fixed bottom-5 right-5 z-50 flex flex-col transition-all duration-300 ease-in-out ${
-        isOpen ? "w-96 h-[520px] bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl" : ""
-      }`}
-      onClick={() => !isOpen && setIsOpen(true)}
-      aria-label="Chatbot AVA"
-      role="region"
-    >
+    <div className={`fixed bottom-5 right-5 z-50 ${isOpen ? "w-96 h-[520px]" : "w-14 h-14"} transition-all duration-300 bg-white/30 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg flex flex-col overflow-hidden`}>
       {!isOpen ? (
-        
-        <div className="w-20 h-20 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold text-lg shadow-xl cursor-pointer">
-          AVA
-        </div>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-gradient-to-br from-blue-600 to-blue-400 text-white text-2xl w-full h-full flex items-center justify-center rounded-full shadow-md hover:scale-105 transition"
+        >
+          TurIA
+        </button>
       ) : (
         <>
-          {/* CABEÇALHO */}
-          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-700 to-blue-400 rounded-t-2xl">
-            <h2 className="text-white font-bold text-lg select-none">AVA</h2>
+          <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-5 py-3 flex justify-between items-center rounded-t-2xl shadow-md">
+            <span className="font-bold text-lg select-none">TurIA</span>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white text-2xl material-symbols-rounded select-none"
-              aria-label="Fechar chatbot"
-              type="button"
+              className="text-white text-xl font-bold"
             >
-              expand_more
+              ×
             </button>
           </div>
 
-          {/* CORPO DA CONVERSA */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`max-w-[80%] px-5 py-3 rounded-2xl shadow-sm whitespace-pre-line break-words ${
-                  msg.sender === "bot"
-                    ? "bg-blue-50 text-blue-900 self-start border border-blue-200"
-                    : "bg-orange-50 text-orange-900 self-end border border-orange-300"
-                }`}
-                style={{ fontSize: "0.95rem", lineHeight: "1.4" }}
-              >
-                {msg.text}
-              </div>
-            ))}
-            {isTyping && (
-              <div
-                className="max-w-[80%] px-5 py-3 rounded-2xl shadow-sm bg-blue-50 text-blue-900 self-start italic border border-blue-200"
-                style={{ fontSize: "0.9rem" }}
-              >
-                Digitando...
-              </div>
+          {dicaDoDia && (
+            <div className="bg-yellow-100 text-yellow-900 px-4 py-2 text-sm font-medium border-b border-yellow-300">
+              {dicaDoDia}
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth">
+            {messages.map((msg, idx) =>
+              msg.sender === "botSuggestions" ? (
+                <div key={idx} className="bg-blue-100 text-blue-900 p-3 rounded-lg space-y-2">
+                  <div className="font-semibold">Sugestões:</div>
+                  <div className="flex flex-wrap gap-2">
+                    {msg.suggestions?.map((suggestion, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSend(suggestion)}
+                        className="bg-blue-200 hover:bg-blue-300 text-sm px-3 py-1 rounded-md transition"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={idx}
+                  className={`max-w-[80%] p-2 rounded-lg whitespace-pre-wrap break-words relative ${
+                    msg.sender === "bot"
+                      ? "bg-blue-100 text-blue-900 self-start animate-fadeIn shadow"
+                      : "bg-orange-100 text-orange-800 self-end ml-auto"
+                  }`}
+                  style={{ animationDuration: msg.sender === "bot" ? "0.5s" : undefined }}
+                >
+                  {msg.text}
+                </div>
+              )
             )}
+
+            {isTyping && <div className="text-sm text-gray-500 italic">Digitando...</div>}
+            <div ref={messagesEndRef} />
+
+ 
+                      
+          
           </div>
 
-          {/* INPUT DE MENSAGEM */}
           <form
             onSubmit={handleFormSubmit}
-            className="flex gap-3 p-4 bg-gray-50 border-t border-gray-200 rounded-b-2xl"
+            className="p-3 border-t border-gray-200 bg-gray-50 flex gap-2"
           >
             <input
               type="text"
               placeholder="Digite sua mensagem..."
-              className="flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              required
-              aria-label="Mensagem do usuário"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
             <button
               type="submit"
-              className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-300 rounded-lg text-white hover:from-orange-500 hover:to-orange-400 transition"
-              aria-label="Enviar mensagem"
+              className="bg-gradient-to-br from-orange-400 to-orange-300 text-white px-4 py-2 rounded-md shadow-md hover:from-orange-500 hover:to-orange-400 transition"
             >
-              <span className="material-symbols-rounded">arrow_upward</span>
+              ➤
             </button>
           </form>
         </>
       )}
+      <style>
+        {`
+          @keyframes fadeIn {
+            0% {opacity: 0; transform: translateY(10px);}
+            100% {opacity: 1; transform: translateY(0);}
+          }
+          .animate-fadeIn {
+            animation-name: fadeIn;
+            animation-fill-mode: forwards;
+          }
+        `}
+      </style>
     </div>
   );
 };

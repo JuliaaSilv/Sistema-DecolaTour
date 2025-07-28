@@ -36,8 +36,19 @@ namespace agencia.Data
                 .Property(p => p.FormaDePagamento)
                 .HasConversion<string>();
 
-                base.OnModelCreating(modelBuilder);
-                
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Pacote>()
+        .HasMany(p => p.Imagens)
+        .WithOne(i => i.Pacote)
+        .HasForeignKey(i => i.PacoteId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Pacote>()
+                .HasMany(p => p.Videos)
+                .WithOne(v => v.Pacote)
+                .HasForeignKey(v => v.PacoteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }
