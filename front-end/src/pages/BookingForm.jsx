@@ -18,6 +18,7 @@ const BookingForm = () => {
   const identifier = decodeURIComponent(id);
   const pacote = getPackage(identifier);
 
+
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -29,7 +30,11 @@ const BookingForm = () => {
     cep: '',
     dataViagem: '',
     numeroViajantes: 2,
-    observacoes: ''
+    observacoes: '',
+    viajantes: [
+      { nome: '', email: '', telefone: '' },
+      { nome: '', email: '', telefone: '' }
+    ]
   });
 
   const [errors, setErrors] = useState({});
@@ -59,11 +64,34 @@ const BookingForm = () => {
         .substring(0, 9);
     }
 
-    setFormData(prev => ({ ...prev, [name]: formattedValue }));
-    
+    // Se for número de viajantes, ajusta o array de viajantes
+    if (name === 'numeroViajantes') {
+      const num = parseInt(formattedValue, 10);
+      setFormData(prev => ({
+        ...prev,
+        numeroViajantes: num,
+        viajantes: Array.from({ length: num }, (_, i) => prev.viajantes[i] || { nome: '', email: '', telefone: '' })
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: formattedValue }));
+    }
     // Limpar erro quando o usuário começar a digitar
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Handler para campos dos viajantes
+  const handleViajanteChange = (index, field, value) => {
+    setFormData(prev => {
+      const updatedViajantes = prev.viajantes.map((v, i) =>
+        i === index ? { ...v, [field]: value } : v
+      );
+      return { ...prev, viajantes: updatedViajantes };
+    });
+    // Limpar erro do campo específico
+    if (errors[`viajante_${index}_${field}`]) {
+      setErrors(prev => ({ ...prev, [`viajante_${index}_${field}`]: '' }));
     }
   };
 
@@ -80,6 +108,14 @@ const BookingForm = () => {
     if (!formData.estado.trim()) newErrors.estado = 'Estado é obrigatório';
     if (!formData.cep.trim()) newErrors.cep = 'CEP é obrigatório';
     if (!formData.dataViagem) newErrors.dataViagem = 'Data da viagem é obrigatória';
+
+    // Validação dos viajantes
+    for (let i = 0; i < formData.numeroViajantes; i++) {
+      if (!formData.viajantes[i]?.nome?.trim()) newErrors[`viajante_${i}_nome`] = `Nome do viajante ${i + 1} é obrigatório`;
+      if (!formData.viajantes[i]?.email?.trim()) newErrors[`viajante_${i}_email`] = `Email do viajante ${i + 1} é obrigatório`;
+      else if (!/\S+@\S+\.\S+/.test(formData.viajantes[i].email)) newErrors[`viajante_${i}_email`] = `Email do viajante ${i + 1} inválido`;
+      if (!formData.viajantes[i]?.telefone?.trim()) newErrors[`viajante_${i}_telefone`] = `Telefone do viajante ${i + 1} é obrigatório`;
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -333,7 +369,6 @@ const BookingForm = () => {
                 <Calendar className="text-[#F28C38]" size={24} />
                 Detalhes da Viagem
               </h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -351,7 +386,6 @@ const BookingForm = () => {
                   />
                   {errors.dataViagem && <p className="text-red-500 text-sm mt-1">{errors.dataViagem}</p>}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Número de Viajantes
@@ -369,6 +403,56 @@ const BookingForm = () => {
                     ))}
                   </select>
                 </div>
+              </div>
+              {/* Formulário dos viajantes */}
+              <div className="mt-8">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Dados dos Viajantes</h4>
+                {formData.viajantes.map((viajante, idx) => (
+                  <div key={idx} className="mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50">
+                    <div className="font-medium text-[#F28C38] mb-2">Viajante {idx + 1}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Nome *</label>
+                        <input
+                          type="text"
+                          value={viajante.nome}
+                          onChange={e => handleViajanteChange(idx, 'nome', e.target.value)}
+                          className={`w-full p-3 border-2 rounded-xl transition-all duration-300 focus:ring-4 focus:ring-orange-100 ${
+                            errors[`viajante_${idx}_nome`] ? 'border-red-500' : 'border-gray-200 focus:border-[#F28C38]'
+                          }`}
+                          placeholder={`Nome do viajante ${idx + 1}`}
+                        />
+                        {errors[`viajante_${idx}_nome`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_nome`]}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                        <input
+                          type="email"
+                          value={viajante.email}
+                          onChange={e => handleViajanteChange(idx, 'email', e.target.value)}
+                          className={`w-full p-3 border-2 rounded-xl transition-all duration-300 focus:ring-4 focus:ring-orange-100 ${
+                            errors[`viajante_${idx}_email`] ? 'border-red-500' : 'border-gray-200 focus:border-[#F28C38]'
+                          }`}
+                          placeholder={`Email do viajante ${idx + 1}`}
+                        />
+                        {errors[`viajante_${idx}_email`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_email`]}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Telefone *</label>
+                        <input
+                          type="text"
+                          value={viajante.telefone}
+                          onChange={e => handleViajanteChange(idx, 'telefone', e.target.value)}
+                          className={`w-full p-3 border-2 rounded-xl transition-all duration-300 focus:ring-4 focus:ring-orange-100 ${
+                            errors[`viajante_${idx}_telefone`] ? 'border-red-500' : 'border-gray-200 focus:border-[#F28C38]'
+                          }`}
+                          placeholder={`Telefone do viajante ${idx + 1}`}
+                        />
+                        {errors[`viajante_${idx}_telefone`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_telefone`]}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
