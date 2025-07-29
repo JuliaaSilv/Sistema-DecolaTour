@@ -14,13 +14,19 @@ import BookingForm from "./pages/BookingForm.jsx";
 import BookingConfirmation from "./pages/BookingConfirmation.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
+
+
+
 import ChatbotPopup from "./components/chatbot/ChatbotPopup.jsx";
+import AccessibilityButton from "./components/accessibility/AccessibilityButton.jsx";
 
 
 function App() {
   return (
     <BrowserRouter>
       <ChatbotPopup />
+      {/* AccessibilityButton: left side, vertically centered, always visible */}
+      <AccessibilityButton />
       <Routes>
         {/* Páginas sem header/footer */}
         <Route path="/login" element={<Login />} />

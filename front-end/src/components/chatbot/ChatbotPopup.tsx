@@ -11,7 +11,7 @@ const dicas = [
 const ChatbotPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Olá! Eu sou a TurIA. Como posso te ajudar hoje?" },
+    { sender: "bot", text: "Olá! Eu sou o Theo. Como posso te ajudar hoje?" },
     {
       sender: "botSuggestions",
       suggestions: [
@@ -91,7 +91,7 @@ const handleSend = async (userText: string) => {
               .slice(0, 5)
               .map(
                 (p) =>
-                  `✈️ ${p.titulo}\n📍 ${p.destino}\n💰 R$ ${p.valorTotal?.toFixed(2) || "N/A"}`
+                  ` ${p.titulo}\n ${p.destino}\n R$ ${p.valorTotal?.toFixed(2) || "N/A"}`
               )
               .join("\n\n")
           : `Você mencionou: ${categoriasDetectadas.join(", ")}, mas nenhum pacote foi encontrado com essas preferências.`;
@@ -99,14 +99,14 @@ const handleSend = async (userText: string) => {
 
     const promptParts = [
       {
-        text: `Você é TurIA, a assistente virtual da agência de viagens Decola Tour, especializada em turismo, seja gentil, educada, e não use * nas mensagens...
+        text: `Você é o Theo, o assistente virtual da agência de viagens Decola Tour, especializada em turismo, seja gentil, educada, e não use * nas mensagens...
 ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
       },
       ...messages.map((msg) => ({
-        text: `${msg.sender === "user" ? "Usuário" : "TurIA"}: ${msg.text}`
+        text: `${msg.sender === "user" ? "Usuário" : "Theo"}: ${msg.text}`
       })),
       { text: `Usuário: ${userText}` },
-      { text: "TurIA:" },
+      { text: "Theo:" },
     ];
 
     const responseIA = await axios.post(
@@ -144,13 +144,47 @@ ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
   };
 
   return (
-    <div className={`fixed bottom-5 right-5 z-50 ${isOpen ? "w-96 h-[520px]" : "w-14 h-14"} transition-all duration-300 bg-white/30 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg flex flex-col overflow-hidden`}>
+    <div className={`fixed bottom-5 right-5 z-50 ${isOpen ? "w-96 h-[520px] bg-white/30 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg flex flex-col overflow-hidden" : ""}`}>
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-br from-blue-600 to-blue-400 text-white text-2xl w-full h-full flex items-center justify-center rounded-full shadow-md hover:scale-105 transition"
+          className="w-20 h-20 bg-blue-600 border-4 border-blue-700 rounded-full shadow-md flex items-center justify-center text-white text-3xl font-semibold hover:scale-105 transition focus:outline-none"
+          aria-label="Abrir chat Theo"
+          style={{ fontFamily: "'Inter', 'Poppins', 'Segoe UI', Arial, sans-serif" }}
         >
-          TurIA
+          <span className="flex items-end gap-[1px] select-none">
+            {['T','h','e','o'].map((char, i) => (
+              <span
+                key={i}
+                className="theo-glow-letter"
+                style={{
+                  animationDelay: `${i * 0.18}s`,
+                  fontFamily: "inherit"
+                }}
+              >
+                {char}
+              </span>
+            ))}
+          </span>
+          <style>{`
+            @keyframes theo-float {
+              0% { transform: translateY(0); }
+              20% { transform: translateY(-12px); }
+              40% { transform: translateY(0); }
+              100% { transform: translateY(0); }
+            }
+            @keyframes theo-glow {
+              0%, 100% { text-shadow: 0 0 0px #fff; }
+              50% { text-shadow: 0 0 8px #fff, 0 0 16px #3b82f6; }
+            }
+            .theo-glow-letter {
+              display: inline-block;
+              animation: theo-float 8.5s cubic-bezier(0.4,0,0.2,1) infinite, theo-glow 1.8s ease-in-out infinite;
+              will-change: transform, text-shadow;
+              font-size: 1.25rem;
+              letter-spacing: 0.04em;
+            }
+          `}</style>
         </button>
       ) : (
         <>

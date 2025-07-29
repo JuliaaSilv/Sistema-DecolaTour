@@ -1,3 +1,9 @@
+/* Destaque do bloco lido pelo leitor de tela */
+.sr-highlight {
+  background: #ffe600 !important;
+  color: #222 !important;
+  transition: background 0.2s, color 0.2s;
+}
 @import "tailwindcss";
 
 /* Configuração da fonte Standard CT EXT Medium (usando Inter como substituta) */
@@ -6,9 +12,52 @@
   font-weight: 500; /* Medium weight */
 }
 
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* High contrast mode for accessibility */
+.contrast-high, .contrast-high * {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+}
+
+.contrast-high a, .contrast-high button, .contrast-high input, .contrast-high select, .contrast-high textarea {
+  background-color: #111 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* High contrast yellow/black mode for accessibility */
+.contrast-yellow, .contrast-yellow * {
+  background-color: #000 !important;
+  color: #ffe600 !important;
+  border-color: #ffe600 !important;
+  box-shadow: none !important;
+}
+
+.contrast-yellow a, .contrast-yellow button, .contrast-yellow input, .contrast-yellow select, .contrast-yellow textarea {
+  background-color: #222 !important;
+  color: #ffe600 !important;
+  border-color: #ffe600 !important;
+}
+
+/* High contrast white/yellow mode for accessibility */
+.contrast-yellowwhite, .contrast-yellowwhite * {
+  background-color: #fff !important;
+  color: #ffe600 !important;
+  border-color: #ffe600 !important;
+  box-shadow: none !important;
+}
+
+.contrast-yellowwhite a, .contrast-yellowwhite button, .contrast-yellowwhite input, .contrast-yellowwhite select, .contrast-yellowwhite textarea {
+  background-color: #ffe600 !important;
+  color: #222 !important;
+  border-color: #ffe600 !important;
 }
