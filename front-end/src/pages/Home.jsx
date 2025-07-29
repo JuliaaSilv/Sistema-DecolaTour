@@ -18,13 +18,7 @@ export default function Home() {
 
   const fetchFeaturedPackages = async () => {
     try {
-      console.log('🔄 Tentando buscar dados do backend...');
-      
-      // TEMPORÁRIO: Força uso de dados mockados para debug
-      console.log('🧪 DEBUG: Forçando uso de dados mockados...');
-      setFeaturedPackages(getMockedPackages());
-      setIsLoading(false);
-      return;
+      console.log('🔄 Buscando dados do backend...');
       
       const response = await fetch('http://localhost:5295/api/Pacote');
       
@@ -48,161 +42,27 @@ export default function Home() {
             rating: 7.5 + Math.random() * 1.5,
             ofertaEspecial: index === data.length - 1,
             imagem: (pkg.imagens && pkg.imagens.length > 0) ? 
-                    `http://localhost:5295${pkg.imagens[0].url}` : 
-                    (pkg.imagemUrl ? `http://localhost:5295${pkg.imagemUrl}` : '/packages/default.jpg'),
+              pkg.imagens[0].url : 
+              '/packages/default.jpg',
+            href: `/package/${pkg.id}`,
             descricao: pkg.descricao
           }));
           
           setFeaturedPackages(adaptedPackages);
-          return;
+        } else {
+          console.log('⚠️ Nenhum pacote encontrado no backend');
+          setFeaturedPackages([]);
         }
+      } else {
+        console.error('❌ Erro na resposta do backend:', response.status);
+        setFeaturedPackages([]);
       }
-      
-      console.log('⚠️ Backend sem dados ou erro. Usando dados mockados...');
-      // Fallback para dados mockados
-      setFeaturedPackages(getMockedPackages());
-      
     } catch (error) {
-      console.error('❌ Erro ao carregar dados do backend:', error);
-      console.log('🔄 Carregando dados mockados como fallback...');
-      setFeaturedPackages(getMockedPackages());
+      console.error('❌ Erro ao buscar pacotes:', error);
+      setFeaturedPackages([]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Dados mockados como fallback
-  const getMockedPackages = () => {
-    return [
-      {
-        id: 'mock-1',
-        nome: 'Pacotes para Rio de Janeiro',
-        destino: 'Rio de Janeiro, RJ',
-        preco: 1092,
-        precoOriginal: 1310,
-        duracao: '10 DIAS / 9 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$318',
-        rating: 8.3,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-        descricao: 'Descubra a Cidade Maravilhosa com suas praias icônicas'
-      },
-      {
-        id: 'mock-2',
-        nome: 'Pacotes para Maceió',
-        destino: 'Maceió, AL',
-        preco: 2562,
-        precoOriginal: 3024,
-        duracao: '11 DIAS / 10 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$462',
-        rating: 8.5,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-        descricao: 'Praias paradisíacas com águas cristalinas'
-      },
-      {
-        id: 'mock-3',
-        nome: 'Pacotes para Natal',
-        destino: 'Natal, RN',
-        preco: 2506,
-        precoOriginal: 2898,
-        duracao: '10 DIAS / 9 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$392',
-        rating: 7.8,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-        descricao: 'Dunas, lagoas e praias deslumbrantes'
-      },
-      {
-        id: 'mock-4',
-        nome: 'Pacotes para São Paulo',
-        destino: 'São Paulo, SP',
-        preco: 545,
-        precoOriginal: null,
-        duracao: '4 DIAS / 3 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de Rio de Janeiro',
-        inclusions: 'Hotel + Aéreo',
-        economia: null,
-        rating: 8.4,
-        ofertaEspecial: true,
-        imagem: 'https://images.unsplash.com/photo-1541742126113-cc51c22f86a6?w=400',
-        descricao: 'A metrópole que nunca dorme'
-      },
-      {
-        id: 'mock-5',
-        nome: 'Pacotes para Florianópolis',
-        destino: 'Florianópolis, SC',
-        preco: 1890,
-        precoOriginal: 2150,
-        duracao: '7 DIAS / 6 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$260',
-        rating: 8.7,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400',
-        descricao: 'Ilha da Magia com praias paradisíacas'
-      },
-      {
-        id: 'mock-6',
-        nome: 'Pacotes para Salvador',
-        destino: 'Salvador, BA',
-        preco: 1650,
-        precoOriginal: 1890,
-        duracao: '8 DIAS / 7 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$240',
-        rating: 8.2,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=400',
-        descricao: 'História, cultura e praias incríveis'
-      },
-      {
-        id: 'mock-7',
-        nome: 'Pacotes para Fortaleza',
-        destino: 'Fortaleza, CE',
-        preco: 2100,
-        precoOriginal: 2400,
-        duracao: '9 DIAS / 8 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$300',
-        rating: 8.1,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-        descricao: 'Sol, praia e cultura nordestina'
-      },
-      {
-        id: 'mock-8',
-        nome: 'Pacotes para Gramado',
-        destino: 'Gramado, RS',
-        preco: 980,
-        precoOriginal: 1200,
-        duracao: '5 DIAS / 4 NOITES',
-        categoria: 'PACOTE',
-        origem: 'Saindo de São Paulo',
-        inclusions: 'Hotel + Aéreo',
-        economia: 'R$220',
-        rating: 9.1,
-        ofertaEspecial: false,
-        imagem: 'https://images.unsplash.com/photo-1570718561584-34de807b4527?w=400',
-        descricao: 'Charme europeu no sul do Brasil'
-      }
-    ];
   };
 
   // Função para lidar com a busca
@@ -288,7 +148,7 @@ export default function Home() {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           console.log('Erro na imagem:', pkg.imagem);
-                          e.target.src = 'https://via.placeholder.com/400x300/e5e5e5/999999?text=Sem+Imagem';
+                          e.target.style.display = 'none';
                         }}
                       />
                       <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
@@ -328,9 +188,18 @@ export default function Home() {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-8">
-                  <p className="text-red-500 text-lg">DEBUG: Nenhum pacote encontrado</p>
-                  <p className="text-gray-500">featuredPackages.length = {featuredPackages.length}</p>
+                <div className="col-span-full text-center py-12">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m16 0h-2M4 5h2" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    Nenhum pacote disponível
+                  </h3>
+                  <p className="text-gray-500">
+                    Não há pacotes cadastrados no momento. Tente novamente mais tarde.
+                  </p>
                 </div>
               )}
             </div>

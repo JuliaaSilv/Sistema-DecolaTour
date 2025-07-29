@@ -70,7 +70,7 @@ const ModernPackageCard = ({
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
             console.log('❌ Erro ao carregar imagem:', imagem);
-            e.target.src = 'https://via.placeholder.com/400x300/e5e5e5/999999?text=Imagem+Indisponível';
+            e.target.style.display = 'none';
           }}
           onLoad={() => {
             console.log('✅ Imagem carregada:', imagem);

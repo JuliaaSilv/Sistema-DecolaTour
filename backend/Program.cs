@@ -128,12 +128,24 @@ app.UseCors("AllowAll");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-     context.Database.EnsureDeleted(); // Use com cuidado
-     context.Database.EnsureCreated();
+    try 
+    {
+        context.Database.EnsureDeleted(); // Use com cuidado
+        context.Database.EnsureCreated();
 
-    // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
-    string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
-    context.Database.ExecuteSqlRaw(script);
+        // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir
+        if (!context.TiposUsuario.Any())
+        {
+            // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
+            string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
+            context.Database.ExecuteSqlRaw(script);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro na inicialização do banco: {ex.Message}");
+        Console.WriteLine($"Detalhes: {ex.InnerException?.Message}");
+    }
 }
 
 // Middleware padrão

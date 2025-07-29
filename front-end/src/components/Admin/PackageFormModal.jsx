@@ -7,22 +7,23 @@ import { estaLogado, obterTipoUsuario } from '../../api/auth';
 
 const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
   const [formData, setFormData] = useState({
-    titulo: editingPackage?.nome || '',
-    destino: editingPackage?.destino || '',
-    origem: editingPackage?.origem || '',
-    valorTotal: editingPackage?.preco || '',
-    descricao: editingPackage?.descricao || '',
-    categorias: editingPackage?.categoria || '2em1',
-    duracao: editingPackage?.duracao || 7,
-    dataDisponivel: editingPackage?.dataDisponivel || new Date().toISOString().split('T')[0],
-    quantidadeMaximaPessoas: editingPackage?.quantidadeMaximaPessoas || '',
-    imagens: [],
-    videos: [],
-    // Campos híbridos opcionais
-    hotelServices: editingPackage?.hotelServices || [],
-    politicas: editingPackage?.politicas || '',
-    overview: editingPackage?.overview || '',
-    highlights: editingPackage?.highlights || []
+      titulo: editingPackage?.nome || '',
+      destino: editingPackage?.destino || '',
+      origem: editingPackage?.origem || '',
+      valorTotal: editingPackage?.preco || '',
+      descricao: editingPackage?.descricao || '',
+      tipoPacote: editingPackage?.tipoPacote || 'nacional',
+      categorias: editingPackage?.categoria || '2em1',
+      duracao: editingPackage?.duracao || 7,
+      dataDisponivel: editingPackage?.dataDisponivel || new Date().toISOString().split('T')[0],
+      quantidadeMaximaPessoas: editingPackage?.quantidadeMaximaPessoas || '',
+      imagens: [],
+      videos: [],
+      // Campos híbridos opcionais
+      hotelServices: editingPackage?.hotelServices || [],
+      politicas: editingPackage?.politicas || '',
+      overview: editingPackage?.overview || '',
+      highlights: editingPackage?.highlights || []
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -150,6 +151,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       formDataToSend.append('ValorUnitario', parseFloat(formData.valorTotal)); // Mesmo valor por enquanto
       formDataToSend.append('Descricao', formData.descricao);
       formDataToSend.append('Categorias', formData.categorias);
+        formDataToSend.append('TipoPacote', formData.tipoPacote);
       formDataToSend.append('Duracao', parseInt(formData.duracao));
       formDataToSend.append('DataDisponivel', formData.dataDisponivel); // Backend deve aceitar YYYY-MM-DD
       formDataToSend.append('QuantidadeMaximaPessoas', parseInt(formData.quantidadeMaximaPessoas));
@@ -285,6 +287,21 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de Pacote *
+                </label>
+                <select
+                  name="tipoPacote"
+                  value={formData.tipoPacote}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="nacional">Nacional</option>
+                  <option value="internacional">Internacional</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Título do Pacote *
                 </label>
                 <input
@@ -342,21 +359,6 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
                 {errors.valorTotal && <p className="text-red-500 text-sm mt-1">{errors.valorTotal}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Categoria
-                </label>
-                <select
-                  name="categorias"
-                  value={formData.categorias}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="2em1">2 em 1</option>
-                  <option value="completo">Completo</option>
-                  <option value="internacional">Internacional</option>
-                </select>
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

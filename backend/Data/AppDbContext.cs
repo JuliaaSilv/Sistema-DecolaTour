@@ -16,6 +16,7 @@ namespace agencia.Data
         public DbSet<Viajante> Viajantes { get; set; }
 
         public DbSet<TipoDocumento> TipoDocumento { get; set; }
+        public DbSet<TipoUsuario> TiposUsuario { get; set; }
         public DbSet<Promocao> Promocoes { get; set; }
 
         public DbSet<ImagemPacote> ImagensPacote { get; set; }
