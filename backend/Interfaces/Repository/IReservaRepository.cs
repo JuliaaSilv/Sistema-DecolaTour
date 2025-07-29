@@ -1,4 +1,4 @@
-/* using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using agencia.Models;
@@ -11,10 +11,10 @@ namespace agencia.Interfaces.Repository
 
         Task<Reserva?> BuscarReservaPorIdAsync(int id);
 
-        Task<Reserva> CriarReservaAsync(Reserva reserva);
+        Task<Reserva?> CriarReservaAsync(Reserva reserva);
 
-        Task<bool> AtualizarStatusAsync(int reservaId, string novoStatus);
-        
-        Task<bool> DeletarReservaAsync(int id);
+        Task<bool?> AtualizarStatusAsync(int reservaId, string? novoStatus);
+
+        Task<bool?> DeletarReservaAsync(int id);
     }
-} */
+} 

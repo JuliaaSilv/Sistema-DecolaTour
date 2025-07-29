@@ -6,15 +6,15 @@ namespace agencia.Models
     public class Reserva
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
         [Required]
         [Column("NUMERO_RESERVA")]
-        public int NumeroReserva { get; set; } 
+        public int NumeroReserva { get; set; }
 
         [Required]
         [Column("DATA_RESERVA")]
-        public DateTime DataReserva { get; set; } 
+        public DateTime DataReserva { get; set; }
 
         [Required]
         [Column("STATUS")]
@@ -22,16 +22,18 @@ namespace agencia.Models
 
         [Required]
         [Column("VALOR_UNITARIO")]
-        public float ValorUnitario { get; set; } 
+        public float ValorUnitario { get; set; }
 
         [Required]
-        [ForeignKey("USUARIO_ID")]
-        public Usuario Usuario { get; set; } 
+        [Column("USUARIO_ID")]
+        public int UsuarioId { get; set; }
+        public Usuario? Usuario { get; set; }
 
         [Required]
-        [ForeignKey("PACOTE_ID")]
-        public Pacote Pacote { get; set; }
+        [Column("PACOTE_ID")]
+        public int PacoteId { get; set; }
+        public Pacote? Pacote { get; set; }
 
-        public List<Viajante> Viajantes { get; set; } 
+        public List<Viajante>? Viajantes { get; set; }
     }
 }

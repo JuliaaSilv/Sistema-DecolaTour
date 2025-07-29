@@ -27,7 +27,7 @@ namespace agencia.Controller
 
         [HttpPost("registrar")]
         [SwaggerOperation(Summary = "Registra um novo usuário")]
-        public async Task<ActionResult> Registrar(UsuarioDTO usuarioDTO)
+        public async Task<ActionResult> Registrar(CreateUsuarioDTO usuarioDTO)
         {
             if (usuarioDTO == null)
                 return BadRequest("Usuário não pode ser nulo.");

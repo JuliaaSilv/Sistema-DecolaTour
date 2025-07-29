@@ -13,7 +13,7 @@ namespace agencia.Interfaces.Services
 
         Task<ReservaDTO?> BuscarReservaPorIdAsync(int id);
 
-        Task<ApiResponse> CriarReservaAsync(ReservaDTO reservaDTO);
+        Task<ApiResponse> CriarReservaAsync(CreateReservaDTO reservaDTO);
 
         Task<ApiResponse> AtualizarStatusAsync(int reservaId, string novoStatus);
         

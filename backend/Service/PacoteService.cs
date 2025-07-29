@@ -2,6 +2,7 @@
 using agencia.Interfaces.Repository;
 using agencia.Interfaces.Services;
 using agencia.Models;
+using AutoMapper;
 
 namespace agencia.Service
 {
@@ -9,11 +10,13 @@ namespace agencia.Service
     {
         private readonly IPacoteRepository _repository;
         private readonly IWebHostEnvironment _env;
+        private readonly IMapper _mapper;
 
-        public PacoteService(IPacoteRepository repository, IWebHostEnvironment env)
+        public PacoteService(IPacoteRepository repository, IWebHostEnvironment env, IMapper mapper)
         {
             _repository = repository;
             _env = env;
+            _mapper = mapper;
         }
 
         public async Task<List<PacoteDTO>> ListarPacotesAsync()
@@ -93,6 +96,11 @@ namespace agencia.Service
             await _repository.AtualizarAsync(pacote);
         }
 
+        public async Task CadastrarSimplesAsync(CreatePacoteDTO dto)
+        {
+            var pacote = _mapper.Map<Pacote>(dto);
+            await _repository.CadastrarAsync(pacote);
+        }
 
         public async Task<List<PacoteDTO>> BuscarComFiltroAsync(FiltroPacoteDTO filtro)
         {

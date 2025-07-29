@@ -35,7 +35,7 @@ namespace agencia.Service
 
 
         //Register, criando usuário, juntamente com uma tratativa Response.
-        public async Task<ApiResponse> RegisterAsync(UsuarioDTO usuarioDTO)
+        public async Task<ApiResponse> RegisterAsync(CreateUsuarioDTO usuarioDTO)
         {
             if (string.IsNullOrWhiteSpace(usuarioDTO.Nome) ||
                 string.IsNullOrWhiteSpace(usuarioDTO.Email) ||
@@ -51,18 +51,14 @@ namespace agencia.Service
                 return new ApiResponse(null, new ErrorResponse("CPF já cadastrado."), 409);
             }
 
-           
             var usuario = _mapper.Map<Usuario>(usuarioDTO);
             usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioDTO.Senha);
             usuario.EmailConfirmado = false;
             usuario.TokenConfirmacaoEmail = Guid.NewGuid().ToString();
             usuario.ExpiracaoTokenConfirmacao = DateTime.UtcNow.AddHours(24);
 
-            
             await Repository.AddAsync(usuario);
 
-
-            
             var usuarioDTOResposta = _mapper.Map<UsuarioDTO>(usuario);
 
             return new ApiResponse(

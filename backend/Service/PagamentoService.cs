@@ -1,150 +1,105 @@
 using agencia.DTOs;
+using agencia.Interfaces.Services;
 using agencia.Models;
 using agencia.Interfaces.Repository;
-using agencia.Interfaces.Services;
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace agencia.Service
 {
     public class PagamentoService : IPagamentoService
     {
-        private IPagamentoRepository _pagamentoRepository { get; }
-        private IReservaService _reservaService { get; }
-        private IMapper _mapper { get; }
+        private readonly IPagamentoRepository _pagamentoRepository;
+        private readonly IReservaRepository _reservaRepository;
+        private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
-        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaService reservaService, IMapper mapper)
+        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaRepository reservaRepository, IMapper mapper, IEmailService emailService)
         {
             _pagamentoRepository = pagamentoRepository;
-            _reservaService = reservaService;
+            _reservaRepository = reservaRepository;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
-        // Cria um novo pagamento no sistema.
-        public async Task<Pagamento?> CriarPagamentoAsync(PagamentoDTO pagamentoDTO)
-        {
-            if (pagamentoDTO == null)
-                throw new Exception("Pagamento a ser criado inválido.");
-
-            try
-            {
-                var pagamento = _mapper.Map<Pagamento>(pagamentoDTO);
-                var pagamentoCriado = await _pagamentoRepository.CriarPagamentoAsync(pagamento);
-                return pagamentoCriado;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-        }
-
-        // Busca um pagamento específico pelo seu ID.
-        public async Task<Pagamento?> BuscarPagamentoPorIdAsync(int id)
+        public async Task<PagamentoDTO?> GetPagamentoByIdAsync(int id)
         {
             var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(id);
-            return pagamento == null ? null : pagamento;
+            if (pagamento == null) return null;
+            return _mapper.Map<PagamentoDTO>(pagamento);
         }
 
-        // Deleta um pagamento existente pelo seu ID.
-        public async Task DeletarPagamentoAsync(int idPagamento)
+        public async Task<List<PagamentoDTO>> GetPagamentosByReservaAsync(int reservaId)
         {
-            if (idPagamento <= 0)
-                throw new Exception("Id do pagamento informado é inválido.");
+            var pagamentos = await _pagamentoRepository.ListarPagamentosPorReservaAsync(reservaId);
+            return _mapper.Map<List<PagamentoDTO>>(pagamentos);
+        }
 
-            var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(idPagamento);
+        public async Task<List<PagamentoDTO>> GetAllPagamentosAsync()
+        {
+            var pagamentos = await _pagamentoRepository.ListarTodosPagamentosAsync();
+            return _mapper.Map<List<PagamentoDTO>>(pagamentos);
+        }
 
+        public async Task<Pagamento> CriarPagamentoAsync(PagamentoRequestDTO dto)
+        {
+            // Validação básica
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Dados do pagamento não informados.");
+
+            // Buscar a reserva usando o repositório de reservas
+            Reserva? reserva = null;
+            if (dto.ReservaId > 0)
+            {
+                reserva = await _reservaRepository.BuscarReservaPorIdAsync(dto.ReservaId);
+                if (reserva == null)
+                    throw new Exception("Reserva não encontrada para o pagamento.");
+
+                // Checagem: só permite pagamento se houver pelo menos um viajante associado
+                if (reserva.Viajantes == null || !reserva.Viajantes.Any())
+                    throw new Exception("Adicione pelo menos um viajante à reserva antes de realizar o pagamento.");
+            }
+
+            // Calcular valor total do pagamento
+            int quantidadeViajantes = reserva?.Viajantes?.Count ?? 1;
+            float valorTotal = (reserva?.ValorUnitario ?? 0) * quantidadeViajantes;
+
+            var pagamento = new Pagamento
+            {
+                Valor = valorTotal,
+                FormaDePagamento = Enum.Parse<FormaDePagamento>(dto.Metodo, true),
+                DataPagamento = DateTime.Now,
+                StatusPagamento = StatusPagamento.Pendente,
+                Reserva = reserva!
+            };
+
+            await _pagamentoRepository.CriarPagamentoAsync(pagamento);
+            var pagamentoDTO = _mapper.Map<PagamentoDTO>(pagamento);
+            if (!string.IsNullOrEmpty(dto.Email))
+                await _emailService.EnviarStatusPagamentoAsync(dto.Email, pagamentoDTO.StatusPagamento, pagamentoDTO);
+            return pagamento;
+        }
+
+        public async Task AtualizarStatusPagamentoAsync(string pagamentoId, string status)
+        {
+            // Buscar pagamento pelo ID
+            if (!int.TryParse(pagamentoId, out int id))
+                throw new ArgumentException("ID do pagamento inválido.");
+
+            var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(id);
             if (pagamento == null)
-                throw new Exception("Pagamento informado não existe.");
+                throw new Exception("Pagamento não encontrado.");
 
-            try
-            {
-                await _pagamentoRepository.DeletarPagamentoAsync(idPagamento);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao deletar pagamento. Detalhe: " + ex.Message);
-            }
-        }
+            // Atualizar status
+            if (!Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
+                throw new Exception("Status de pagamento inválido.");
 
-        // Lista todos os pagamentos para uma determinada reserva.
-        public async Task<IEnumerable<Pagamento>> ListarPagamentosAsync(int idReserva)
-        {
-            if (idReserva <= 0)
-                throw new Exception("Id da reserva informada é inválido.");
+            pagamento.StatusPagamento = novoStatus;
+            await _pagamentoRepository.AtualizaPagamentoAsync(pagamento);
 
-            var reserva = await _reservaService.BuscarReservaPorIdAsync(idReserva);
-            if (reserva == null)
-                throw new Exception("Reserva não encontrada.");
-
-            try
-            {
-                var pagamentos = await _pagamentoRepository.ListarPagamentosAsync(idReserva);
-
-                if (pagamentos == null || !pagamentos.Any())
-                    return Enumerable.Empty<Pagamento>();
-
-                return _mapper.Map<IEnumerable<Pagamento>>(pagamentos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao listar pagamentos da reserva. Detalhe: " + ex.Message);
-            }
-        }
-
-        public async Task AtualizarStatusDaReservaPeloPagamentoAsync(int pagamentoId, string novoStatus)
-        {
-            if (pagamentoId <= 0)
-                throw new Exception("Id do pagamento informado é inválido.");
-
-            var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(pagamentoId);
-            if (pagamento == null)
-                throw new Exception("Pagamento informado não encontrado.");
-
-            var response = await _reservaService.AtualizarStatusAsync(pagamento.Reserva.Id, novoStatus);
-
-            if (response.Error != null)
-                throw new Exception(response.Error.Message);
-
-        }
-
-        public async Task<Pagamento?> AtualizaPagamentoAsync(PagamentoDTO pagamentoDTO)
-        {
-            if (pagamentoDTO == null)
-                throw new Exception("Pagamento a ser atualizado inválido.");
-
-            try
-            {
-                var pagamento = _mapper.Map<Pagamento>(pagamentoDTO);
-                var pagamentoAtualizado = await _pagamentoRepository.AtualizaPagamentoAsync(pagamento);
-
-                switch (pagamentoAtualizado.StatusPagamento)
-                {
-
-                    case StatusPagamento.Pendente:
-                        await AtualizarStatusDaReservaPeloPagamentoAsync(pagamentoAtualizado.Id, StatusReseva.Pendente.ToString());
-                        break;
-
-                    case StatusPagamento.Aprovado:
-                        await AtualizarStatusDaReservaPeloPagamentoAsync(pagamentoAtualizado.Id, StatusReseva.Confirmada.ToString());
-                        break;
-
-                    case StatusPagamento.Rejeitado:
-                        await AtualizarStatusDaReservaPeloPagamentoAsync(pagamentoAtualizado.Id, StatusReseva.Pendente.ToString());
-                        break;
-
-                    case StatusPagamento.Cancelado:
-                        await AtualizarStatusDaReservaPeloPagamentoAsync(pagamentoAtualizado.Id, StatusReseva.Cancelada.ToString());
-                        break;
-
-                }
-
-
-                return pagamentoAtualizado;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            // Se desejar, envie e-mail de notificação
+            // if (pagamento.Reserva != null && !string.IsNullOrEmpty(pagamento.Reserva.Email))
+            //     await _emailService.EnviarStatusPagamentoAsync(pagamento.Reserva.Email, status, pagamento);
         }
     }
 }

@@ -1,4 +1,4 @@
-/* using agencia.DTOs;
+using agencia.DTOs;
 using agencia.Models;
 using agencia.Response;
 using agencia.Interfaces.Repository;
@@ -22,21 +22,29 @@ namespace agencia.Service
         public async Task<IEnumerable<ReservaDTO>> ListarReservasAsync()
         {
             var reservas = await _reservaRepository.ListarReservasAsync();
-            return _mapper.Map<IEnumerable<ReservaDTO>>(reservas);
+            var reservaDTOs = _mapper.Map<List<ReservaDTO>>(reservas);
+            for (int i = 0; i < reservaDTOs.Count; i++)
+            {
+                reservaDTOs[i].QuantidadeViajantes = reservas.ElementAt(i).Viajantes?.Count ?? 0;
+            }
+            return reservaDTOs;
         }
 
         // Busca uma reserva específica pelo seu ID.
         public async Task<ReservaDTO?> BuscarReservaPorIdAsync(int id)
         {
             var reserva = await _reservaRepository.BuscarReservaPorIdAsync(id);
-            return reserva == null ? null : _mapper.Map<ReservaDTO>(reserva);
+            if (reserva == null) return null;
+            var dto = _mapper.Map<ReservaDTO>(reserva);
+            dto.QuantidadeViajantes = reserva.Viajantes?.Count ?? 0;
+            return dto;
         }
 
         // Cria uma nova reserva no sistema, com tratativa de resposta padronizada.
-        public async Task<ApiResponse> CriarReservaAsync(ReservaDTO reservaDTO)
+        public async Task<ApiResponse> CriarReservaAsync(CreateReservaDTO reservaDTO)
         {
             if (reservaDTO == null)
-                return new ApiResponse(null, new ErrorResponse("Dados da reserva não informados!"), 400);
+                return new ApiResponse(new { }, new ErrorResponse("Dados da reserva não informados!"), 400);
 
             var reserva = _mapper.Map<Reserva>(reservaDTO);
             reserva.NumeroReserva = new Random().Next(100000, 999999);
@@ -45,6 +53,7 @@ namespace agencia.Service
 
             var reservaCriada = await _reservaRepository.CriarReservaAsync(reserva);
             var reservaCriadaDTO = _mapper.Map<ReservaDTO>(reservaCriada);
+            reservaCriadaDTO.QuantidadeViajantes = reservaCriada?.Viajantes != null ? reservaCriada.Viajantes.Count : 0;
 
             return new ApiResponse(
                 new { Mensagem = "Reserva criada com sucesso", Reserva = reservaCriadaDTO },
@@ -58,10 +67,10 @@ namespace agencia.Service
         {
             var reserva = await _reservaRepository.BuscarReservaPorIdAsync(reservaId);
             if (reserva == null)
-                return new ApiResponse(null, new ErrorResponse("Reserva não encontrada."), 404);
+                return new ApiResponse(new { }, new ErrorResponse("Reserva não encontrada."), 404);
 
             if (!System.Enum.TryParse(typeof(StatusReseva), novoStatus, true, out var statusEnum))
-                return new ApiResponse(null, new ErrorResponse("Status inválido."), 400);
+                return new ApiResponse(new { }, new ErrorResponse("Status inválido."), 400);
 
             reserva.Status = novoStatus;
             await _reservaRepository.AtualizarStatusAsync(reservaId, novoStatus);
@@ -78,11 +87,12 @@ namespace agencia.Service
         {
             var reserva = await _reservaRepository.BuscarReservaPorIdAsync(id);
             if (reserva == null)
-                return new ApiResponse(null, new ErrorResponse("Reserva não encontrada."), 404);
+                return new ApiResponse(new { }, new ErrorResponse("Reserva não encontrada."), 404);
+
 
             var sucesso = await _reservaRepository.DeletarReservaAsync(id);
-            if (!sucesso)
-                return new ApiResponse(null, new ErrorResponse("Erro ao deletar reserva."), 500);
+            if (sucesso != true)
+                return new ApiResponse(new { }, new ErrorResponse("Erro ao deletar reserva."), 500);
 
             return new ApiResponse(
                 new { Mensagem = "Reserva deletada com sucesso" },
@@ -91,4 +101,4 @@ namespace agencia.Service
             );
         }
     }
-} */
+} 

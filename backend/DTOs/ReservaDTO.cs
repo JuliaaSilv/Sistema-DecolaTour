@@ -20,5 +20,9 @@ namespace agencia.DTOs
         public int UsuarioId { get; set; }
 
         public int PacoteId { get; set; }
+
+        public int QuantidadeViajantes { get; set; }
+
+        public decimal ValorTotal => ValorUnitario * QuantidadeViajantes;
     }
 }

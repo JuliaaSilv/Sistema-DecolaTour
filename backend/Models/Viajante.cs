@@ -23,9 +23,7 @@ namespace agencia.Models
 
         [Required]
         [Column("ID_RESERVA")]
-        public int IdReserva { get; set; }
-      
-        [ForeignKey("ID_RESERVA")]
-        public Reserva Reserva { get; set; } 
+        public int ReservaId { get; set; }
+        public Reserva? Reserva { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace agencia.Interfaces.Services
         Task<List<PacoteDTO>> BuscarComFiltroAsync(FiltroPacoteDTO filtro);
         Task AtualizarAsync(int id, PacoteUploadDTO dto);
         Task RemoverAsync(int id);
+        Task CadastrarSimplesAsync(CreatePacoteDTO dto);
     }
 }

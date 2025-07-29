@@ -1,11 +1,11 @@
- using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using agencia.Response;
 using agencia.Service;
-using agencia.Interfaces.Services; 
-using agencia.DTOs;               
+using agencia.Interfaces.Services;
+using agencia.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,10 +23,11 @@ namespace agencia.Controller
             ReservaService = reservaService;
             PacoteService = pacoteService;
         }
-        
+
         /// Cria uma nova reserva.
         [HttpPost]
-        public async Task<ActionResult> CriarReserva([FromBody] ReservaDTO reservaDTO)
+        [Authorize(Roles = "1,2")]
+        public async Task<ActionResult> CriarReserva([FromBody] CreateReservaDTO reservaDTO)
         {
             if (reservaDTO == null)
                 return BadRequest(new ApiResponse(null, new ErrorResponse("Dados da reserva não informados!"), 400));
@@ -39,10 +40,10 @@ namespace agencia.Controller
             return StatusCode(response.StatusCode, response.Data);
         }
 
-      
+
         /// Lista todas as reservas do sistema (apenas para administradores).
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult> ListarReservas()
         {
             var reservas = await ReservaService.ListarReservasAsync();
@@ -52,10 +53,10 @@ namespace agencia.Controller
             return Ok(new ApiResponse(reservas, null, 200));
         }
 
-       
+
         /// Busca uma reserva específica pelo ID (apenas para administradores).
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult> BuscarReservaPorId(int id)
         {
             var reserva = await ReservaService.BuscarReservaPorIdAsync(id);
@@ -65,10 +66,10 @@ namespace agencia.Controller
             return Ok(new ApiResponse(reserva, null, 200));
         }
 
-        
+
         /// Atualiza o status de uma reserva (apenas para administradores).
         [HttpPatch("{id}/status")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult> AtualizarStatus(int id, [FromBody] AtualizarStatusReservaDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.NovoStatus))
@@ -83,7 +84,7 @@ namespace agencia.Controller
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult> DeletarReserva(int id)
         {
             var response = await ReservaService.DeletarReservaAsync(id);
@@ -92,6 +93,6 @@ namespace agencia.Controller
 
             return Ok(response);
         }
-      
+
     }
-} 
+}

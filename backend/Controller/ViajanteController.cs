@@ -1,5 +1,5 @@
-using agencia.Models;
-using agencia.Services;
+using agencia.DTOs;
+using agencia.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -7,49 +7,71 @@ namespace agencia.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Controller responsável pelos endpoints de Viajante (CRUD).
+    /// </summary>
     public class ViajanteController : ControllerBase
     {
-        private readonly ViajanteService _service;
+        private readonly IViajanteService _service;
 
-        public ViajanteController(ViajanteService service)
+        /// <summary>
+        /// Injeta o serviço de viajante.
+        /// </summary>
+        public ViajanteController(IViajanteService service)
         {
             _service = service;
         }
 
         [HttpGet]
+        /// <summary>
+        /// Retorna todos os viajantes cadastrados.
+        /// </summary>
         public async Task<IActionResult> GetAll()
         {
-            var viajantes = await _service.ListarTodosAsync();
+            var viajantes = await _service.GetAllAsync();
             return Ok(viajantes);
         }
 
         [HttpGet("{id}")]
+        /// <summary>
+        /// Busca um viajante pelo ID.
+        /// </summary>
         public async Task<IActionResult> GetById(int id)
         {
-            var viajante = await _service.BuscarPorIdAsync(id);
+            var viajante = await _service.GetByIdAsync(id);
             if (viajante == null) return NotFound();
             return Ok(viajante);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Viajante viajante)
+        /// <summary>
+        /// Cria um novo viajante.
+        /// </summary>
+        public async Task<IActionResult> Create([FromBody] ViajanteDTO viajanteDTO)
         {
-            await _service.AdicionarAsync(viajante);
-            return CreatedAtAction(nameof(GetById), new { id = viajante.Id }, viajante);
+            await _service.AddAsync(viajanteDTO);
+            return CreatedAtAction(nameof(GetById), new { id = viajanteDTO.Id }, viajanteDTO);
         }
         [HttpPut("{id}")]
-public async Task<IActionResult> Update(int id, [FromBody] Viajante viajante)
-{
-    if (id != viajante.Id) return BadRequest();
-    await _service.AtualizarAsync(viajante);
-    return NoContent();
-}
+        /// <summary>
+        /// Atualiza um viajante existente.
+        /// </summary>
+        public async Task<IActionResult> Update(int id, [FromBody] ViajanteDTO viajanteDTO)
+        {
+            viajanteDTO.Id = id;
+            await _service.UpdateAsync(viajanteDTO);
+            return NoContent();
+        }
 
-[HttpDelete("{id}")]
-public async Task<IActionResult> Delete(int id)
-{
-    await _service.RemoverAsync(id);
-    return NoContent();
-}
+
+        [HttpDelete("{id}")]
+        /// <summary>
+        /// Remove um viajante pelo ID.
+        /// </summary>
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _service.DeleteAsync(id);
+            return NoContent();
+        }
     }
 }

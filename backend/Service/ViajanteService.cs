@@ -1,32 +1,72 @@
 using agencia.Models;
-using agencia.Repositories;
+using agencia.Interfaces.Repository;
+using agencia.Interfaces.Services;
+using agencia.DTOs;
+using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace agencia.Services
+namespace agencia.Service
 {
-    public class ViajanteService
+    /// <summary>
+    /// Serviço de regras de negócio para Viajante, faz ponte entre controller e repositório.
+    /// </summary>
+    public class ViajanteService : IViajanteService
     {
-        private readonly ViajanteRepository _repository;
+        private readonly IViajanteRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ViajanteService(ViajanteRepository repository)
+        /// <summary>
+        /// Injeta o repositório de viajante e o AutoMapper.
+        /// </summary>
+        public ViajanteService(IViajanteRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task<List<Viajante>> ListarTodosAsync() => _repository.GetAllAsync();
-
-        public Task<Viajante?> BuscarPorIdAsync(int id) => _repository.GetByIdAsync(id);
-
-        public Task AdicionarAsync(Viajante viajante) => _repository.AddAsync(viajante);
-        public async Task AtualizarAsync(Viajante viajante)
+        /// <summary>
+        /// Retorna todos os viajantes como DTO.
+        /// </summary>
+        public async Task<IEnumerable<ViajanteDTO>> GetAllAsync()
         {
+            var viajantes = await _repository.GetAllAsync();
+            return _mapper.Map<IEnumerable<ViajanteDTO>>(viajantes);
+        }
+
+        /// <summary>
+        /// Busca um viajante por ID e retorna como DTO.
+        /// </summary>
+        public async Task<ViajanteDTO?> GetByIdAsync(int id)
+        {
+            var viajante = await _repository.GetByIdAsync(id);
+            return viajante == null ? null : _mapper.Map<ViajanteDTO>(viajante);
+        }
+
+        /// <summary>
+        /// Adiciona um novo viajante a partir do DTO.
+        /// </summary>
+        public async Task AddAsync(ViajanteDTO viajanteDTO)
+        {
+            var viajante = _mapper.Map<Viajante>(viajanteDTO);
+            await _repository.AddAsync(viajante);
+        }
+
+        /// <summary>
+        /// Atualiza um viajante existente a partir do DTO.
+        /// </summary>
+        public async Task UpdateAsync(ViajanteDTO viajanteDTO)
+        {
+            var viajante = _mapper.Map<Viajante>(viajanteDTO);
             await _repository.UpdateAsync(viajante);
         }
 
-        public async Task RemoverAsync(int id)
+        /// <summary>
+        /// Remove um viajante pelo ID.
+        /// </summary>
+        public async Task DeleteAsync(int id)
         {
-             await _repository.DeleteAsync(id);
+            await _repository.DeleteAsync(id);
         }
     }
 }

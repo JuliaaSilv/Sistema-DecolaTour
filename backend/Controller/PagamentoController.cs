@@ -1,106 +1,73 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using agencia.DTOs;
 using agencia.Interfaces.Services;
-using agencia.Response;
-using agencia.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using AutoMapper;
 
-public interface IPagamentoController
+namespace agencia.Controller
 {
-    Task<ActionResult> BuscarPagamentoPorId(int id);
-    Task<ActionResult> CriarPagamento(PagamentoDTO pagamentoDTO);
-    
-}
-
-[ApiController]
-[Route("api/[controller]")]
-public class PagamentoController : ControllerBase, IPagamentoController
-{
-    private readonly IPagamentoService _pagamentoService;
-
-    private IMapper _mapper { get; }
-
-    public PagamentoController(IPagamentoService pagamentoService, IMapper mapper)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PagamentoController : ControllerBase
     {
-        _pagamentoService = pagamentoService;
-        _mapper = mapper;
-    }
+        private readonly IPagamentoService _pagamentoService;
+        private readonly IMapper _mapper;
 
-    /// <summary>
-    /// Cria um novo pagamento.
-    /// </summary>
-    [HttpPost]
-    [Authorize(Roles = "1,2")]
-    public async Task<ActionResult> CriarPagamento([FromBody] PagamentoDTO pagamentoDTO)
-    {
-        if (pagamentoDTO == null)
-            return BadRequest(new ApiResponse(null, new ErrorResponse("Dados do pagamento não informados."), 400));
-
-        try
+        public PagamentoController(IPagamentoService pagamentoService, IMapper mapper)
         {
-            var pagamentoCriado = await _pagamentoService.CriarPagamentoAsync(pagamentoDTO);
-
-            return StatusCode(201, _mapper.Map<PagamentoDTO>(pagamentoCriado));
-            
+            _pagamentoService = pagamentoService;
+            _mapper = mapper;
         }
-        catch (Exception ex)
+
+        /// Busca um pagamento por ID
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPagamentoById(int id)
         {
-            return StatusCode(500, new ApiResponse(null, new ErrorResponse("Erro ao criar pagamento: " + ex.Message), 500));
+            var pagamento = await _pagamentoService.GetPagamentoByIdAsync(id);
+            if (pagamento == null) return NotFound();
+            return Ok(pagamento);
         }
-    }
 
-    /// <summary>
-    /// Busca um pagamento específico pelo ID.
-    /// </summary>
-    [HttpGet("{id}")]
-    [Authorize(Roles = "1,2")]
-    public async Task<ActionResult> BuscarPagamentoPorId(int id)
-    {
-        var pagamento = await _pagamentoService.BuscarPagamentoPorIdAsync(id);
-        if (pagamento == null)
-            return NotFound(new ApiResponse(null, new ErrorResponse("Pagamento não encontrado."), 404));
+        /// Lista todos os pagamentos de uma reserva
+        [HttpGet("reserva/{reservaId}")]
+        public async Task<IActionResult> GetPagamentosByReserva(int reservaId)
+        {
+            var pagamentos = await _pagamentoService.GetPagamentosByReservaAsync(reservaId);
+            return Ok(pagamentos);
+        }
 
-        return Ok(new ApiResponse(pagamento, null, 200));
-    }
- /*
-    [HttpGet("{idReserva}/reserva")]
-    [Authorize(Roles = "1,2")]
-    public async Task<ActionResult> BuscarPagamentoDaReserva(int idReserva)
-    {
-        var pagamento = await _pagamentoService.BuscarPagamentoPorIdAsync(idReserva);
-        if (pagamento == null)
-            return NotFound(new ApiResponse(null, new ErrorResponse("Pagamento não encontrado."), 404));
+        /// Lista todos os pagamentos
+        [HttpGet]
+        public async Task<IActionResult> GetAllPagamentos()
+        {
+            var pagamentos = await _pagamentoService.GetAllPagamentosAsync();
+            return Ok(pagamentos);
+        }
 
-        return Ok(new ApiResponse(pagamento, null, 200));
-    }
-*/
-    [HttpPut("{id}")]
-    [Authorize(Roles = "1,2")]
-    public async Task<ActionResult> AtualizarPagamento(int id, [FromBody] PagamentoDTO pagamentoDTO)
-    {
-        if (pagamentoDTO == null || id <= 0)
-            return BadRequest(new ApiResponse(null, new ErrorResponse("Dados inválidos."), 400));
+        /// Cria um novo pagamento.
+        [HttpPost]
+        public async Task<IActionResult> CriarPagamento([FromBody] PagamentoRequestDTO dto)
+        {
+            try
+            {
+                var pagamento = await _pagamentoService.CriarPagamentoAsync(dto);
+                // Mapeia para DTO para evitar ciclo de serialização
+                var pagamentoDTO = _mapper.Map<PagamentoDTO>(pagamento);
+                return Ok(pagamentoDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { erro = ex.Message });
+            }
+        }
 
-        var pagamentoAtualizado = await _pagamentoService.AtualizaPagamentoAsync(pagamentoDTO);
-        if (pagamentoAtualizado == null)
-            return NotFound(new ApiResponse(null, new ErrorResponse("Pagamento não encontrado ou não foi possível atualizar."), 404));
-
-        return Ok(new ApiResponse(pagamentoAtualizado, null, 200));
-    }
-
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "1,2")]
-    public async Task<ActionResult> DeletarPagamento(int id)
-    {
-        if (id <= 0)
-            return BadRequest(new ApiResponse(null, new ErrorResponse("ID inválido."), 400));
-
-        var pagamento = await _pagamentoService.BuscarPagamentoPorIdAsync(id);
-        if (pagamento == null)
-            return NotFound(new ApiResponse(null, new ErrorResponse("Pagamento não encontrado."), 404));
-
-        await _pagamentoService.DeletarPagamentoAsync(id);
-        return Ok(new ApiResponse("Pagamento deletado com sucesso.", null, 200));
+        [HttpPost("webhook")]
+        public async Task<IActionResult> Webhook([FromBody] dynamic data)
+        {
+            string pagamentoId = data.data.id;
+            string status = data.data.status;
+            await _pagamentoService.AtualizarStatusPagamentoAsync(pagamentoId, status);
+            return Ok();
+        }
     }
 }

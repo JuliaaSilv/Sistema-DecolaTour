@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using agencia.Data;
 
 public class Repository<T> : IRepository<T> where T : class
 {
-    protected readonly DbContext _context;
+    protected readonly AppDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public Repository(DbContext context)
+    public Repository(AppDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();

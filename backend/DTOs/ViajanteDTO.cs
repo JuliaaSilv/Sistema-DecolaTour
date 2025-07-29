@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace agencia.DTOs
 {
+    /// <summary>
+    /// DTO para transferência de dados de Viajante entre camadas.
+    /// </summary>
     public class ViajanteDTO
     {
         public int Id { get; set; }

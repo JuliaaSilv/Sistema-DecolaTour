@@ -16,7 +16,7 @@ public class PacoteController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Lista todos os pacotes disponíveis")]
+    [SwaggerOperation(Summary = "Lista todos os pacotes disponï¿½veis")]
     public async Task<IActionResult> Listar()
     {
         var pacotes = await _service.ListarPacotesAsync();
@@ -31,12 +31,12 @@ public class PacoteController : ControllerBase
         return pacote == null ? NotFound() : Ok(pacote);
     }
 
-    [HttpPost]
+    [HttpPost("cadastrar-simples")]
     [Authorize(Roles = "1")]
-    [SwaggerOperation(Summary = "Cadastra um novo pacote")]
-    public async Task<IActionResult> Cadastrar([FromForm] PacoteUploadDTO dto)
+    [SwaggerOperation(Summary = "Cadastra um novo pacote (dados simples)")]
+    public async Task<IActionResult> CadastrarSimples([FromBody] CreatePacoteDTO dto)
     {
-        await _service.CadastrarAsync(dto);
+        await _service.CadastrarSimplesAsync(dto);
         return Ok("Pacote cadastrado com sucesso!");
     }
 

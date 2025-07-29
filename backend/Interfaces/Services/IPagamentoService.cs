@@ -1,25 +1,19 @@
 using agencia.DTOs;
 using agencia.Models;
-using agencia.Response;
-
-
+using System.Threading.Tasks;
 
 namespace agencia.Interfaces.Services
 {
-
     public interface IPagamentoService
     {
+        Task<Pagamento> CriarPagamentoAsync(PagamentoRequestDTO dto);
 
-        Task<Pagamento?> BuscarPagamentoPorIdAsync(int id);
+        Task AtualizarStatusPagamentoAsync(string pagamentoId, string status);
 
-        Task<Pagamento?> CriarPagamentoAsync(PagamentoDTO pagamentoDTO);
+        Task<PagamentoDTO?> GetPagamentoByIdAsync(int id);
 
-        Task<Pagamento?>AtualizaPagamentoAsync(PagamentoDTO pagamentoDTO);
+        Task<List<PagamentoDTO>> GetPagamentosByReservaAsync(int reservaId);
 
-        Task DeletarPagamentoAsync(int id);
-
-        Task<IEnumerable<Pagamento>> ListarPagamentosAsync(int idReserva);
-
-        Task AtualizarStatusDaReservaPeloPagamentoAsync(int pagamentoId, string novoStatus);
+        Task<List<PagamentoDTO>> GetAllPagamentosAsync();
     }
 }

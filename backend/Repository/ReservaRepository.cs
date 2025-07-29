@@ -1,4 +1,4 @@
-/* using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,23 +54,23 @@ namespace agencia.Repository
 
  
         /// Atualiza o status de uma reserva existente.
-        public async Task<bool> AtualizarStatusAsync(int reservaId, string novoStatus)
+        public async Task<bool?> AtualizarStatusAsync(int reservaId, string? novoStatus)
         {
             var reserva = await _context.Reservas.FindAsync(reservaId);
-            if (reserva == null) return false;
-            reserva.Status = novoStatus;
+            if (reserva == null) return null;
+            reserva.Status = novoStatus ?? reserva.Status;
             _context.Reservas.Update(reserva);
             return await _context.SaveChangesAsync() > 0;
         }
 
 
         /// Deleta uma reserva pelo ID.
-        public async Task<bool> DeletarReservaAsync(int id)
+        public async Task<bool?> DeletarReservaAsync(int id)
         {
             var reserva = await _context.Reservas.FindAsync(id);
-            if (reserva == null) return false;
+            if (reserva == null) return null;
             _context.Reservas.Remove(reserva);
             return await _context.SaveChangesAsync() > 0;
         }
     }
-} */
+} 
