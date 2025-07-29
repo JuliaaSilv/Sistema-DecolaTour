@@ -13,7 +13,7 @@ import Button from './Button';
 
 import { useNavigate } from 'react-router-dom';
 
-const DestinationCard = ({ id, nome, imagem, preco }) => {
+const DestinationCard = ({ nome, imagem, preco }) => {
   const navigate = useNavigate();
   return (
     <article className="group bg-white/95 backdrop-blur-sm w-full max-w-[280px] sm:max-w-[320px] md:max-w-[350px] lg:max-w-[300px] xl:max-w-[320px] 2xl:max-w-[360px] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] lg:hover:scale-105 overflow-hidden border border-white/30">
@@ -52,7 +52,7 @@ const DestinationCard = ({ id, nome, imagem, preco }) => {
             variant="primary" 
             size="medium" 
             className="w-full sm:w-auto md:w-full lg:w-auto text-xs sm:text-sm md:text-base lg:text-sm xl:text-base px-3 sm:px-4 md:px-6 lg:px-4 xl:px-6 py-2 sm:py-2.5 md:py-3 lg:py-2 xl:py-2.5 rounded-lg font-semibold transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white"
-            onClick={() => navigate(`/packages/${id}`)}
+            onClick={() => navigate(`/packages/${encodeURIComponent(nome)}`)}
           >
             VER MAIS
           </Button>

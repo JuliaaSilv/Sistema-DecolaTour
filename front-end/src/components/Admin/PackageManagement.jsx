@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Plus, Search, Edit, Trash2, Eye, Filter, Download } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import PackageFormModal from './PackageFormModal';
 
 // Dados mockados - substituir por dados reais da API
 const mockPackages = [
@@ -43,15 +44,98 @@ const mockPackages = [
 ];
 
 const PackageManagement = () => {
-  const [packages, setPackages] = useState(mockPackages);
+  const [packages, setPackages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Carrega os pacotes do backend
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      console.log('PackageManagement - Token:', token ? 'Presente' : 'Ausente');
+      
+      const response = await fetch('http://localhost:5295/api/Pacote', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+        }
+      });
+
+      console.log('PackageManagement - Response status:', response.status);
+      console.log('PackageManagement - Response ok:', response.ok);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('PackageManagement - Dados brutos do backend:', data);
+        console.log('PackageManagement - Quantidade de pacotes:', data.length);
+        
+        // Se não há dados do backend, usa dados mockados temporariamente
+        if (!data || data.length === 0) {
+          console.log('PackageManagement - Nenhum pacote encontrado no backend, usando dados mockados');
+          setPackages(mockPackages);
+          return;
+        }
+        
+        // Adapta os dados do backend para o formato esperado pelo frontend
+        const adaptedPackages = data.map(pkg => {
+          console.log('PackageManagement - Pacote individual:', pkg);
+          console.log('PackageManagement - pkg.imagens:', pkg.imagens);
+          console.log('PackageManagement - pkg.imagemUrl:', pkg.imagemUrl);
+          
+          return {
+            id: pkg.id,
+            nome: pkg.titulo || pkg.nome,
+            destino: pkg.destino,
+            preco: parseFloat(pkg.valorTotal || 0),
+            categoria: pkg.categorias || 'completo',
+            status: 'ativo', // Status padrão até implementar no backend
+            reservas: Math.floor(Math.random() * 50), // Dados fictícios até implementar
+            dataUltimaReserva: new Date().toISOString().split('T')[0],
+            imagem: pkg.imagemUrl || 
+                   (pkg.imagens && pkg.imagens.length > 0 ? 
+                    `http://localhost:5295${pkg.imagens[0].url}` : '/packages/default.jpg'),
+            descricao: pkg.descricao,
+            quantidadeMaximaPessoas: pkg.quantidadeMaximaPessoas,
+            origem: pkg.origem,
+            email: pkg.email,
+            detalhes: typeof pkg.detalhes === 'string' ? JSON.parse(pkg.detalhes) : pkg.detalhes,
+            politicas: pkg.politicas
+          };
+        });
+        console.log('PackageManagement - Pacotes adaptados:', adaptedPackages);
+        setPackages(adaptedPackages);
+      } else {
+        console.error('PackageManagement - Erro ao carregar pacotes, status:', response.status);
+        const errorText = await response.text();
+        console.error('PackageManagement - Erro detalhado:', errorText);
+        // Fallback para dados mockados se não conseguir carregar do backend
+        setPackages(mockPackages);
+      }
+    } catch (error) {
+      console.error('PackageManagement - Erro de conexão:', error);
+      // Fallback para dados mockados
+      setPackages(mockPackages);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSavePackage = (savedPackage) => {
+    // Atualiza a lista de pacotes
+    fetchPackages();
+  };
 
   const filteredPackages = packages.filter(pkg => {
-    const matchesSearch = pkg.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pkg.destino.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = (pkg.nome?.toLowerCase() || '').includes(searchLower) ||
+                         (pkg.destino?.toLowerCase() || '').includes(searchLower);
     const matchesStatus = filterStatus === 'todos' || pkg.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -74,9 +158,33 @@ const PackageManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este pacote?')) {
-      setPackages(packages.filter(pkg => pkg.id !== id));
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Você precisa estar logado para excluir um pacote');
+          return;
+        }
+
+        const response = await fetch(`http://localhost:5295/api/Pacote/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        if (response.ok) {
+          // Remove da lista local
+          setPackages(packages.filter(pkg => pkg.id !== id));
+          alert('Pacote excluído com sucesso!');
+        } else {
+          alert('Erro ao excluir pacote');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir pacote:', error);
+        alert('Erro de conexão');
+      }
     }
   };
 
@@ -148,12 +256,47 @@ const PackageManagement = () => {
 
       {/* Lista de Pacotes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredPackages.map((packageItem) => (
+        {isLoading ? (
+          // Loading skeleton
+          Array.from({ length: 6 }, (_, index) => (
+            <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-0">
+                <div className="h-48 bg-gray-200 rounded-t-lg animate-pulse"></div>
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                  <div className="flex justify-between">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          filteredPackages.map((packageItem) => (
           <Card key={packageItem.id} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
               {/* Imagem do pacote */}
-              <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 rounded-t-lg flex items-center justify-center">
-                <Package className="w-16 h-16 text-white/50" />
+              <div className="h-48 rounded-t-lg overflow-hidden">
+                {packageItem.imagem && packageItem.imagem !== '/packages/default.jpg' ? (
+                  <img 
+                    src={packageItem.imagem} 
+                    alt={packageItem.nome}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center ${
+                    packageItem.imagem && packageItem.imagem !== '/packages/default.jpg' ? 'hidden' : 'flex'
+                  }`}
+                >
+                  <Package className="w-16 h-16 text-white/50" />
+                </div>
               </div>
               
               <div className="p-4 space-y-3">
@@ -219,11 +362,12 @@ const PackageManagement = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Mensagem quando não há resultados */}
-      {filteredPackages.length === 0 && (
+      {!isLoading && filteredPackages.length === 0 && (
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-8 text-center">
             <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -232,6 +376,17 @@ const PackageManagement = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de Cadastro/Edição */}
+      <PackageFormModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingPackage(null);
+        }}
+        editingPackage={editingPackage}
+        onSave={handleSavePackage}
+      />
     </div>
   );
 };

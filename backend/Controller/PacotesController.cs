@@ -36,8 +36,21 @@ public class PacoteController : ControllerBase
     [SwaggerOperation(Summary = "Cadastra um novo pacote (dados simples)")]
     public async Task<IActionResult> CadastrarSimples([FromBody] CreatePacoteDTO dto)
     {
-        await _service.CadastrarSimplesAsync(dto);
-        return Ok("Pacote cadastrado com sucesso!");
+        try
+        {
+            // Debug: verificar claims do usuário
+            var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            Console.WriteLine($"Role do usuário: {userRole}");
+            
+            await _service.CadastrarSimplesAsync(dto);
+            return Ok(new { message = "Pacote cadastrado com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro no controller: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            return BadRequest(new { message = $"Erro ao cadastrar pacote: {ex.Message}" });
+        }
     }
 
     [HttpPost("buscar")]

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Users } from 'lucide-react';
-import { getPackageById } from '../data/packages';
+import { getPackage } from '../data/packages';
 
 // Função para extrair valor numérico do preço
 const extractNumericPrice = (priceString) => {
@@ -14,7 +14,9 @@ const extractNumericPrice = (priceString) => {
 const BookingForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const pacote = getPackageById(id);
+  // Decodifica o parâmetro caso seja um nome com caracteres especiais
+  const identifier = decodeURIComponent(id);
+  const pacote = getPackage(identifier);
 
   const [formData, setFormData] = useState({
     nome: '',

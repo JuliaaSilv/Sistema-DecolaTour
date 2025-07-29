@@ -48,6 +48,22 @@ namespace agencia.Models
         [Column("CATEGORIAS")]
         public string Categorias { get; set; } = string.Empty;
 
+        // Campos opcionais para dados híbridos
+        [Column("HOTEL_SERVICES")]
+        public string? HotelServices { get; set; }
+
+        [Column("POLITICAS")]
+        public string? Politicas { get; set; }
+
+        [Column("INCLUSIONS")]
+        public string? Inclusions { get; set; }
+
+        [Column("HIGHLIGHTS")]
+        public string? Highlights { get; set; }
+
+        [Column("OVERVIEW")]
+        public string? Overview { get; set; }
+
 
         public ICollection<ImagemPacote> Imagens { get; set; } = new List<ImagemPacote>();
         public ICollection<VideoPacote> Videos { get; set; } = new List<VideoPacote>();

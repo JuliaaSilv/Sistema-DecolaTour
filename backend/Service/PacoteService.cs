@@ -26,9 +26,24 @@ namespace agencia.Service
             {
                 Id = p.Id,
                 Titulo = p.Titulo,
+                Descricao = p.Descricao,
                 Destino = p.Destino,
+                Origem = p.Origem,
+                Categorias = p.Categorias,
+                Duracao = p.Duracao,
+                DataDisponivel = p.DataDisponivel,
+                ValorUnitario = p.ValorUnitario,
                 ValorTotal = p.ValorTotal,
-                ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty
+                QuantidadeMaximaPessoas = p.QuantidadeMaximaPessoas,
+                ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty,
+                Imagens = p.Imagens?.Select(img => new ImagemPacoteDTO { Url = img.Url }).ToList(),
+                Videos = p.Videos?.Select(vid => new VideoPacoteDTO { Url = vid.Url }).ToList(),
+                // Campos híbridos opcionais
+                HotelServices = p.HotelServices,
+                Politicas = p.Politicas,
+                Inclusions = p.Inclusions,
+                Highlights = p.Highlights,
+                Overview = p.Overview
             }).ToList();
         }
 
@@ -48,8 +63,15 @@ namespace agencia.Service
                 Duracao = dto.Duracao,
                 Categorias = dto.Categorias,
                 DataDisponivel = dto.DataDisponivel,
+                ValorUnitario = dto.ValorUnitario,
                 ValorTotal = dto.ValorTotal,
                 QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas,
+                // Campos híbridos opcionais
+                HotelServices = dto.HotelServices,
+                Politicas = dto.Politicas,
+                Inclusions = dto.Inclusions,
+                Highlights = dto.Highlights,
+                Overview = dto.Overview,
                 Imagens = new List<ImagemPacote>(),
                 Videos = new List<VideoPacote>()
             };
@@ -157,6 +179,12 @@ namespace agencia.Service
             pacoteExistente.DataDisponivel = dto.DataDisponivel;
             pacoteExistente.ValorTotal = dto.ValorTotal;
             pacoteExistente.QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas;
+            // Campos híbridos opcionais
+            pacoteExistente.HotelServices = dto.HotelServices;
+            pacoteExistente.Politicas = dto.Politicas;
+            pacoteExistente.Inclusions = dto.Inclusions;
+            pacoteExistente.Highlights = dto.Highlights;
+            pacoteExistente.Overview = dto.Overview;
 
             await _repository.AtualizarAsync(pacoteExistente);
         }
