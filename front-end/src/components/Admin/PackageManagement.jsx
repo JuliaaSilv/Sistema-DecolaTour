@@ -85,22 +85,25 @@ const PackageManagement = () => {
         
         // Adapta os dados do backend para o formato esperado pelo frontend
         const adaptedPackages = data.map(pkg => {
-          console.log('PackageManagement - Pacote individual:', pkg);
-          console.log('PackageManagement - pkg.imagens:', pkg.imagens);
-          console.log('PackageManagement - pkg.imagemUrl:', pkg.imagemUrl);
-          
+          // Adapta categoria: pega a primeira se vier separada por vírgula
+          let categoria = 'completo';
+          if (pkg.categorias) {
+            categoria = pkg.categorias.split(',')[0].toLowerCase();
+          }
           return {
             id: pkg.id,
             nome: pkg.titulo || pkg.nome,
             destino: pkg.destino,
             preco: parseFloat(pkg.valorTotal || 0),
-            categoria: pkg.categorias || 'completo',
+            categoria,
             status: 'ativo', // Status padrão até implementar no backend
             reservas: Math.floor(Math.random() * 50), // Dados fictícios até implementar
             dataUltimaReserva: new Date().toISOString().split('T')[0],
-            imagem: pkg.imagemUrl || 
-                   (pkg.imagens && pkg.imagens.length > 0 ? 
-                    `http://localhost:5295${pkg.imagens[0].url}` : '/packages/default.jpg'),
+            imagem: pkg.imagemUrl && pkg.imagemUrl.trim() !== ''
+              ? pkg.imagemUrl
+              : (pkg.imagens && pkg.imagens.length > 0
+                  ? `http://localhost:5295${pkg.imagens[0].url}`
+                  : ''), // Deixe vazio se não houver imagem
             descricao: pkg.descricao,
             quantidadeMaximaPessoas: pkg.quantidadeMaximaPessoas,
             origem: pkg.origem,
@@ -279,7 +282,7 @@ const PackageManagement = () => {
             <CardContent className="p-0">
               {/* Imagem do pacote */}
               <div className="h-48 rounded-t-lg overflow-hidden">
-                {packageItem.imagem && packageItem.imagem !== '/packages/default.jpg' ? (
+                {packageItem.imagem ? (
                   <img 
                     src={packageItem.imagem} 
                     alt={packageItem.nome}
@@ -292,7 +295,7 @@ const PackageManagement = () => {
                 ) : null}
                 <div 
                   className={`w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center ${
-                    packageItem.imagem && packageItem.imagem !== '/packages/default.jpg' ? 'hidden' : 'flex'
+                    packageItem.imagem ? 'hidden' : 'flex'
                   }`}
                 >
                   <Package className="w-16 h-16 text-white/50" />
