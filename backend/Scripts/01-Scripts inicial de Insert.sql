@@ -28,7 +28,7 @@ VALUES (
     NULL,
     NULL,
     '$2b$12$D5ARIB.W7jXi5aOtGVSc8ecbLyv4ckX8/OhHx.JVWKVTMCZoAW0xm',
-    1
+    2
 );
 
 INSERT INTO TB_USUARIOS (
@@ -57,7 +57,7 @@ VALUES (
     NULL,
     NULL,
     '$2b$12$rzXSc291A5pyvxg8E7wvWe9z2L0XLBxchx/BZz7JWTmKW9GUDVThC',
-    3
+    1
 );
 
 
