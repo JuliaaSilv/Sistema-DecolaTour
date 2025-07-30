@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import qrCodePix from "../assets/qrcodepix.png";
 
 // Estilos CSS customizados para o efeito 3D
 const customStyles = {
@@ -541,14 +542,32 @@ export default function Pagamento() {
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <div className="text-center">
                   <div className="text-5xl mb-3">📱</div>
-                  <h4 className="text-xl font-bold text-[#F28C38] mb-3">Pagamento via Pix</h4>
-                  <div className="bg-white p-4 rounded-lg border border-gray-200 inline-block">
+                  <h4 className="text-xl font-bold text-[#F28C38] mb-4">Pagamento via Pix</h4>
+                  
+                  {/* QR Code */}
+                  <div className="bg-white p-6 rounded-lg border border-gray-200 inline-block mb-4">
+                    <img 
+                      src={qrCodePix} 
+                      alt="QR Code PIX" 
+                      className="w-48 h-48 mx-auto mb-3"
+                    />
                     <p className="text-sm text-gray-600 mb-2">Chave Pix:</p>
                     <p className="font-mono text-lg font-semibold text-[#F28C38]">pix@decolatour.com.br</p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-3">
-                    O QR Code será exibido na próxima tela para facilitar o pagamento
-                  </p>
+                  
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-700 font-medium">
+                      ✅ Escaneie o QR Code
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Ou copie a chave PIX acima para fazer a transferência
+                    </p>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                      <p className="text-sm text-green-700 font-medium">
+                        💰 Desconto de 5% aplicado no pagamento via PIX
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
