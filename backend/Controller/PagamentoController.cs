@@ -3,6 +3,7 @@ using agencia.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace agencia.Controller
 {
@@ -38,6 +39,7 @@ namespace agencia.Controller
 
         /// Lista todos os pagamentos
         [HttpGet]
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> GetAllPagamentos()
         {
             var pagamentos = await _pagamentoService.GetAllPagamentosAsync();

@@ -46,13 +46,8 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 // Configuração do banco de dados
 
-
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DB_DecolaTuor;Trusted_Connection=True;Encrypt=False"));
-
-
-
-
 
 // Adiciona controladores e Swagger
 builder.Services.AddControllers();
@@ -99,6 +94,25 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Extrai o token mesmo se o "Bearer" estiver faltando
+                if (string.IsNullOrEmpty(context.Token) &&
+                    context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+                {
+                    var token = authHeader.ToString().Split(' ').LastOrDefault();
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                }
+                return Task.CompletedTask;
+            }
+        };
+
     }
 
     );
