@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { obterTipoUsuario } from "../../api/auth";
 import {
   LayoutDashboard,
   Package,
@@ -16,19 +16,29 @@ import Button from "./ui/Button";
 import Tooltip from "../common/Tooltip";
 import { cn } from "../../lib/utils";
 
-const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "packages", label: "Pacotes", icon: Package },
-  { id: "reservations", label: "Reservas", icon: Calendar },
-  { id: "users", label: "Usuários", icon: Users },
-  { id: "promotions", label: "Promoções", icon: Gift },
-  { id: "destinations", label: "Destinos", icon: MapPin },
-  { id: "reports", label: "Relatórios", icon: BarChart3 },
-  { id: "settings", label: "Configurações", icon: Settings },
-];
-
 export default function AdminSidebar({ activeTab, onTabChange }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [tipoUsuario, setTipoUsuario] = useState(null);
+
+  useEffect(() => {
+    const tipo = obterTipoUsuario();
+    if (tipo) {
+      setTipoUsuario(parseInt(tipo));
+    }
+  }, []);
+
+  if (tipoUsuario === null || tipoUsuario === undefined) return null;
+
+  const menuItems = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, rolesPermitidas: [1] },
+    { id: "packages", label: "Pacotes", icon: Package, rolesPermitidas: [1, 2] },
+    { id: "reservations", label: "Reservas", icon: Calendar, rolesPermitidas: [1, 2] },
+    { id: "users", label: "Usuários", icon: Users, rolesPermitidas: [1, 2] },
+    { id: "promotions", label: "Promoções", icon: Gift, rolesPermitidas: [1] },
+    { id: "destinations", label: "Destinos", icon: MapPin, rolesPermitidas: [1] },
+    { id: "reports", label: "Relatórios", icon: BarChart3, rolesPermitidas: [1] },
+    { id: "settings", label: "Configurações", icon: Settings, rolesPermitidas: [1] },
+  ];
 
   return (
     <aside
@@ -51,36 +61,38 @@ export default function AdminSidebar({ activeTab, onTabChange }) {
         </Button>
 
         <nav className="space-y-2">
-          {menuItems.map((item) => {
-            const buttonContent = (
-              <Button
-                key={item.id}
-                variant={activeTab === item.id ? "default" : "ghost"}
-                className={cn(
-                  "w-full text-left",
-                  activeTab === item.id ? "bg-blue-500 text-white hover:bg-blue-600" : "text-blue-700 hover:bg-blue-50",
-                  collapsed ? "justify-center px-1" : "justify-start px-3"
-                )}
-                onClick={() => onTabChange(item.id)}
-              >
-                <div className={cn(
-                  "flex items-center",
-                  collapsed ? "justify-center" : "justify-start"
-                )}>
-                  <item.icon className={cn("w-5 h-5", !collapsed && "mr-3")} />
-                  {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
-                </div>
-              </Button>
-            );
+          {menuItems
+            .filter(item => item.rolesPermitidas.includes(tipoUsuario))
+            .map((item) => {
+              const buttonContent = (
+                <Button
+                  key={item.id}
+                  variant={activeTab === item.id ? "default" : "ghost"}
+                  className={cn(
+                    "w-full text-left",
+                    activeTab === item.id ? "bg-blue-500 text-white hover:bg-blue-600" : "text-blue-700 hover:bg-blue-50",
+                    collapsed ? "justify-center px-1" : "justify-start px-3"
+                  )}
+                  onClick={() => onTabChange(item.id)}
+                >
+                  <div className={cn(
+                    "flex items-center",
+                    collapsed ? "justify-center" : "justify-start"
+                  )}>
+                    <item.icon className={cn("w-5 h-5", !collapsed && "mr-3")} />
+                    {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+                  </div>
+                </Button>
+              );
 
-            return collapsed ? (
-              <Tooltip key={item.id} content={item.label} position="right">
-                {buttonContent}
-              </Tooltip>
-            ) : (
-              buttonContent
-            );
-          })}
+              return collapsed ? (
+                <Tooltip key={item.id} content={item.label} position="right">
+                  {buttonContent}
+                </Tooltip>
+              ) : (
+                buttonContent
+              );
+            })}
         </nav>
       </div>
     </aside>

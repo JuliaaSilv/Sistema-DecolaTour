@@ -5,6 +5,7 @@ import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
 import PackageFormModal from './PackageFormModal';
+import { obterTipoUsuario } from '../../api/auth'; // adicione este import
 
 // Dados mockados - substituir por dados reais da API
 const mockPackages = [
@@ -50,6 +51,9 @@ const PackageManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Obtenha o tipo do usuário
+  const tipoUsuario = parseInt(obterTipoUsuario());
 
   // Carrega os pacotes do backend
   useEffect(() => {
@@ -216,13 +220,15 @@ const PackageManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          <Button
-            onClick={handleCreate}
-            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            <span>Novo Pacote</span>
-          </Button>
+          {tipoUsuario === 1 && (
+            <Button
+              onClick={handleCreate}
+              className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span>Novo Pacote</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -344,23 +350,27 @@ const PackageManagement = () => {
                     <Eye className="w-4 h-4 mr-1" />
                     <span>Ver</span>
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 flex items-center justify-center"
-                    onClick={() => handleEdit(packageItem)}
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    <span>Editar</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-50 flex items-center justify-center px-3"
-                    onClick={() => handleDelete(packageItem.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  {tipoUsuario === 1 && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 flex items-center justify-center"
+                        onClick={() => handleEdit(packageItem)}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        <span>Editar</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-300 text-red-700 hover:bg-red-50 flex items-center justify-center px-3"
+                        onClick={() => handleDelete(packageItem.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -381,15 +391,17 @@ const PackageManagement = () => {
       )}
 
       {/* Modal de Cadastro/Edição */}
-      <PackageFormModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingPackage(null);
-        }}
-        editingPackage={editingPackage}
-        onSave={handleSavePackage}
-      />
+      {tipoUsuario === 1 && (
+        <PackageFormModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingPackage(null);
+          }}
+          editingPackage={editingPackage}
+          onSave={handleSavePackage}
+        />
+      )}
     </div>
   );
 };

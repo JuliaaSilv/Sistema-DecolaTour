@@ -4,6 +4,7 @@ import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import { obterTipoUsuario } from '../../api/auth'; 
 
 // Dados mockados - substituir por dados reais da API
 const mockUsers = [
@@ -68,6 +69,9 @@ const UserManagement = () => {
   const [filterStatus, setFilterStatus] = useState('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+
+  // Obtenha o tipo do usuário
+  const tipoUsuario = parseInt(obterTipoUsuario());
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,13 +143,15 @@ const UserManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          <Button
-            onClick={handleCreate}
-            className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            <span>Novo Usuário</span>
-          </Button>
+          {tipoUsuario === 1 && (
+            <Button
+              onClick={handleCreate}
+              className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span>Novo Usuário</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -272,23 +278,27 @@ const UserManagement = () => {
                     <Eye className="w-4 h-4 mr-1" />
                     <span>Ver</span>
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 flex items-center justify-center"
-                    onClick={() => handleEdit(user)}
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    <span>Editar</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-50 flex items-center justify-center px-3"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  {tipoUsuario === 1 && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 flex items-center justify-center"
+                        onClick={() => handleEdit(user)}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        <span>Editar</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-300 text-red-700 hover:bg-red-50 flex items-center justify-center px-3"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -305,6 +315,12 @@ const UserManagement = () => {
             <p className="text-gray-500">Tente ajustar os filtros ou criar um novo usuário.</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Modal de Cadastro/Edição */}
+      {tipoUsuario === 1 && isModalOpen && (
+        // ...seu modal de edição/criação aqui...
+        <div>Modal de edição/criação</div>
       )}
     </div>
   );

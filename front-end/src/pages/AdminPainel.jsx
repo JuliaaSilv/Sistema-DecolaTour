@@ -9,10 +9,11 @@ import ExportButtons from "../components/Admin/export-buttons";
 import PackageManagement from "../components/Admin/PackageManagement";
 import ReservationManagement from "../components/Admin/ReservationManagement";
 import UserManagement from "../components/Admin/UserManagement";
+import { obterTipoUsuario } from "../api/auth"; 
 
-// Exemplo de AdminPainel.jsx já adaptado para usar os novos componentes
 export default function AdminPainel() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const tipoUsuario = parseInt(obterTipoUsuario());
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,7 +21,7 @@ export default function AdminPainel() {
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
         <main className="flex-1 p-6 space-y-6 overflow-x-hidden min-h-screen">
-          {activeTab === "dashboard" && (
+          {activeTab === "dashboard" && tipoUsuario === 1 && (
             <>
               <ExportButtons />
               <DashboardMetrics />

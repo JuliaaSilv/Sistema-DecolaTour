@@ -162,6 +162,7 @@ export default function PackageDetails() {
       // Marcadores para componentes
       isFromBackend: true,
       hasCustomData: !!(backendData.hotelServices || backendData.politicas || backendData.highlights)
+      
     };
   };
 

@@ -203,7 +203,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       }
 
       // Envia para o backend
-      const response = await fetch('http://localhost:5295/api/Pacote', {
+      const response = await fetch('http://localhost:5295/api/Pacote/cadastrar-simples', {
         method: editingPackage ? 'PUT' : 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

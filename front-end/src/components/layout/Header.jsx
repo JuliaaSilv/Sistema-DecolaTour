@@ -98,7 +98,7 @@ export default function Header() {
                     </button>
 
                     {/* Visível apenas para tipoUsuario === "1" */}
-                    {tipoUsuario === "1" && (
+                    {["1", "2"].includes(tipoUsuario)  && (
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                         onClick={() => {
