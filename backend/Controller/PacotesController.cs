@@ -41,7 +41,7 @@ public class PacoteController : ControllerBase
             // Debug: verificar claims do usuário
             var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
             Console.WriteLine($"Role do usuário: {userRole}");
-            
+
             await _service.CadastrarSimplesAsync(dto);
             return Ok(new { message = "Pacote cadastrado com sucesso!" });
         }
