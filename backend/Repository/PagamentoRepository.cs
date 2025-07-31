@@ -20,7 +20,7 @@ namespace agencia.Repository
 
         public async Task<Pagamento> BuscarPagamentoPorIdAsync(int id)
         {
-            var pagamento = await _dbSet.FindAsync(id);
+            var pagamento = await _dbSet.Include(r => r.Reserva).FirstOrDefaultAsync(u => u.Id == id);
             if (pagamento == null)
                 throw new Exception("Pagamento não encontrado.");
             return pagamento;

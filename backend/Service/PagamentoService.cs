@@ -11,13 +11,15 @@ namespace agencia.Service
     {
         private readonly IPagamentoRepository _pagamentoRepository;
         private readonly IReservaRepository _reservaRepository;
+        private readonly IReservaService _reservaService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
 
-        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaRepository reservaRepository, IMapper mapper, IEmailService emailService)
+        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaService reservaService, IReservaRepository reservaRepository, IMapper mapper, IEmailService emailService)
         {
             _pagamentoRepository = pagamentoRepository;
             _reservaRepository = reservaRepository;
+            _reservaService = reservaService;
             _mapper = mapper;
             _emailService = emailService;
         }
@@ -100,6 +102,59 @@ namespace agencia.Service
             // Se desejar, envie e-mail de notificação
             // if (pagamento.Reserva != null && !string.IsNullOrEmpty(pagamento.Reserva.Email))
             //     await _emailService.EnviarStatusPagamentoAsync(pagamento.Reserva.Email, status, pagamento);
+        }
+
+        public async Task AtualizarStatusAsync(int pagamentoId, string status)
+        {
+            // Buscar pagamento pelo ID
+            if (pagamentoId < 0)
+                throw new ArgumentException("ID do pagamento inválido.");
+
+            var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(pagamentoId);
+            if (pagamento == null)
+                throw new Exception("Pagamento não encontrado.");
+
+            // Atualizar status
+            if (!Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
+                throw new Exception("Status de pagamento inválido.");
+
+            pagamento.StatusPagamento = novoStatus;
+            await _pagamentoRepository.AtualizaPagamentoAsync(pagamento);
+
+            var statusReseva = "";
+
+            // Converte a string para o enum (com tratamento de erro)
+            if (Enum.TryParse<StatusPagamento>(status, out StatusPagamento statusEnum))
+            {
+                switch (statusEnum)
+                {
+                    case StatusPagamento.Pago:
+                        statusReseva = StatusReseva.Confirmada.ToString();
+                        break;
+
+                    case StatusPagamento.Pendente:
+                        statusReseva = StatusReseva.Pendente.ToString();
+                        break;
+
+                    case StatusPagamento.Reembolsado :
+                        statusReseva = StatusReseva.Cancelada.ToString();
+                        break;
+
+                    case StatusPagamento.Rejeitado :
+                        statusReseva = StatusReseva.Pendente.ToString();
+                        break;
+
+                    default:
+                        Console.WriteLine("Status de pagamento não reconhecido");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Status inválido: {statusReseva}");
+            }
+
+            await _reservaService.AtualizarStatusAsync(pagamento.Reserva.Id, statusReseva);
         }
     }
 }

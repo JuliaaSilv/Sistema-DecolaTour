@@ -34,11 +34,7 @@ builder.Services.AddScoped<IViajanteService, ViajanteService>();
 builder.Services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
 
-
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
-
-
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));

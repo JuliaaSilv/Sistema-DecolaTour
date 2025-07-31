@@ -71,5 +71,13 @@ namespace agencia.Controller
             await _pagamentoService.AtualizarStatusPagamentoAsync(pagamentoId, status);
             return Ok();
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] PagamentoStatusDTO dto)
+        {
+            string status = dto.Status.ToString();
+            await _pagamentoService.AtualizarStatusAsync(id, status);
+            return Ok();
+        }        
     }
 }

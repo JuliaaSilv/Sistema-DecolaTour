@@ -10,6 +10,9 @@ namespace agencia.Interfaces.Services
 
         Task AtualizarStatusPagamentoAsync(string pagamentoId, string status);
 
+
+        Task AtualizarStatusAsync(int pagamentoId, string status);
+
         Task<PagamentoDTO?> GetPagamentoByIdAsync(int id);
 
         Task<List<PagamentoDTO>> GetPagamentosByReservaAsync(int reservaId);
