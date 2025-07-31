@@ -320,13 +320,6 @@ export const packageDetails = {
   hotelInfo: {
     estrelas: 4,
     localizacao: "A 765 m do centro",
-    nota: 8.2,
-    comentarios: 922,
-    resumoIA: "A localização é excelente e a equipe é muito simpática. A limpeza e a organização dos quartos são excelentes. Embora o café da manhã pudesse ser melhorado e o restaurante tenha tempos de espera, a experiência geral é muito boa."
-  },
-  descricoes: {
-    resumida: "Localizado no centro de Curitiba, o Mabu Curitiba Business tem dois restaurantes, Wi-Fi gratuito em todo o edifício e 11 salas de reuniões. Você precisa saber: • O estacionamento tem custo adicional. • Há unidades adaptadas para pessoas com mobilidade reduzida. Você poderá desfrutar do buffet de café da manhã no Brasserie Quatro Estações, que oferece frutas, bolos, pães e bebidas. Além disso, o Dumont Restaurant serve uma variedade de pratos internacionais à la carte e o Villa Lobos Piano Bar prepara uma seleção de coquetéis. Conheça os pontos de interesse mais próximos:",
-    completa: "Localizado no centro de Curitiba, o Mabu Curitiba Business tem dois restaurantes, Wi-Fi gratuito em todo o edifício e 11 salas de reuniões. Você precisa saber: • O estacionamento tem custo adicional. • Há unidades adaptadas para pessoas com mobilidade reduzida. Você poderá desfrutar do buffet de café da manhã no Brasserie Quatro Estações, que oferece frutas, bolos, pães e bebidas. Além disso, o Dumont Restaurant serve uma variedade de pratos internacionais à la carte e o Villa Lobos Piano Bar prepara uma seleção de coquetéis. Conheça os pontos de interesse mais próximos: • O Centro Cultural Teatro Guaíra fica a 100 m. • Encontra-se a 150 m da Praça Santos Andrade. • A 2 km do Shopping Estação. • O Mabu Curitiba Business está localizado a 3 km do estádio Arena da Baixada. • A 4 km do Jardim Botânico. • O Museu Oscar Niemeyer situa-se a 10 minutos de carro. • Fica a 17 km do Aeroporto Internacional de Curitiba. As instalações empresariais que inclui o Mabu Business são 11 salas de reuniões e um auditório com capacidade para até 280 pessoas."
   }
 };
 

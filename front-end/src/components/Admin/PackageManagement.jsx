@@ -19,28 +19,6 @@ const mockPackages = [
     reservas: 24,
     dataUltimaReserva: "2024-07-20",
     imagem: "/packages/foz.jpg"
-  },
-  {
-    id: 2,
-    nome: "Rio de Janeiro",
-    destino: "Rio de Janeiro, Brasil", 
-    preco: 1355,
-    categoria: "completo",
-    status: "ativo",
-    reservas: 18,
-    dataUltimaReserva: "2024-07-18",
-    imagem: "/packages/rio.jpg"
-  },
-  {
-    id: 3,
-    nome: "Florianópolis",
-    destino: "Florianópolis, Brasil",
-    preco: 807,
-    categoria: "hospedagem",
-    status: "inativo",
-    reservas: 12,
-    dataUltimaReserva: "2024-07-15",
-    imagem: "/packages/floripa.jpg"
   }
 ];
 
@@ -110,7 +88,7 @@ const PackageManagement = () => {
                   : ''), // Deixe vazio se não houver imagem
             descricao: pkg.descricao,
             quantidadeMaximaPessoas: pkg.quantidadeMaximaPessoas,
-            origem: pkg.origem,
+            // origem: pkg.origem,
             email: pkg.email,
             detalhes: typeof pkg.detalhes === 'string' ? JSON.parse(pkg.detalhes) : pkg.detalhes,
             politicas: pkg.politicas

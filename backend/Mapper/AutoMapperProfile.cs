@@ -47,7 +47,10 @@ namespace agencia.Mapper
             CreateMap<Pacote, PacoteDTO>();
             CreateMap<PacoteDTO, Pacote>();
             CreateMap<CreatePacoteDTO, Pacote>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Imagens, opt => opt.Ignore())
+                .ForMember(dest => dest.Videos, opt => opt.Ignore())
+                .ForMember(dest => dest.Estrelas, opt => opt.MapFrom(src => src.Estrelas ?? 3));
 
             CreateMap<CreateUsuarioDTO, Usuario>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());

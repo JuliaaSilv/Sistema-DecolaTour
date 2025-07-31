@@ -34,7 +34,7 @@ public class PacoteController : ControllerBase
     [HttpPost("cadastrar-simples")]
     [Authorize(Roles = "1")]
     [SwaggerOperation(Summary = "Cadastra um novo pacote (dados simples)")]
-    public async Task<IActionResult> CadastrarSimples([FromBody] CreatePacoteDTO dto)
+    public async Task<IActionResult> CadastrarSimples([FromForm] CreatePacoteDTO dto)
     {
         try
         {

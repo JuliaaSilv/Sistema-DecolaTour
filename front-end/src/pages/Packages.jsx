@@ -78,7 +78,7 @@ export default function Packages() {
                 precoOriginal={pkg.valorTotal ? pkg.valorTotal * 1.15 : null}
                 duracao={pkg.duracao ? `${pkg.duracao} DIAS / ${pkg.duracao - 1} NOITES` : undefined}
                 categoria={pkg.categorias || 'NACIONAL'}
-                origem={pkg.origem || "Saindo de São Paulo"}
+                // origem={pkg.origem || "Saindo de São Paulo"}
                 inclusions="Hotel + Aéreo"
                 rating={pkg.rating || 8.5}
                 economia={null}
@@ -119,7 +119,7 @@ export default function Packages() {
                 precoOriginal={pkg.valorTotal ? pkg.valorTotal * 1.15 : null}
                 duracao={pkg.duracao ? `${pkg.duracao} DIAS / ${pkg.duracao - 1} NOITES` : undefined}
                 categoria={pkg.categorias || 'INTERNACIONAL'}
-                origem={pkg.origem || "Saindo de São Paulo"}
+                // origem={pkg.origem || "Saindo de São Paulo"}
                 inclusions="Hotel + Aéreo"
                 rating={pkg.rating || 8.5}
                 economia={null}
@@ -133,20 +133,6 @@ export default function Packages() {
             </div>
           )}
         </div>
-      </section>
-
-      {/* Seção adicional */}
-      <section className="max-w-full md:max-w-4xl mx-auto px-2 sm:px-4 py-6 sm:py-8 text-center">
-        <p className="text-blue-700 text-sm sm:text-base mb-6 font-medium">
-          Quer um pacote personalizado? Entre em contato conosco!
-        </p>
-        <Button
-          variant="primary"
-          size="large"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 md:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          Solicitar Orçamento
-        </Button>
       </section>
     </main>
   );

@@ -19,7 +19,7 @@ const SearchBar = ({
 }) => {
   // Configuração dos campos de busca funcionais
   const originDestinationFields = [
-    { label: 'Origem', placeholder: 'De onde você sai?' },
+    // { label: 'Origem', placeholder: 'De onde você sai?' },
     { label: 'Destino', placeholder: 'Para onde quer ir?' }
   ];
   

@@ -14,7 +14,7 @@ import Button from './Button';
 
 const FunctionalSearchBar = ({ onSearch }) => {
   // Estado simples para os dados da busca
-  const [origem, setOrigem] = useState('');
+  // const [origem, setOrigem] = useState('');
   const [destino, setDestino] = useState('');
   const [dataIda, setDataIda] = useState('');
   const [dataVolta, setDataVolta] = useState('');
@@ -23,7 +23,7 @@ const FunctionalSearchBar = ({ onSearch }) => {
   // Função para realizar a busca
   const handleBuscar = () => {
     const dadosBusca = {
-      origem,
+      // origem,
       destino,
       dataIda,
       dataVolta,
@@ -47,7 +47,7 @@ const FunctionalSearchBar = ({ onSearch }) => {
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         
         {/* Origem */}
-        <div className="flex-1">
+        {/* <div className="flex-1">
           <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-text hover:shadow-md">
             <FaMapMarkerAlt className="text-gray-400 mr-2" />
             <div className="flex-1">
@@ -63,7 +63,7 @@ const FunctionalSearchBar = ({ onSearch }) => {
               />
             </div>
           </div>
-        </div>
+        </div> */}
         
         {/* Destino */}
         <div className="flex-1">

@@ -11,7 +11,7 @@ const PackageHighlights = ({ pacote }) => {
     {
       icon: <Calendar className="text-[#F28C38]" size={24} />,
       title: "Duração",
-      description: "3 dias e 2 noites de experiência única"
+      description: `${pacote.duracao} dias e ${pacote.duracao - 1} noites de experiência única `
     },
     {
       icon: <Users className="text-[#F28C38]" size={24} />,

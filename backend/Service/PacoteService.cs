@@ -28,22 +28,14 @@ namespace agencia.Service
                 Titulo = p.Titulo,
                 Descricao = p.Descricao,
                 Destino = p.Destino,
-                Origem = p.Origem,
                 Categorias = p.Categorias,
                 Duracao = p.Duracao,
                 DataDisponivel = p.DataDisponivel,
-                ValorUnitario = p.ValorUnitario,
                 ValorTotal = p.ValorTotal,
                 QuantidadeMaximaPessoas = p.QuantidadeMaximaPessoas,
                 ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty,
                 Imagens = p.Imagens?.Select(img => new ImagemPacoteDTO { Url = img.Url }).ToList(),
-                Videos = p.Videos?.Select(vid => new VideoPacoteDTO { Url = vid.Url }).ToList(),
-                // Campos híbridos opcionais
-                HotelServices = p.HotelServices,
-                Politicas = p.Politicas,
-                Inclusions = p.Inclusions,
-                Highlights = p.Highlights,
-                Overview = p.Overview
+                Videos = p.Videos?.Select(vid => new VideoPacoteDTO { Url = vid.Url }).ToList()
             }).ToList();
         }
 
@@ -59,19 +51,12 @@ namespace agencia.Service
                 Titulo = dto.Titulo,
                 Descricao = dto.Descricao,
                 Destino = dto.Destino,
-                Origem = dto.Origem,
+                Estrelas = dto.Estrelas,
                 Duracao = dto.Duracao,
                 Categorias = dto.Categorias,
                 DataDisponivel = dto.DataDisponivel,
-                ValorUnitario = dto.ValorUnitario,
                 ValorTotal = dto.ValorTotal,
                 QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas,
-                // Campos híbridos opcionais
-                HotelServices = dto.HotelServices,
-                Politicas = dto.Politicas,
-                Inclusions = dto.Inclusions,
-                Highlights = dto.Highlights,
-                Overview = dto.Overview,
                 Imagens = new List<ImagemPacote>(),
                 Videos = new List<VideoPacote>()
             };
@@ -121,6 +106,39 @@ namespace agencia.Service
         public async Task CadastrarSimplesAsync(CreatePacoteDTO dto)
         {
             var pacote = _mapper.Map<Pacote>(dto);
+            pacote.Imagens = new List<ImagemPacote>();
+            pacote.Videos = new List<VideoPacote>();
+
+            var root = Path.Combine(_env.ContentRootPath, "wwwroot");
+            var pastaPacote = Path.Combine(root, "imagens", pacote.Id.ToString());
+            Directory.CreateDirectory(pastaPacote);
+
+            if (dto.Imagens != null)
+            {
+                foreach (var imagem in dto.Imagens)
+                {
+                    var nomeImagem = Guid.NewGuid() + Path.GetExtension(imagem.FileName);
+                    var caminhoImagem = Path.Combine(pastaPacote, nomeImagem);
+                    using var stream = new FileStream(caminhoImagem, FileMode.Create);
+                    await imagem.CopyToAsync(stream);
+                    pacote.Imagens.Add(new ImagemPacote { Url = $"/imagens/{pacote.Id}/{nomeImagem}" });
+                }
+            }
+
+            if (dto.Videos != null)
+            {
+                var pastaVideos = Path.Combine(root, "videos", pacote.Id.ToString());
+                Directory.CreateDirectory(pastaVideos);
+                foreach (var video in dto.Videos)
+                {
+                    var nomeVideo = Guid.NewGuid() + Path.GetExtension(video.FileName);
+                    var caminhoVideo = Path.Combine(pastaVideos, nomeVideo);
+                    using var stream = new FileStream(caminhoVideo, FileMode.Create);
+                    await video.CopyToAsync(stream);
+                    pacote.Videos.Add(new VideoPacote { Url = $"/videos/{pacote.Id}/{nomeVideo}" });
+                }
+            }
+
             await _repository.CadastrarAsync(pacote);
         }
 
@@ -128,10 +146,6 @@ namespace agencia.Service
         {
             var pacotes = await _repository.ListarAsync();
             var resultado = pacotes.AsQueryable();
-
-            // Filtra pela origem, se informado
-            if (!string.IsNullOrWhiteSpace(filtro.Origem))
-                resultado = resultado.Where(p => p.Origem.ToLower().Contains(filtro.Origem.ToLower()));
 
             // Filtra pelo destino, se informado
             if (!string.IsNullOrWhiteSpace(filtro.Destino))
@@ -157,9 +171,7 @@ namespace agencia.Service
                 Id = p.Id,
                 Titulo = p.Titulo,
                 Destino = p.Destino,
-                ValorTotal = filtro.Viajantes.HasValue
-                    ? p.ValorUnitario * filtro.Viajantes.Value
-                    : p.ValorUnitario,
+                ValorTotal = p.ValorTotal,
                 ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty
             }).ToList();
         }
@@ -174,17 +186,11 @@ namespace agencia.Service
             pacoteExistente.Descricao = dto.Descricao;
             pacoteExistente.Categorias = dto.Categorias;
             pacoteExistente.Destino = dto.Destino;
-            pacoteExistente.Origem = dto.Origem;
+            pacoteExistente.Estrelas = dto.Estrelas;
             pacoteExistente.Duracao = dto.Duracao;
             pacoteExistente.DataDisponivel = dto.DataDisponivel;
             pacoteExistente.ValorTotal = dto.ValorTotal;
             pacoteExistente.QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas;
-            // Campos híbridos opcionais
-            pacoteExistente.HotelServices = dto.HotelServices;
-            pacoteExistente.Politicas = dto.Politicas;
-            pacoteExistente.Inclusions = dto.Inclusions;
-            pacoteExistente.Highlights = dto.Highlights;
-            pacoteExistente.Overview = dto.Overview;
 
             await _repository.AtualizarAsync(pacoteExistente);
         }

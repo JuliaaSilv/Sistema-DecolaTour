@@ -1,5 +1,6 @@
 import React from 'react';
 import GoogleMap from '../common/GoogleMap';
+import Button from '../common/Button';
 
 /**
  * Componente de localização com mapa integrado ao Google Maps
@@ -18,12 +19,14 @@ const LocationMap = ({
         {/* Título da seção */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h3 className="text-xl sm:text-2xl font-bold text-blue-900">Localização</h3>
-          <button 
-            className="eva-3-btn bg-orange-500 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-orange-600 transition self-start sm:self-auto"
+          <Button
+            variant="primary"
+            size="large"
+            className="rounded-lg font-semibold shadow hover:shadow-lg transition self-start sm:self-auto"
             onClick={onMapClick}
           >
             Veja no Google Maps
-          </button>
+          </Button>
         </div>
         
         {/* Mapa do Google Maps */}
@@ -43,11 +46,6 @@ const LocationMap = ({
           <p className="text-blue-800 text-base mb-1">
             {description}
           </p>
-          {location && (
-            <p className="text-blue-600 text-sm font-medium mt-2">
-              📍 {location}
-            </p>
-          )}
         </div>
       </div>
     </section>

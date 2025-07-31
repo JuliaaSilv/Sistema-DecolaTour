@@ -75,7 +75,7 @@ const handleSend = async (userText: string) => {
     if (categoriasDetectadas.length > 0) {
       const response = await axios.post("http://localhost:5295/api/pacote/buscar", {
         Categorias: categoriasDetectadas,
-        origem: "",
+        // origem: "",
         destino: "",
         dataIda: null,
         dataVolta: null,

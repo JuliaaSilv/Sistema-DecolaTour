@@ -10,12 +10,12 @@ namespace agencia.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Origem",
-                table: "TB_PACOTES",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            // migrationBuilder.AddColumn<string>(
+            //     name: "Origem",
+            //     table: "TB_PACOTES",
+            //     type: "nvarchar(max)",
+            //     nullable: false,
+            //     defaultValue: "");
 
             migrationBuilder.AddColumn<int>(
                 name: "QUANTIDADE_MAXIMA",
@@ -28,9 +28,9 @@ namespace agencia.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Origem",
-                table: "TB_PACOTES");
+            // migrationBuilder.DropColumn(
+            //     name: "Origem",
+            //     table: "TB_PACOTES");
 
             migrationBuilder.DropColumn(
                 name: "QUANTIDADE_MAXIMA",

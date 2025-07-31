@@ -148,9 +148,9 @@ namespace agencia.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DURACAO");
 
-                    b.Property<string>("Origem")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    // b.Property<string>("Origem")
+                    //     .IsRequired()
+                    //     .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PromocaoId")
                         .HasColumnType("int");

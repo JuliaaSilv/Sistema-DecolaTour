@@ -22,7 +22,7 @@ const Button = ({
   
   // Variantes de estilo
   const variants = {
-    primary: 'bg-[#F28C38E5] text-white hover:bg-[#5a3f7b]',
+    primary: 'bg-orange-500 text-white hover:bg-orange-600',
     secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300'
   };
   

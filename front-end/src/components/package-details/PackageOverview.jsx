@@ -4,13 +4,11 @@ import { CheckCircle, MapPin, Camera, Utensils, Car, Wifi, Dumbbell, Users } fro
 const PackageOverview = ({ pacote }) => {
   const highlights = [
     "Vista panorâmica da cidade",
-    "Localização privilegiada no centro",
     "Acesso fácil a pontos turísticos",
     "Café da manhã continental incluso"
   ];
 
   const included = [
-    { icon: <MapPin size={20} />, text: "Transfer do aeroporto" },
     { icon: <Camera size={20} />, text: "City tour guiado" },
     { icon: <Utensils size={20} />, text: "Café da manhã completo" },
     { icon: <Car size={20} />, text: "Estacionamento gratuito" }
@@ -20,7 +18,6 @@ const PackageOverview = ({ pacote }) => {
     { icon: <Wifi size={20} />, text: "Wi-Fi de alta velocidade" },
     { icon: <Dumbbell size={20} />, text: "Academia 24 horas" },
     { icon: <Users size={20} />, text: "Recepção 24 horas" },
-    { icon: <Car size={20} />, text: "Serviço de valet" }
   ];
 
   return (
@@ -81,10 +78,7 @@ const PackageOverview = ({ pacote }) => {
           Sobre este Pacote
         </h3>
         <p className="text-gray-700 text-center leading-relaxed max-w-4xl mx-auto">
-          Desfrute de uma experiência única no coração da cidade, com acomodações de primeira qualidade 
-          e serviços exclusivos. Este pacote foi cuidadosamente elaborado para proporcionar momentos 
-          inesquecíveis, combinando conforto, localização privilegiada e atendimento personalizado. 
-          Ideal para quem busca uma viagem especial com todos os detalhes pensados para seu bem-estar.
+          {pacote?.descricao || "Descrição não disponível."}
         </p>
       </div>
     </section>

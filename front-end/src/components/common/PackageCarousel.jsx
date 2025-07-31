@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ModernPackageCard from './ModernPackageCard';
+import SimplePackageCard from './SimplePackageCard';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const PackageCarousel = ({ packages, title = "Destinos Populares" }) => {
+const PackageCarousel = ({ packages}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCards, setVisibleCards] = useState(4);
-  const carouselRef = useRef(null);
 
   console.log('🎠 PackageCarousel renderizado com packages:', packages);
 
@@ -18,6 +18,7 @@ const PackageCarousel = ({ packages, title = "Destinos Populares" }) => {
       else setVisibleCards(4);                   // desktop
     };
 
+    // Atualiza o número de cards visíveis ao carregar e ao redimensionar a tela
     updateVisibleCards();
     window.addEventListener('resize', updateVisibleCards);
     return () => window.removeEventListener('resize', updateVisibleCards);
@@ -25,56 +26,72 @@ const PackageCarousel = ({ packages, title = "Destinos Populares" }) => {
 
   if (!packages || packages.length === 0) {
     console.log('⚠️ PackageCarousel: Nenhum pacote fornecido');
-    return (
-      <div className="text-center py-12 bg-white m-4 rounded-lg">
-        <p className="text-gray-500 text-lg">Nenhum pacote disponível no momento.</p>
-        <p className="text-gray-400 text-sm mt-2">Verifique sua conexão ou tente novamente.</p>
-      </div>
-    );
+    return null;
   }
 
   console.log('🎠 Renderizando carrossel com', packages.length, 'pacotes');
 
-  return (
-    <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 bg-[#E6E6EB]">
-      {/* Título da seção */}
-      <div className="max-w-7xl mx-auto mb-8 lg:mb-12">
-        <h1 className="text-blue-900 text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-center lg:text-left lg:ml-[2%] leading-tight"> 
-          {title}
-        </h1>
-        <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-3 text-center lg:text-left lg:ml-[2%] max-w-2xl font-medium">
-          Explore os melhores destinos selecionados especialmente para você
-        </p>
-      </div>
+  // Lógica de navegação do carrossel
+  // maxIndex limita o índice máximo para garantir que sempre haja o número correto de cards visíveis
+  const maxIndex = Math.max(0, packages.length - visibleCards);
+  // handlePrev e handleNext mudam o índice atual do carrossel, navegando entre os grupos de cards
+  const handlePrev = () => {
+    setCurrentIndex((prev) => Math.max(prev - 1, 0)); // Volta uma página, sem passar do início
+  };
+  const handleNext = () => {
+    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex)); // Avança uma página, sem passar do final
+  };
 
-      {/* Container do carrossel - Versão simplificada para debug */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
-          {packages.slice(0, 4).map((pkg, index) => {
-            console.log('🎴 Renderizando card:', pkg);
-            return (
-              <div key={`package-${pkg.id || index}`} className="flex justify-center">
-                <ModernPackageCard
-                  id={pkg.id}
-                  nome={pkg.nome}
-                  destino={pkg.destino}
-                  imagem={pkg.imagem}
-                  preco={pkg.preco}
-                  precoOriginal={pkg.precoOriginal}
-                  duracao={pkg.duracao}
-                  categoria={pkg.categoria?.toUpperCase() || "PACOTE"}
-                  rating={pkg.rating || 8.0}
-                  origem={pkg.origem || "Saindo de São Paulo"}
-                  inclusions={pkg.inclusions || "Hotel + Aéreo"}
-                  economia={pkg.economia}
-                  ofertaEspecial={pkg.ofertaEspecial}
-                />
-              </div>
-            );
-          })}
+  return (
+    <div className="max-w-7xl mx-auto relative">
+      {/* Botão esquerdo */}
+      {packages.length > visibleCards && (
+        <button
+          className="absolute left-[-32px] top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow-lg p-2 hover:bg-blue-100 transition disabled:opacity-40 cursor-pointer"
+          onClick={handlePrev}
+          disabled={currentIndex === 0}
+          aria-label="Anterior"
+        >
+          <ChevronLeft size={32} />
+        </button>
+      )}
+      {/* Carrossel animado */}
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500"
+          style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
+        >
+          {packages.map((pkg, index) => (
+            <div
+              key={`package-${pkg.id || index}`}
+              className="flex justify-center"
+              style={{ minWidth: `${100 / visibleCards}%`, transition: 'min-width 0.3s' }}
+            >
+              <SimplePackageCard
+                imagem={pkg.imagem}
+                nome={pkg.nome}
+                preco={pkg.preco}
+                duracao={pkg.duracao}
+                destino={pkg.destino}
+                categoria={pkg.categoria}
+                inclusions={pkg.inclusions}
+              />
+            </div>
+          ))}
         </div>
       </div>
-    </section>
+      {/* Botão direito */}
+      {packages.length > visibleCards && (
+        <button
+          className="absolute right-[-32px] top-1/2 -translate-y-1/2 z-10 bg-white rounded-full shadow-lg p-2 hover:bg-blue-100 transition disabled:opacity-40 cursor-pointer"
+          onClick={handleNext}
+          disabled={currentIndex === maxIndex}
+          aria-label="Próximo"
+        >
+          <ChevronRight size={32} />
+        </button>
+      )}
+    </div>
   );
 };
 

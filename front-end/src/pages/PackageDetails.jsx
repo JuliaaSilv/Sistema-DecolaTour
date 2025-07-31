@@ -9,7 +9,6 @@ import PackageHero from "../components/package-details/PackageHero";
 import HotelInfoCard from "../components/package-details/HotelInfoCard";
 import PricingCard from "../components/package-details/PricingCard";
 import LocationMap from "../components/package-details/LocationMap";
-import PackageInclusions from "../components/package-details/PackageInclusions";
 import HotelGallery from "../components/package-details/HotelGallery";
 import PackageOverview from "../components/package-details/PackageOverview";
 import PackageHighlights from "../components/package-details/PackageHighlights";
@@ -65,106 +64,7 @@ export default function PackageDetails() {
     return null;
   };
 
-  // Função para gerar dados padrão baseados no pacote
-  const generateDefaultData = (packageData) => {
-    const isLuxury = packageData.categoria?.toLowerCase().includes('luxo') || 
-                     packageData.valorTotal > 5000;
-    
-    return {
-      hotelServices: isLuxury ? [
-        { icon: "🏊‍♀️", title: "Piscina", description: "Piscina aquecida" },
-        { icon: "🍽️", title: "Restaurante", description: "Culinária gourmet" },
-        { icon: "📶", title: "Wi-Fi", description: "Internet de alta velocidade" },
-        { icon: "🚗", title: "Valet", description: "Serviço de estacionamento" },
-        { icon: "💆‍♀️", title: "Spa", description: "Centro de bem-estar" },
-        { icon: "🎯", title: "Concierge", description: "Atendimento personalizado" }
-      ] : [
-        { icon: "🏊‍♀️", title: "Piscina", description: "Área de lazer" },
-        { icon: "🍽️", title: "Restaurante", description: "Opções gastronômicas" },
-        { icon: "📶", title: "Wi-Fi", description: "Internet gratuita" },
-        { icon: "🅿️", title: "Estacionamento", description: "Vagas disponíveis" }
-      ],
-      
-      highlights: [
-        `Localização privilegiada em ${packageData.destino}`,
-        `${packageData.duracao || 'Múltiplas'} noites de hospedagem`,
-        'Atendimento especializado',
-        packageData.origem ? `Saída de ${packageData.origem}` : 'Flexibilidade de origem'
-      ],
-      
-      overview: packageData.descricao || 
-        `Descubra ${packageData.destino} em um pacote completo que combina conforto, 
-         localização privilegiada e experiências inesquecíveis. Este destino oferece 
-         uma mistura perfeita de cultura, gastronomia e paisagens deslumbrantes.`,
-      
-      inclusions: {
-        included: [
-          'Hospedagem conforme categoria escolhida',
-          'Café da manhã',
-          'Taxas de serviço',
-          'Suporte 24h durante a viagem'
-        ],
-        notIncluded: [
-          'Passagens aéreas',
-          'Refeições não especificadas',
-          'Passeios opcionais',
-          'Seguro viagem',
-          'Despesas pessoais'
-        ]
-      },
-      
-      policies: `Cancelamento: Até 48h antes da viagem sem custos. 
-                 Check-in: A partir das 14h. Check-out: Até 12h. 
-                 Política de não reembolso para no-shows.`
-    };
-  };
-
-  // Função para fazer merge dos dados backend com fallbacks
-  const mergePackageData = (backendData, staticData = null) => {
-    if (!backendData) return staticData;
-    
-    const defaults = generateDefaultData(backendData);
-    
-    return {
-      // Dados principais sempre do backend
-      id: backendData.id,
-      nome: backendData.titulo || backendData.nome,
-      destino: backendData.destino,
-      preco: `R$ ${parseFloat(backendData.valorTotal || 0).toLocaleString('pt-BR')}`,
-      categoria: backendData.categorias || 'completo',
-      imagem: backendData.imagemUrl || 
-             (backendData.imagens && backendData.imagens.length > 0 ? 
-              `http://localhost:5295${backendData.imagens[0].url}` : '/packages/default.jpg'),
-      descricao: backendData.descricao || "Pacote criado pelo sistema administrativo.",
-      
-      // Detalhes estruturados
-      detalhes: [
-        { label: "Hospedagem", valor: `${backendData.duracao || 0} noites` },
-        { label: "Origem", valor: backendData.origem || "A definir" },
-        { label: "Destino", valor: backendData.destino || "A definir" },
-        { label: "Valor Total", valor: `R$ ${parseFloat(backendData.valorTotal || 0).toLocaleString('pt-BR')}` },
-        { label: "Valor Unitário", valor: `R$ ${parseFloat(backendData.valorUnitario || 0).toLocaleString('pt-BR')}` },
-        { label: "Quantidade máxima", valor: `${backendData.quantidadeMaximaPessoas || 0} pessoas` },
-        { label: "Data disponível", valor: backendData.dataDisponivel ? new Date(backendData.dataDisponivel).toLocaleDateString('pt-BR') : "A definir" },
-      ],
-      
-      // Galeria de imagens
-      galeria: backendData.imagens ? backendData.imagens.map(img => `http://localhost:5295${img.url}`) : [],
-      videos: backendData.videos ? backendData.videos.map(video => `http://localhost:5295${video.url}`) : [],
-      
-      // Dados híbridos (backend tem prioridade, fallback para defaults)
-      hotelServices: backendData.hotelServices ? JSON.parse(backendData.hotelServices) : defaults.hotelServices,
-      politicas: backendData.politicas || defaults.policies,
-      highlights: backendData.highlights ? JSON.parse(backendData.highlights) : defaults.highlights,
-      overview: backendData.overview || defaults.overview,
-      inclusions: backendData.inclusions ? JSON.parse(backendData.inclusions) : defaults.inclusions,
-      
-      // Marcadores para componentes
-      isFromBackend: true,
-      hasCustomData: !!(backendData.hotelServices || backendData.politicas || backendData.highlights)
-      
-    };
-  };
+ 
 
   useEffect(() => {
     async function loadPackage() {
@@ -175,57 +75,32 @@ export default function PackageDetails() {
       let backendPackage = await fetchFromBackend(identifier);
       console.log('PackageDetails - pacote do backend encontrado:', backendPackage);
       
-      let finalPackage = null;
-      
       if (backendPackage) {
         // Se encontrou no backend, faz merge com dados padrão
-        finalPackage = mergePackageData(backendPackage);
-        console.log('PackageDetails - pacote híbrido criado:', finalPackage);
+        setPacote(backendPackage);
       } else {
         // Se não encontrou, gera dados padrão indicando que não foi encontrado
-        console.log('PackageDetails - Pacote não encontrado, gerando dados padrão');
-        finalPackage = {
-          id: identifier,
-          nome: "Pacote não encontrado",
-          destino: "Destino não disponível",
-          preco: "R$ 0",
-          categoria: "Indisponível",
-          descricao: "Este pacote não está disponível no momento.",
-          detalhes: [],
-          galeria: [],
-          isFromBackend: false,
-          hasCustomData: false
-        };
+        console.log('PackageDetails - Pacote não encontrado');
+        setPacote(null);
       }
       
-      setPacote(finalPackage);
       setIsLoading(false);
     }
     
     loadPackage();
   }, [identifier]);
 
-  // Extraindo dados centralizados com fallbacks inteligentes
-  const { imagensGaleria: defaultImages, hotelInfo, descricoes } = packageDetails;
+  // // Extraindo dados centralizados com fallbacks inteligentes
+  // const { imagensGaleria: defaultImages, hotelInfo, descricoes } = packageDetails;
   
   // Sistema híbrido para imagens
-  const imagensGaleria = pacote?.galeria && pacote.galeria.length > 0 ? pacote.galeria : defaultImages;
+ const imagensGaleria = pacote?.imagens?.map(img => `http://localhost:5295${img.url}`) ?? null;
+
   
-  // Sistema híbrido para serviços do hotel
-  const hotelServicesData = pacote?.hotelServices || hotelServices;
-  
-  // Sistema híbrido para dados do hotel
-  const hotelInfoData = pacote?.isFromBackend ? {
-    ...hotelInfo,
-    // Sobrescreve com dados reais do backend quando disponível
-    name: pacote.nome,
-    location: pacote.destino,
-    rating: hotelInfo.rating, // mantém rating padrão
-    reviews: hotelInfo.reviews // mantém reviews padrão
-  } : hotelInfo;
 
   const handleReserva = () => {
-    navigate(`/booking-form/${encodeURIComponent(pacote.nome)}`);
+    // Redireciona para a página BookingForm usando o id do pacote
+    navigate(`/booking-form/${pacote.id}`);
   };
 
   // Validação de pacote
@@ -252,7 +127,7 @@ export default function PackageDetails() {
       {/* Hero banner componentizado */}
       <PackageHero 
         backgroundImage={fundo}
-        title={pacote.nome}
+        title={pacote.titulo}
         subtitle={pacote.destino}
       />
 
@@ -272,47 +147,29 @@ export default function PackageDetails() {
           
           <div className="flex flex-col md:flex-row justify-between p-4 mt-10 md:p-8 gap-8 bg-transparent">
             {/* Card de info do hotel componentizado */}
-            <HotelInfoCard pacote={pacote} hotelInfo={hotelInfoData} />
+            <HotelInfoCard pacote={pacote} />
             
             {/* Card de preços componentizado */}
             <PricingCard 
               pacote={pacote} 
-              hotelInfo={hotelInfoData} 
               onReserve={handleReserva}
             />
           </div>
         </div>
       </section>
 
-
-      {/* Serviços do hotel componentizados - agora com dados híbridos */}
-      <HotelServices 
-        services={hotelServicesData}
-        isCustom={pacote?.hasCustomData}
-        title={pacote?.isFromBackend ? `Serviços disponíveis em ${pacote.destino}` : "Serviços do Hotel"}
-      />
-
-      {/* Overview do pacote - dados híbridos */}
+      {/* Overview do pacote */}
       <PackageOverview 
         pacote={pacote} 
-        overview={pacote?.overview}
       />
 
-      {/* Destaques do pacote - dados híbridos */}
+      {/* Destaques do pacote */}
       <PackageHighlights 
         pacote={pacote}
-        highlights={pacote?.highlights}
       />
 
       {/* Mapa componentizado */}
       <LocationMap location={pacote.destino} />
-
-      {/* Inclusões do pacote componentizadas - dados híbridos */}
-      <PackageInclusions 
-        pacote={pacote}
-        inclusions={pacote?.inclusions}
-        policies={pacote?.politicas}
-      />
 
       {/* Seção de avaliações com espaçamento maior */}
       <div className="mt-16">

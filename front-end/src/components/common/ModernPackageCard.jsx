@@ -11,7 +11,7 @@ const ModernPackageCard = ({
   duracao,
   categoria = "PACOTE",
   rating = 8.5,
-  origem = "Saindo de São Paulo",
+  // origem = "Saindo de São Paulo",
   inclusions = "Hotel + Aéreo",
   economia,
   ofertaEspecial = false,
@@ -121,9 +121,10 @@ const ModernPackageCard = ({
         </div>
 
         {/* Origem */}
-        <div className="text-gray-600 text-sm mb-2">
+        {/* <div className="text-gray-600 text-sm mb-2">
           {origem}
-        </div>
+          {destino}
+        </div> */}
 
         {/* Inclusões */}
         <div className="text-gray-600 text-sm mb-4">

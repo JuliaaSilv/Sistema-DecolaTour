@@ -43,18 +43,3 @@ export const hotelServices = [
   { icon: "🛎️", title: "Recepção 24h", description: "Atendimento contínuo" }
 ];
 
-// Mantidas apenas as funções auxiliares que ainda podem ser necessárias
-export const getPackageById = (id) => {
-  console.warn('⚠️ getPackageById chamado, mas dados estáticos foram removidos');
-  return null;
-};
-
-export const getPackageByName = (nome) => {
-  console.warn('⚠️ getPackageByName chamado, mas dados estáticos foram removidos');
-  return null;
-};
-
-export const getPackage = (identifier) => {
-  console.warn('⚠️ getPackage chamado, mas dados estáticos foram removidos');
-  return null;
-};
