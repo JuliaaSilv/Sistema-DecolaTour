@@ -6,6 +6,9 @@ using agencia.Interfaces.Repository;
 using agencia.Data;
 using agencia.Models;
 using Microsoft.EntityFrameworkCore;
+using agencia.DTOs;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace agencia.Repository
 {
@@ -15,10 +18,14 @@ namespace agencia.Repository
         // Contexto do banco de dados (Entity Framework)
         private readonly AppDbContext _context;
 
+        // Preciso de _connectionString para pegar a lista completa de informações de reservas (pagamentos, dasdos do cliente, dados do pacote) direto do banco.
+        private readonly string _connectionString;
+
         // Construtor recebe o contexto via injeção de dependência
-        public ReservaRepository(AppDbContext context)
+        public ReservaRepository(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
        
@@ -71,6 +78,37 @@ namespace agencia.Repository
             if (reserva == null) return null;
             _context.Reservas.Remove(reserva);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<IEnumerable<ReservaCompletaDTO>> ListaCompletaDeReservasAsync()
+        {
+            using (var db = new SqlConnection(_connectionString))
+            {
+                var sql = @"
+                SELECT 
+                    r.Id,
+                    r.NUMERO_RESERVA AS Codigo,
+                    u.NOME AS Cliente,
+                    u.EMAIL AS Email,
+                    p.DESCRICAO AS Pacote,
+                    p.DESTINO AS Destino,
+                    p.DATA_DISPONIVEL AS DataViagem,
+                    r.DATA_RESERVA AS DataReserva,
+                    p.VALOR_TOTAL AS Valor,
+                    r.STATUS AS Status,
+                    v.qnt_viajantes pessoas,
+                    pg.STATUS_PAGAMENTO AS Pagamento
+                FROM TB_RESERVAS r
+                INNER JOIN TB_USUARIOS u ON u.Id = r.USUARIO_ID
+                INNER JOIN TB_PACOTES p ON p.Id = r.PACOTE_ID
+                LEFT JOIN TB_PAGAMENTOS pg ON pg.ID_RESERVA = r.Id
+                left 
+                join (select v.ID_RESERVA, count(1) qnt_viajantes from TB_VIAGANTES v group by v.ID_RESERVA) v
+                on v.ID_RESERVA  = r.Id                
+                ORDER BY r.DATA_RESERVA DESC";
+
+                return await db.QueryAsync<ReservaCompletaDTO>(sql);
+            }
         }
     }
 } 

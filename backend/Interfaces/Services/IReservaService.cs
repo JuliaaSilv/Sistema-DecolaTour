@@ -10,7 +10,7 @@ namespace agencia.Interfaces.Services
     public interface IReservaService
     {
         Task<IEnumerable<ReservaDTO>> ListarReservasAsync();
-
+        Task<IEnumerable<ReservaCompletaDTO>> ListaCompletaDeReservasAsync(); // Adicionado para tela de administrador.
         Task<ReservaDTO?> BuscarReservaPorIdAsync(int id);
 
         Task<ApiResponse> CriarReservaAsync(CreateReservaDTO reservaDTO);

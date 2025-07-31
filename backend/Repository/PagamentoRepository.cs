@@ -26,6 +26,15 @@ namespace agencia.Repository
             return pagamento;
         }
 
+        public async Task<Pagamento> BuscarPagamentoPorIdReservaAsync(int idReserva)
+        {
+            var pagamento = await _dbSet
+                .Include(p => p.Reserva)
+                .FirstOrDefaultAsync(p => p.Reserva.Id == idReserva);
+
+            return pagamento;
+        }
+
         public async Task<Pagamento> CriarPagamentoAsync(Pagamento pagamento)
         {
             if (pagamento == null)

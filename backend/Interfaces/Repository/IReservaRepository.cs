@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using agencia.DTOs;
 using agencia.Models;
 
 namespace agencia.Interfaces.Repository
@@ -16,5 +17,8 @@ namespace agencia.Interfaces.Repository
         Task<bool?> AtualizarStatusAsync(int reservaId, string? novoStatus);
 
         Task<bool?> DeletarReservaAsync(int id);
+
+        // Adicionado para a lista de reservas do dashboard de administrador.
+        Task<IEnumerable<ReservaCompletaDTO>> ListaCompletaDeReservasAsync();
     }
 } 

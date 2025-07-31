@@ -40,10 +40,9 @@ namespace agencia.Controller
             return StatusCode(response.StatusCode, response.Data);
         }
 
-
         /// Lista todas as reservas do sistema (apenas para administradores).
         [HttpGet]
-        [Authorize(Roles = "1")]
+        [Authorize(Roles = "2")]
         public async Task<ActionResult> ListarReservas()
         {
             var reservas = await ReservaService.ListarReservasAsync();
@@ -53,6 +52,18 @@ namespace agencia.Controller
             return Ok(new ApiResponse(reservas, null, 200));
         }
 
+        // Adicionado para tela de administrador.
+        // Lista todas as reservas juntamente com alguns dados associados como pagamento, cliente (apenas para administradores).
+        [HttpGet("/api/Reserva/lista-completa")]
+        [Authorize(Roles = "2")]
+        public async Task<ActionResult> ListarCompletaDeReservas()
+        {
+            var reservas = await ReservaService.ListaCompletaDeReservasAsync();
+            if (reservas == null || !reservas.Any())
+                return NotFound(new ApiResponse(null, new ErrorResponse("Nenhuma reserva encontrada."), 404));
+
+            return Ok(new ApiResponse(reservas, null, 200));
+        }
 
         /// Busca uma reserva específica pelo ID (apenas para administradores).
         [HttpGet("{id}")]

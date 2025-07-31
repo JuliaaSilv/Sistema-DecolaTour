@@ -46,11 +46,11 @@ INSERT INTO TB_USUARIOS (
     TIPO_USUARIO_ID
 )
 VALUES (
-    'Cliente',
+    'Pedro Guimarães',
     '110.000.000-01',
     '(00) 00000-0000',
     '1990-01-01',
-    'cliente@decolatour.com',
+    'pedro@decolatour.com',
     1,
     NULL,
     NULL,
@@ -61,14 +61,98 @@ VALUES (
 );
 
 
+INSERT INTO TB_USUARIOS (
+    NOME,
+    CPF,
+    TELEFONE,
+    DATA_NASCIMENTO,
+    EMAIL,
+    EMAIL_COMFIRMADO,
+    TOKEN_EMAILCONFIRMADO,
+    TOKEN_EXPIRACAO_EMAILCONFIRMADO,
+    TOKEN_RECUPERACAO_SENHA,
+    TOKEN_EXPIRACAO_RECUPERACAO_SENHA,
+    SENHA,
+    TIPO_USUARIO_ID
+)
+VALUES (
+    'Arthur Aguiar Lopes',
+    '110.000.000-01',
+    '(00) 00000-0000',
+    '1990-01-01',
+    'arthur@decolatour.com',
+    1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    '$2b$12$rzXSc291A5pyvxg8E7wvWe9z2L0XLBxchx/BZz7JWTmKW9GUDVThC',
+    1
+);
+
+
+INSERT INTO TB_USUARIOS (
+    NOME,
+    CPF,
+    TELEFONE,
+    DATA_NASCIMENTO,
+    EMAIL,
+    EMAIL_COMFIRMADO,
+    TOKEN_EMAILCONFIRMADO,
+    TOKEN_EXPIRACAO_EMAILCONFIRMADO,
+    TOKEN_RECUPERACAO_SENHA,
+    TOKEN_EXPIRACAO_RECUPERACAO_SENHA,
+    SENHA,
+    TIPO_USUARIO_ID
+)
+VALUES (
+    'Sandra Aguiar Lopes',
+    '110.000.000-01',
+    '(00) 00000-0000',
+    '1990-01-01',
+    'sandra@decolatour.com',
+    1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    '$2b$12$rzXSc291A5pyvxg8E7wvWe9z2L0XLBxchx/BZz7JWTmKW9GUDVThC',
+    1
+);
+
+
+
 INSERT INTO TB_PACOTES (TITULO, DESCRICAO, [ORIGEM], DESTINO, DURACAO, DATA_DISPONIVEL, VALOR_UNITARIO, VALOR_TOTAL, [QUANTIDADE_MAXIMA], CATEGORIAS)
 VALUES ('Pacote Cancún', 'Viagem completa para Cancún', 'Recife', 'Cancún', 7, '2025-08-01', 6000.00, 6000.00, 1, 'Internacional,Praia');
+
+INSERT INTO TB_PACOTES (TITULO, DESCRICAO, [ORIGEM], DESTINO, DURACAO, DATA_DISPONIVEL, VALOR_UNITARIO, VALOR_TOTAL, [QUANTIDADE_MAXIMA], CATEGORIAS)
+VALUES ('Pacote Dubai', 'Viagem completa para Dubai', 'Recife', 'Dubai', 7, '2025-12-01', 12000.00, 12000.00, 1, 'Internacional,Praia');
 
 
 INSERT INTO TB_RESERVAS (USUARIO_ID, PACOTE_ID, NUMERO_RESERVA, DATA_RESERVA, VALOR_UNITARIO, STATUS)
 SELECT 
     u.Id, p.Id, 1001, '2025-07-10', 6000.00, 'PENDENTE'
 FROM TB_USUARIOS u, TB_PACOTES p
-WHERE u.NOME = 'Cliente' AND p.TITULO = 'Pacote Cancún';
+WHERE u.NOME = 'Arthur Aguiar Lopes' AND p.TITULO = 'Pacote Cancún';
 
+INSERT INTO TB_RESERVAS (USUARIO_ID, PACOTE_ID, NUMERO_RESERVA, DATA_RESERVA, VALOR_UNITARIO, STATUS)
+SELECT 
+    u.Id, p.Id, 7051, '2025-05-13', 2700.00, 'PENDENTE'
+FROM TB_USUARIOS u, TB_PACOTES p
+WHERE u.NOME = 'Pedro Guimarães' AND p.TITULO = 'Pacote Dubai';
 
+-- Colocando 2 Viajantes para a mesma reseva,
+INSERT INTO TB_VIAGANTES
+(NOME, DOCUMENTO, PASSAPORTE, ID_RESERVA)
+VALUES('Arthur Aguiar Lopes', '46456', '', 1);  
+
+INSERT INTO TB_VIAGANTES
+(NOME, DOCUMENTO, PASSAPORTE, ID_RESERVA)
+VALUES('Sandra Aguiar Lopes', '12312343223', '', 1);
+
+-- Colocando 1 viajante para uma reserva.
+INSERT INTO TB_VIAGANTES
+(NOME, DOCUMENTO, PASSAPORTE, ID_RESERVA)
+VALUES('Pedro Guimarães', '12312343223', '', 2);
+
+-- Insere os pagamentos pendentes para as reservas.

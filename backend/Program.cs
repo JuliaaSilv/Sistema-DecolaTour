@@ -44,11 +44,12 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+// Configuração do banco de dados lendo direto do arquivo de propriedades appsettings.json no lugar de por direto no código.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Configuração do banco de dados
-
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=DB_DecolaTuor;Trusted_Connection=True;Encrypt=False"));
+    options.UseSqlServer(connectionString));
 
 // Adiciona controladores e Swagger
 builder.Services.AddControllers();
@@ -95,7 +96,7 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
         };
-
+/*
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -113,7 +114,7 @@ builder.Services.AddAuthentication(options =>
                 return Task.CompletedTask;
             }
         };
-
+*/
     }
 
     );

@@ -100,5 +100,11 @@ namespace agencia.Service
                 200
             );
         }
+
+        // Adicionado para a tela de lista de reservas do dhashboard do administrador.
+        public async Task<IEnumerable<ReservaCompletaDTO>> ListaCompletaDeReservasAsync()
+        {
+            return await _reservaRepository.ListaCompletaDeReservasAsync();
+        }
     }
 } 

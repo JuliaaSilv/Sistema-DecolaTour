@@ -1,66 +1,41 @@
-import React, { useState } from 'react';
-import { Calendar, Plus, Search, Edit, Trash2, Eye, Filter, Download, User, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Plus, Search, Edit, Trash2, Eye, Download, User, MapPin } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
-import { obterTipoUsuario } from '../../api/auth'; // Adicione este import
-
-// Dados mockados - substituir por dados reais da API
-const mockReservations = [
-  {
-    id: 1,
-    codigo: "RES001",
-    cliente: "Maria Silva",
-    email: "maria@email.com",
-    pacote: "Foz do Iguaçu",
-    destino: "Foz do Iguaçu, Brasil",
-    dataViagem: "2024-08-15",
-    dataReserva: "2024-07-20",
-    valor: 2110,
-    status: "confirmada",
-    pessoas: 2,
-    pagamento: "pago"
-  },
-  {
-    id: 2,
-    codigo: "RES002", 
-    cliente: "João Santos",
-    email: "joao@email.com",
-    pacote: "Rio de Janeiro",
-    destino: "Rio de Janeiro, Brasil",
-    dataViagem: "2024-08-20",
-    dataReserva: "2024-07-18",
-    valor: 1355,
-    status: "pendente",
-    pessoas: 1,
-    pagamento: "pendente"
-  },
-  {
-    id: 3,
-    codigo: "RES003",
-    cliente: "Ana Costa",
-    email: "ana@email.com", 
-    pacote: "Florianópolis",
-    destino: "Florianópolis, Brasil",
-    dataViagem: "2024-08-25",
-    dataReserva: "2024-07-15",
-    valor: 807,
-    status: "cancelada",
-    pessoas: 3,
-    pagamento: "reembolsado"
-  }
-];
+import { obterTipoUsuario } from '../../api/auth';
+import { fetchReservas, normalizeReservaData } from '../../api/reservas';
 
 const ReservationManagement = () => {
-  const [reservations, setReservations] = useState(mockReservations);
+  const [reservations, setReservations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Obtenha o tipo do usuário
   const tipoUsuario = parseInt(obterTipoUsuario());
+
+  useEffect(() => {
+    const loadReservations = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchReservas();
+        console.log(normalizeReservaData);
+        
+        setReservations(data.map(normalizeReservaData));
+        //setReservations(mockReservations) // Caso eu quiser usar os dados mockados.
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadReservations();
+  }, []);
 
   const filteredReservations = reservations.filter(reservation => {
     const matchesSearch = reservation.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -93,16 +68,24 @@ const ReservationManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Tem certeza que deseja excluir esta reserva?')) {
-      setReservations(reservations.filter(res => res.id !== id));
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
-  const handleCreate = () => {
-    setEditingReservation(null);
-    setIsModalOpen(true);
-  };
+  if (error) {
+    return (
+      <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+        <CardContent className="p-8 text-center">
+          <div className="text-red-500 mb-4">Erro ao carregar reservas</div>
+          <p className="text-gray-500">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -178,7 +161,7 @@ const ReservationManagement = () => {
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
-                      <h3 className="font-bold text-lg text-blue-900">#{reservation.codigo}</h3>
+                      <h3 className="font-bold text-lg text-blue-900">#RES{reservation.codigo}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={getStatusColor(reservation.status)}>
                           {reservation.status}
@@ -221,42 +204,11 @@ const ReservationManagement = () => {
                       </div>
                     </div>
                   </div>
+                  
+                         
                 </div>
 
-                {/* Ações */}
-                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:w-32">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-blue-300 text-blue-700 hover:bg-blue-50 flex items-center justify-center"
-                    onClick={() => {}}
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    <span>Ver</span>
-                  </Button>
-                  {tipoUsuario === 1 && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-orange-300 text-orange-700 hover:bg-orange-50 flex items-center justify-center"
-                        onClick={() => handleEdit(reservation)}
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        <span>Editar</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-300 text-red-700 hover:bg-red-50 flex items-center justify-center"
-                        onClick={() => handleDelete(reservation.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        <span>Excluir</span>
-                      </Button>
-                    </>
-                  )}
-                </div>
+         
               </div>
             </CardContent>
           </Card>
@@ -264,7 +216,7 @@ const ReservationManagement = () => {
       </div>
 
       {/* Mensagem quando não há resultados */}
-      {filteredReservations.length === 0 && (
+      {filteredReservations.length === 0 && !isLoading && (
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
           <CardContent className="p-8 text-center">
             <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -274,11 +226,7 @@ const ReservationManagement = () => {
         </Card>
       )}
 
-      {/* Modal de Cadastro/Edição */}
-      {tipoUsuario === 1 && isModalOpen && (
-        // ...seu modal de edição/criação aqui...
-        <div>Modal de edição/criação</div>
-      )}
+ 
     </div>
   );
 };

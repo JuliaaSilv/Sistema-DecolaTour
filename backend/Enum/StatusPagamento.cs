@@ -1,7 +1,7 @@
 public enum StatusPagamento
 {
     Pendente,
-    Aprovado,
+    Pago,
     Rejeitado,
-    Cancelado
+    Reembolsado
 }

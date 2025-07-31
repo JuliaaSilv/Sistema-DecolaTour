@@ -12,6 +12,8 @@ namespace agencia.Interfaces.Repository
 
         Task<Pagamento> BuscarPagamentoPorIdAsync(int id);
 
+        Task<Pagamento> BuscarPagamentoPorIdReservaAsync(int idReserva);
+
         Task<IEnumerable<Pagamento>> ListarPagamentosPorReservaAsync(int idReserva);
 
         Task<IEnumerable<Pagamento>> ListarTodosPagamentosAsync();
