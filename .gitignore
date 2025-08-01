@@ -26,6 +26,7 @@ back-end/*~
 
 ## Node.js dependencies (NUNCA commitar)
 front-end/node_modules/
+backend/node_modules/
 node_modules/
 
 ## Arquivos de ambiente (NUNCA commitar)
