@@ -1,19 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/Admin/admin-sidebar";
 import DashboardMetrics from "../components/Admin/dashboard-metrics";
 import RevenueChart from "../components/Admin/revenue-chart";
 import PopularDestinations from "../components/Admin/popular-destinations";
-import ActivePromotions from "../components/Admin/active-promotions";
 import FrequentClients from "../components/Admin/frequent-clients";
 import ExportButtons from "../components/Admin/export-buttons";
 import PackageManagement from "../components/Admin/PackageManagement";
 import ReservationManagement from "../components/Admin/ReservationManagement";
 import UserManagement from "../components/Admin/UserManagement";
-import { obterTipoUsuario } from "../api/auth"; 
+import { obterTipoUsuario, estaLogado } from "../api/auth"; 
 
 export default function AdminPainel() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const navigate = useNavigate();
   const tipoUsuario = parseInt(obterTipoUsuario());
+
+  // Verificar acesso ao painel administrativo
+  useEffect(() => {
+    if (!estaLogado()) {
+      navigate('/admin-login');
+      return;
+    }
+
+    if (tipoUsuario !== 1 && tipoUsuario !== 2) {
+      // Se não for administrador (1) nem atendente (2), redirecionar para home
+      navigate('/');
+      return;
+    }
+  }, [navigate, tipoUsuario]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,7 +36,7 @@ export default function AdminPainel() {
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
         <main className="flex-1 p-6 space-y-6 overflow-x-hidden min-h-screen">
-          {activeTab === "dashboard" && tipoUsuario === 1 && (
+          {activeTab === "dashboard" && (tipoUsuario === 1 || tipoUsuario === 2) && (
             <>
               <ExportButtons />
               <DashboardMetrics />
@@ -29,8 +44,7 @@ export default function AdminPainel() {
               <RevenueChart />
               <PopularDestinations />
 
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <ActivePromotions />
+              <div className="grid grid-cols-1 xl:grid-cols-1 gap-6">
                 <FrequentClients />
               </div>
             </>

@@ -9,16 +9,21 @@ import { Star } from 'lucide-react';
  * @param {object} hotelInfo - Info do hotel (estrelas, localizacao)
  */
 const HotelInfoCard = ({ pacote }) => {
+  // Garantir que temos um valor válido para estrelas
+  const estrelas = Number(pacote?.estrelas) || 0;
+  
   return (
     <div className="flex-1">
       <h3 className="text-xl font-bold text-blue-900 mb-2">{pacote.titulo}</h3>
       
       {/* Estrelas */}
-      <div className="flex items-center gap-1 text-yellow-500">
-        {[...Array(Number(pacote?.estrelas) || 0)].map((_, i) => (
+      <div className="flex items-center gap-1 text-yellow-500 mb-4">
+        {[...Array(estrelas)].map((_, i) => (
           <Star key={i} className='w-4 h-4 fill-yellow-400 stroke-yellow-500' />
         ))}
-        <span className="text-blue-900 font-medium">{Number(pacote?.estrelas) || 0} estrela{Number(pacote?.estrelas) > 1 ? 's' : ''}</span>
+        <span className="text-blue-900 font-medium ml-1">
+          {estrelas} estrela{estrelas !== 1 ? 's' : ''}
+        </span>
       </div>
       
       {/* Descrição */}

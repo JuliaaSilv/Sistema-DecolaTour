@@ -53,9 +53,9 @@ namespace agencia.Controller
         }
 
         // Adicionado para tela de administrador.
-        // Lista todas as reservas juntamente com alguns dados associados como pagamento, cliente (apenas para administradores).
+        // Lista todas as reservas juntamente com alguns dados associados como pagamento, cliente (apenas para administradores e atendentes).
         [HttpGet("/api/Reserva/lista-completa")]
-        [Authorize(Roles = "2")]
+        [Authorize(Roles = "1,2")]
         public async Task<ActionResult> ListarCompletaDeReservas()
         {
             var reservas = await ReservaService.ListaCompletaDeReservasAsync();

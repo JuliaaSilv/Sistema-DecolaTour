@@ -8,6 +8,34 @@ import Button from "../common/Button";
  * @param {function} onReserve - Função chamada ao clicar em Reservar
  */
 const PricingCard = ({ pacote, onReserve }) => {
+  // Função para formatar valor monetário
+  const formatCurrency = (value) => {
+    if (!value) return "R$ 0,00";
+    
+    // Se é número, converte para formato brasileiro
+    if (typeof value === 'number') {
+      return value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+    
+    // Se é string, tenta converter
+    if (typeof value === 'string') {
+      // Remove caracteres não numéricos exceto vírgula e ponto
+      const numericValue = value.replace(/[^\d.,]/g, '');
+      const number = parseFloat(numericValue.replace(',', '.'));
+      
+      if (!isNaN(number)) {
+        return number.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        });
+      }
+    }
+    
+    return "R$ 0,00";
+  };
   return (
     <div className="flex-1 flex flex-col items-center justify-center bg-blue-50/80 rounded-xl p-6 mt-8 md:mt-0">
       {/* Seção de economia */}
@@ -17,7 +45,7 @@ const PricingCard = ({ pacote, onReserve }) => {
 
       {/* Preços */}
       <div className="text-blue-900 text-xl font-bold mb-1">
-        {pacote.valorTotal}
+        {formatCurrency(pacote.valorTotal)}
       </div>
       <div className="text-blue-700 text-sm mb-2">Preço final por pessoa</div>
       <div className="text-gray-500 text-xs mb-4">
@@ -36,7 +64,7 @@ const PricingCard = ({ pacote, onReserve }) => {
 
       {/* Milhas */}
       <div className="text-purple-700 text-xs mt-3">
-        Ganhe {pacote.valorTotal} milhas Avanade Pass
+        Ganhe {Math.floor((pacote.valorTotal || 0) * 0.1)} milhas Avanade Pass
       </div>
     </div>
   );

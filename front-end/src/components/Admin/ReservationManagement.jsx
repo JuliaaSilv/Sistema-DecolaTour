@@ -68,6 +68,11 @@ const ReservationManagement = () => {
     setIsModalOpen(true);
   };
 
+  const handleCreate = () => {
+    setEditingReservation(null);
+    setIsModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -107,7 +112,7 @@ const ReservationManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          {tipoUsuario === 1 && (
+          {(tipoUsuario === 1 || tipoUsuario === 2) && (
             <Button
               onClick={handleCreate}
               className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"

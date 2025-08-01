@@ -39,9 +39,22 @@ export default function Login() {
     if (resultado.sucesso) {
       // Mostra mensagem de sucesso
       setSucesso('Login realizado com sucesso! 🎉');
+      
+      // Verifica se há uma URL de redirecionamento salva
+      const redirectUrl = localStorage.getItem('redirectAfterLogin');
+      
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {
-        navigate('/home');
+        if (redirectUrl) {
+          // Remove a URL de redirecionamento do localStorage
+          localStorage.removeItem('redirectAfterLogin');
+          console.log('🔄 Redirecionando para:', redirectUrl);
+          // Redireciona para a URL salva
+          navigate(redirectUrl);
+        } else {
+          // Redireciona para home se não há URL salva
+          navigate('/home');
+        }
       }, 2000);
     } else {
       // Deu erro, mostra a mensagem

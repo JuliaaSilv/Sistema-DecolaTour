@@ -63,6 +63,13 @@ namespace agencia.Mapper
             CreateMap<Avaliacao, AvaliacaoDTO>();
             CreateMap<AvaliacaoDTO, Avaliacao>();
 
+            // Mapeamento para avaliação completa com dados de usuário
+            CreateMap<Avaliacao, AvaliacaoCompletaDTO>()
+                .ForMember(dest => dest.Reserva, opt => opt.MapFrom(src => src.Reserva));
+            
+            CreateMap<Reserva, ReservaParaAvaliacaoDTO>()
+                .ForMember(dest => dest.Usuario, opt => opt.MapFrom(src => src.Usuario));
+
 
             CreateMap<Midia, MidiaDTO>();
             CreateMap<MidiaDTO, Midia>();

@@ -100,7 +100,7 @@ namespace agencia.Service
             try
             {
                 var avaliacoes = await _avaliacaoRepository.ListarAvaliacoesPorPacoteAsync(pacoteId);
-                var avaliacoesDTO = _mapper.Map<IEnumerable<AvaliacaoDTO>>(avaliacoes);
+                var avaliacoesDTO = _mapper.Map<IEnumerable<AvaliacaoCompletaDTO>>(avaliacoes);
 
                 return new ApiResponse(avaliacoesDTO, null, 200);
             }

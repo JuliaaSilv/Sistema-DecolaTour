@@ -32,7 +32,7 @@ public class PacoteController : ControllerBase
     }
 
     [HttpPost("cadastrar-simples")]
-    [Authorize(Roles = "1")]
+    [Authorize(Roles = "1,2")]
     [SwaggerOperation(Summary = "Cadastra um novo pacote (dados simples)")]
     public async Task<IActionResult> CadastrarSimples([FromForm] CreatePacoteDTO dto)
     {
@@ -62,19 +62,55 @@ public class PacoteController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "1,2")]
     [SwaggerOperation(Summary = "Atualiza um pacote existente")]
     public async Task<ActionResult> Atualizar(int id, [FromForm] PacoteUploadDTO dto)
     {
-        await _service.AtualizarAsync(id, dto);
-        return Ok();
+        try
+        {
+            // Verifica se o modelo é válido
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors?.Count > 0)
+                    .Select(x => new { 
+                        Field = x.Key, 
+                        Errors = x.Value?.Errors?.Select(e => e.ErrorMessage ?? string.Empty).ToArray() ?? new string[0]
+                    })
+                    .ToArray();
+                
+                return BadRequest(new { 
+                    message = "Dados inválidos", 
+                    errors = errors 
+                });
+            }
+
+            await _service.AtualizarAsync(id, dto);
+            return Ok(new { message = "Pacote atualizado com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao atualizar pacote: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            return BadRequest(new { message = $"Erro ao atualizar pacote: {ex.Message}" });
+        }
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "1,2")]
     [SwaggerOperation(Summary = "Remove um pacote")]
     public async Task<ActionResult> Remover(int id)
     {
-        await _service.RemoverAsync(id);
-        return Ok();
+        try
+        {
+            await _service.RemoverAsync(id);
+            return Ok(new { message = "Pacote removido com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao remover pacote: {ex.Message}");
+            return BadRequest(new { message = $"Erro ao remover pacote: {ex.Message}" });
+        }
     }
     [HttpGet("categorias")]
     public async Task<IActionResult> ListarCategorias()
@@ -85,5 +121,13 @@ public class PacoteController : ControllerBase
             .Distinct()
             .ToList();
         return Ok(categorias);
+    }
+
+    [HttpGet("galeria/tamanhos")]
+    [SwaggerOperation(Summary = "Retorna os tamanhos das imagens do mosaico da galeria")]
+    public IActionResult ObterTamanhosMosaico()
+    {
+        var tamanhos = agencia.Service.ImageProcessingService.GetMosaicSizes();
+        return Ok(tamanhos);
     }
 }

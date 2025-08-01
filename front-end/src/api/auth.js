@@ -55,7 +55,7 @@ export async function fazerCadastro(nome, email, senha, cpf, telefone, dataNasci
         cpf: cpf,
         telefone: telefone,
         dataNascimento: dataNascimento,
-        tipoUsuarioId: 1, // Cliente padrão
+        tipoUsuarioId: 3, // Cliente padrão
       }),
     });
 

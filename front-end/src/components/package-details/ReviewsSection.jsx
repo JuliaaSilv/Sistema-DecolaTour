@@ -1,61 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, ThumbsUp, Calendar, User } from 'lucide-react';
 
-const ReviewsSection = () => {
+const ReviewsSection = ({ pacoteId }) => {
   const [filter, setFilter] = useState('all');
   const [reviewHelpful, setReviewHelpful] = useState({});
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
 
-  const reviews = [
-    {
-      id: 1,
-      name: "Maria Silva",
-      rating: 5,
-      date: "2025-01-15",
-      comment: "Experiência incrível! O hotel superou todas as expectativas. Localização perfeita e atendimento excepcional.",
-      helpful: 12,
-      verified: true
-    },
-    {
-      id: 2,
-      name: "João Santos",
-      rating: 4,
-      date: "2025-01-10",
-      comment: "Muito bom! Café da manhã delicioso e quartos confortáveis. Apenas o wi-fi poderia ser mais rápido.",
-      helpful: 8,
-      verified: true
-    },
-    {
-      id: 3,
-      name: "Ana Costa",
-      rating: 5,
-      date: "2025-01-05",
-      comment: "Perfeito para lua de mel! Vista deslumbrante e serviço de quarto impecável. Recomendo muito!",
-      helpful: 15,
-      verified: true
-    },
-    {
-      id: 4,
-      name: "Carlos Lima",
-      rating: 4,
-      date: "2024-12-28",
-      comment: "Ótima localização e bom custo-benefício. Staff muito atencioso e instalações bem cuidadas.",
-      helpful: 6,
-      verified: true
-    },
-    {
-      id: 5,
-      name: "Fernanda Oliveira",
-      rating: 5,
-      date: "2024-12-20",
-      comment: "Simplesmente maravilhoso! Desde a recepção até o check-out, tudo foi perfeito. Voltarei com certeza!",
-      helpful: 11,
-      verified: true
-    }
-  ];
+  // Busca avaliações do backend
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!pacoteId) {
+        setIsLoading(false);
+        return;
+      }
 
-  const averageRating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
+      try {
+        console.log('🔍 Buscando avaliações para pacote:', pacoteId);
+        const response = await fetch(`http://localhost:5295/api/Avaliacao/pacote/${pacoteId}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📝 Avaliações encontradas:', data);
+          console.log('📝 Estrutura da primeira avaliação:', data[0]);
+          
+          // Transforma os dados do backend para o formato esperado
+          const formattedReviews = data.map(avaliacao => {
+            console.log('🔍 Processando avaliação:', {
+              id: avaliacao.id,
+              reserva: avaliacao.reserva,
+              usuario: avaliacao.reserva?.usuario
+            });
+            
+            return {
+              id: avaliacao.id,
+              name: avaliacao.reserva?.usuario?.nome || 'Usuário Anônimo',
+              rating: avaliacao.nota,
+              date: avaliacao.data,
+              comment: avaliacao.comentario,
+              helpful: 0, // Começamos com 0, pode ser implementado depois
+              verified: true // Por enquanto todos são verificados
+            };
+          });
+          
+          setReviews(formattedReviews);
+          
+          // Calcula média
+          if (formattedReviews.length > 0) {
+            const avg = formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length;
+            setAverageRating(avg);
+          }
+        } else {
+          console.log('⚠️ Nenhuma avaliação encontrada para este pacote');
+          setReviews([]);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao buscar avaliações:', error);
+        setReviews([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [pacoteId]);
+
   const totalReviews = reviews.length;
-
   const filteredReviews = filter === 'all' ? reviews : reviews.filter(review => review.rating === parseInt(filter));
 
   const renderStars = (rating) => {
@@ -88,6 +99,45 @@ const ReviewsSection = () => {
     return originalCount + (reviewHelpful[reviewId] || 0);
   };
 
+  // Se ainda está carregando
+  if (isLoading) {
+    return (
+      <section className="max-w-full md:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 mb-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F28C38] mx-auto mb-4"></div>
+              <p className="text-gray-600">Carregando avaliações...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Se não há avaliações, mostra apenas o CTA
+  if (totalReviews === 0) {
+    return (
+      <section className="max-w-full md:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 mb-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Avaliações dos Hóspedes</h2>
+            <p className="text-gray-600">Seja o primeiro a avaliar este pacote!</p>
+          </div>
+
+          {/* CTA para deixar avaliação */}
+          <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white text-center">
+            <h3 className="text-xl font-semibold mb-2">Já se hospedou conosco?</h3>
+            <p className="mb-4 opacity-90">Compartilhe sua experiência e ajude outros viajantes!</p>
+            <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
+              Deixar Primeira Avaliação
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="max-w-full md:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 mb-12">
       <div className="bg-white rounded-2xl shadow-lg p-8">
@@ -100,7 +150,7 @@ const ReviewsSection = () => {
           {/* Resumo das avaliações */}
           <div className="flex items-center gap-4 mt-4 lg:mt-0">
             <div className="text-center">
-              <div className="text-4xl font-bold text-[#F28C38]">{averageRating}</div>
+              <div className="text-4xl font-bold text-[#F28C38]">{averageRating.toFixed(1)}</div>
               <div className="flex items-center justify-center mb-1">
                 {renderStars(Math.round(averageRating))}
               </div>
@@ -186,7 +236,7 @@ const ReviewsSection = () => {
 
         {/* CTA para deixar avaliação */}
         <div className="mt-8 text-center">
-          <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white">
+          <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white text-center">
             <h3 className="text-xl font-semibold mb-2">Já se hospedou conosco?</h3>
             <p className="mb-4 opacity-90">Compartilhe sua experiência e ajude outros viajantes!</p>
             <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300 cursor-pointer">

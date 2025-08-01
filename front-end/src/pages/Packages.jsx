@@ -27,9 +27,17 @@ export default function Packages() {
     }
   };
 
-  // Separar por tipoPacote
-  const nacionais = packages.filter(pkg => (pkg.tipoPacote || pkg.TipoPacote) === "nacional");
-  const internacionais = packages.filter(pkg => (pkg.tipoPacote || pkg.TipoPacote) === "internacional");
+  // Separar por categorias (usando a lógica anterior)
+  const nacionais = packages.filter(pkg => 
+    pkg.categorias && (
+      pkg.categorias.toLowerCase().includes('nacional') ||
+      pkg.categorias.toLowerCase().includes('cidade') ||
+      pkg.categorias.toLowerCase().includes('praia') && !pkg.categorias.toLowerCase().includes('internacional')
+    )
+  );
+  const internacionais = packages.filter(pkg => 
+    pkg.categorias && pkg.categorias.toLowerCase().includes('internacional')
+  );
 
   return (
     <main className="min-h-screen bg-[#E6E6EB]">

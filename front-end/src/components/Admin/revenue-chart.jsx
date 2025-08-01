@@ -1,23 +1,108 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useState, useEffect } from "react";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
 import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, AlertTriangle, BarChart3 } from "lucide-react";
 import { cn } from "../../lib/utils";
-
-const monthlyRevenue = [
-	{ month: "Jan", revenue: 45000, target: 50000 },
-	{ month: "Fev", revenue: 52000, target: 50000 },
-	{ month: "Mar", revenue: 48000, target: 50000 },
-	{ month: "Abr", revenue: 61000, target: 55000 },
-	{ month: "Mai", revenue: 55000, target: 55000 },
-	{ month: "Jun", revenue: 67000, target: 60000 },
-	{ month: "Jul", revenue: 72000, target: 65000 },
-	{ month: "Ago", revenue: 68000, target: 65000 },
-];
+import { fetchFaturamentoMensal } from "../../api/dashboard";
 
 export default function RevenueChart() {
+	const [data, setData] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+
+	useEffect(() => {
+		const loadRevenueData = async () => {
+			try {
+				setLoading(true);
+				const response = await fetchFaturamentoMensal();
+				
+				// Transformar dados para o formato do gráfico
+				const formattedData = response.map(item => ({
+					month: item.mes,
+					revenue: item.valor || 0,
+					target: (item.valor || 0) * 1.1 // Meta como 110% da receita atual
+				}));
+				
+				setData(formattedData);
+			} catch (err) {
+				console.error("Erro ao carregar dados de faturamento:", err);
+				setError("Erro ao carregar dados de receita");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadRevenueData();
+	}, []);
+
+	if (loading) {
+		return (
+			<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+				<CardHeader>
+					<CardTitle className="flex items-center text-blue-700">
+						<TrendingUp className="w-5 h-5 mr-2" />
+						Receita Mensal
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="h-350 flex items-center justify-center">
+						<div className="animate-pulse text-center">
+							<BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+							<p className="text-gray-500">Carregando dados...</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	}
+
+	if (error) {
+		return (
+			<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+				<CardHeader>
+					<CardTitle className="flex items-center text-blue-700">
+						<TrendingUp className="w-5 h-5 mr-2" />
+						Receita Mensal
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="h-350 flex items-center justify-center">
+						<div className="text-center">
+							<AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+							<h3 className="text-lg font-semibold text-red-800 mb-2">Erro ao carregar dados</h3>
+							<p className="text-red-600">{error}</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	}
+
+	if (!data || data.length === 0) {
+		return (
+			<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+				<CardHeader>
+					<CardTitle className="flex items-center text-blue-700">
+						<TrendingUp className="w-5 h-5 mr-2" />
+						Receita Mensal
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="h-350 flex items-center justify-center">
+						<div className="text-center">
+							<BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+							<h3 className="text-lg font-semibold text-gray-600 mb-2">Nenhum dado disponível</h3>
+							<p className="text-gray-500">Não há dados de receita para exibir no gráfico.</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	return (
 		<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
 			<CardHeader>
@@ -29,7 +114,7 @@ export default function RevenueChart() {
 			<CardContent>
 				<ResponsiveContainer width="100%" height={350}>
 					<BarChart
-						data={monthlyRevenue}
+						data={data}
 						margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
 					>
 						<CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
@@ -40,7 +125,7 @@ export default function RevenueChart() {
 						/>
 						<Tooltip
 							formatter={(value, name) => [
-								`R$ ${Number(value).toLocaleString()}`,
+								`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
 								name === "revenue" ? "Receita" : "Meta",
 							]}
 							labelStyle={{ color: "#374151" }}

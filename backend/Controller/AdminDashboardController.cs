@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using agencia.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace agencia.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "1,2")] // Apenas administradores e atendentes
     public class AdminDashboardController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -54,7 +56,9 @@ namespace agencia.Controller
         public async Task<IActionResult> GetDestinosPopulares()
         {
             var destinos = await _context.Reservas
-                .GroupBy(r => r.Pacote.Destino)
+                .Include(r => r.Pacote)
+                .Where(r => r.Pacote != null && r.Pacote.Destino != null)
+                .GroupBy(r => r.Pacote!.Destino)
                 .Select(g => new {
                     Destino = g.Key,
                     Reservas = g.Count()
@@ -88,9 +92,11 @@ namespace agencia.Controller
         public async Task<IActionResult> GetClientesFrequentes()
         {
             var clientes = await _context.Reservas
-                .GroupBy(r => r.Usuario.Email)
+                .Include(r => r.Usuario)
+                .Where(r => r.Usuario != null && r.Usuario.Email != null)
+                .GroupBy(r => r.Usuario!.Email)
                 .Select(g => new {
-                    Nome = g.First().Usuario.Nome,
+                    Nome = g.First().Usuario!.Nome,
                     Email = g.Key,
                     Reservas = g.Count()
                 }).OrderByDescending(x => x.Reservas)

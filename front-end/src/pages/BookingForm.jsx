@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Users } from 'lucide-react';
-import { getPackage } from '../data/packages';
+import { getPackage } from '../api/packages';
+import { estaLogado, obterTipoUsuario } from '../api/auth';
 
 // Função para extrair valor numérico do preço
-const extractNumericPrice = (priceString) => {
-  if (!priceString) return 0;
-  // Remove "R$", espaços e converte vírgulas em pontos para parsing
-  const numericString = priceString.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
-  return parseFloat(numericString) || 0;
+const extractNumericPrice = (priceValue) => {
+  if (!priceValue) return 0;
+  
+  // Se já é um número, retorna diretamente
+  if (typeof priceValue === 'number') return priceValue;
+  
+  // Se é string, processa
+  if (typeof priceValue === 'string') {
+    // Remove "R$", espaços e converte vírgulas em pontos para parsing
+    const numericString = priceValue.replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+    return parseFloat(numericString) || 0;
+  }
+  
+  return 0;
 };
 
 const BookingForm = () => {
@@ -16,7 +26,9 @@ const BookingForm = () => {
   const navigate = useNavigate();
   // Decodifica o parâmetro caso seja um nome com caracteres especiais
   const identifier = decodeURIComponent(id);
-  const pacote = getPackage(identifier);
+  
+  const [pacote, setPacote] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
 
   const [formData, setFormData] = useState({
@@ -38,6 +50,45 @@ const BookingForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Verificar autenticação ao carregar o componente
+  useEffect(() => {
+    const verificarAuth = () => {
+      if (!estaLogado()) {
+        // Salvar URL atual para redirect após login
+        localStorage.setItem('redirectAfterLogin', window.location.pathname);
+        navigate('/login');
+        return;
+      }
+
+      const tipoUsuario = obterTipoUsuario();
+      if (tipoUsuario !== "3") {
+        // Se não for cliente (tipo 3), redirecionar para página inicial
+        navigate('/');
+        return;
+      }
+    };
+
+    verificarAuth();
+  }, [navigate]);
+
+  // Carregar dados do pacote
+  useEffect(() => {
+    async function loadPackage() {
+      setIsLoading(true);
+      try {
+        const packageData = await getPackage(identifier);
+        setPacote(packageData);
+      } catch (error) {
+        console.error('Erro ao carregar pacote:', error);
+        setPacote(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    loadPackage();
+  }, [identifier]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -127,7 +178,7 @@ const BookingForm = () => {
       // Criar objeto pacote com preço numérico
       const pacoteComPrecoNumerico = {
         ...pacote,
-        preco: extractNumericPrice(pacote.preco)
+        preco: extractNumericPrice(pacote.valorTotal || pacote.preco)
       };
       
       // Navegar para a página de pagamento com os dados
@@ -143,6 +194,16 @@ const BookingForm = () => {
   const handleBack = () => {
     navigate(`/packages/${id}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Carregando...</h2>
+        </div>
+      </div>
+    );
+  }
 
   if (!pacote) {
     return (
@@ -186,14 +247,22 @@ const BookingForm = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Resumo da Reserva</h2>
           <div className="flex items-center gap-4">
             <img 
-              src={pacote.imagem} 
-              alt={pacote.nome}
+              src={pacote.imagens && pacote.imagens.length > 0 
+                ? `http://localhost:5295${pacote.imagens[0].url}` 
+                : '/default-package.jpg'
+              } 
+              alt={pacote.titulo}
               className="w-20 h-20 object-cover rounded-lg"
             />
             <div>
-              <h3 className="font-semibold text-gray-800 text-lg">{pacote.nome}</h3>
+              <h3 className="font-semibold text-gray-800 text-lg">{pacote.titulo}</h3>
               <p className="text-gray-600">{pacote.destino}</p>
-              <p className="text-[#F28C38] font-bold text-xl">R$ {extractNumericPrice(pacote.preco).toLocaleString('pt-BR')}</p>
+              <p className="text-[#F28C38] font-bold text-xl">
+                {extractNumericPrice(pacote.valorTotal || pacote.preco).toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                })}
+              </p>
             </div>
           </div>
         </div>

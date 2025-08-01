@@ -28,6 +28,7 @@ namespace agencia.Service
                 Titulo = p.Titulo,
                 Descricao = p.Descricao,
                 Destino = p.Destino,
+                Estrelas = p.Estrelas,
                 Categorias = p.Categorias,
                 Duracao = p.Duracao,
                 DataDisponivel = p.DataDisponivel,
@@ -70,13 +71,24 @@ namespace agencia.Service
 
             if (dto.Imagens != null)
             {
-                foreach (var imagem in dto.Imagens)
+                for (int i = 0; i < dto.Imagens.Count; i++)
                 {
+                    var imagem = dto.Imagens[i];
                     var nomeImagem = Guid.NewGuid() + Path.GetExtension(imagem.FileName);
                     var caminhoImagem = Path.Combine(pastaPacote, nomeImagem);
 
-                    using var stream = new FileStream(caminhoImagem, FileMode.Create);
-                    await imagem.CopyToAsync(stream);
+                    // Processa as 3 primeiras imagens para o mosaico da galeria
+                    if (i < 3)
+                    {
+                        var processedImageData = await ImageProcessingService.ResizeImageForGallery(imagem, i);
+                        await ImageProcessingService.SaveProcessedImageAsync(processedImageData, caminhoImagem);
+                    }
+                    else
+                    {
+                        // Imagens após a terceira mantêm tamanho original
+                        using var stream = new FileStream(caminhoImagem, FileMode.Create);
+                        await imagem.CopyToAsync(stream);
+                    }
 
                     pacote.Imagens.Add(new ImagemPacote { Url = $"/imagens/{pacote.Id}/{nomeImagem}" });
                 }
@@ -115,12 +127,25 @@ namespace agencia.Service
 
             if (dto.Imagens != null)
             {
-                foreach (var imagem in dto.Imagens)
+                for (int i = 0; i < dto.Imagens.Count; i++)
                 {
+                    var imagem = dto.Imagens[i];
                     var nomeImagem = Guid.NewGuid() + Path.GetExtension(imagem.FileName);
                     var caminhoImagem = Path.Combine(pastaPacote, nomeImagem);
-                    using var stream = new FileStream(caminhoImagem, FileMode.Create);
-                    await imagem.CopyToAsync(stream);
+                    
+                    // Processa as 3 primeiras imagens para o mosaico da galeria
+                    if (i < 3)
+                    {
+                        var processedImageData = await ImageProcessingService.ResizeImageForGallery(imagem, i);
+                        await ImageProcessingService.SaveProcessedImageAsync(processedImageData, caminhoImagem);
+                    }
+                    else
+                    {
+                        // Imagens após a terceira mantêm tamanho original
+                        using var stream = new FileStream(caminhoImagem, FileMode.Create);
+                        await imagem.CopyToAsync(stream);
+                    }
+                    
                     pacote.Imagens.Add(new ImagemPacote { Url = $"/imagens/{pacote.Id}/{nomeImagem}" });
                 }
             }
@@ -171,6 +196,7 @@ namespace agencia.Service
                 Id = p.Id,
                 Titulo = p.Titulo,
                 Destino = p.Destino,
+                Estrelas = p.Estrelas,
                 ValorTotal = p.ValorTotal,
                 ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty
             }).ToList();

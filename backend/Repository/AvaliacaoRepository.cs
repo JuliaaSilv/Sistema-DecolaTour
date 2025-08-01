@@ -15,7 +15,9 @@ namespace agencia.Repository
         {
             return await _context.Set<Avaliacao>()
                 .Include(a => a.Reserva)
-                .ThenInclude(r => r.Pacote)
+                    .ThenInclude(r => r.Usuario)
+                .Include(a => a.Reserva)
+                    .ThenInclude(r => r.Pacote)
                 .Where(a => a.Reserva.PacoteId == pacoteId)
                 .OrderByDescending(a => a.Data)
                 .ToListAsync();

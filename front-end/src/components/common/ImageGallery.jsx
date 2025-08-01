@@ -20,7 +20,7 @@ const ImageGallery = ({
       <div className="relative w-full h-full flex items-center justify-center">
         {/* Botão anterior */}
         <button
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition cursor-pointer"
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}
           onClick={prevImage}
           aria-label="Foto anterior"
@@ -37,7 +37,7 @@ const ImageGallery = ({
 
         {/* Botão próximo */}
         <button
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition cursor-pointer"
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}
           onClick={nextImage}
           aria-label="Próxima foto"
@@ -47,7 +47,7 @@ const ImageGallery = ({
 
         {/* Botão fechar */}
         <button
-          className="absolute top-6 right-6 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition"
+          className="absolute top-6 right-6 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition cursor-pointer"
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}
           onClick={closeGallery}
           aria-label="Fechar galeria"

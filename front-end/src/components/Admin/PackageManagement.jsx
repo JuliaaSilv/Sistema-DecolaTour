@@ -5,7 +5,8 @@ import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
 import PackageFormModal from './PackageFormModal';
-import { obterTipoUsuario } from '../../api/auth'; // adicione este import
+import PackageViewModal from './PackageViewModal';
+import { obterTipoUsuario } from '../../api/auth';
 
 // Dados mockados - substituir por dados reais da API
 const mockPackages = [
@@ -27,8 +28,11 @@ const PackageManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
+  const [viewingPackage, setViewingPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Obtenha o tipo do usuário
   const tipoUsuario = parseInt(obterTipoUsuario());
@@ -41,6 +45,7 @@ const PackageManagement = () => {
   const fetchPackages = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       console.log('PackageManagement - Token:', token ? 'Presente' : 'Ausente');
       
@@ -88,6 +93,8 @@ const PackageManagement = () => {
                   : ''), // Deixe vazio se não houver imagem
             descricao: pkg.descricao,
             quantidadeMaximaPessoas: pkg.quantidadeMaximaPessoas,
+            duracao: pkg.duracao,
+            estrelas: pkg.estrelas,
             // origem: pkg.origem,
             email: pkg.email,
             detalhes: typeof pkg.detalhes === 'string' ? JSON.parse(pkg.detalhes) : pkg.detalhes,
@@ -100,11 +107,13 @@ const PackageManagement = () => {
         console.error('PackageManagement - Erro ao carregar pacotes, status:', response.status);
         const errorText = await response.text();
         console.error('PackageManagement - Erro detalhado:', errorText);
+        setError('Erro ao carregar pacotes do servidor');
         // Fallback para dados mockados se não conseguir carregar do backend
         setPackages(mockPackages);
       }
     } catch (error) {
       console.error('PackageManagement - Erro de conexão:', error);
+      setError('Erro de conexão com o servidor');
       // Fallback para dados mockados
       setPackages(mockPackages);
     } finally {
@@ -115,6 +124,8 @@ const PackageManagement = () => {
   const handleSavePackage = (savedPackage) => {
     // Atualiza a lista de pacotes
     fetchPackages();
+    // Mostra mensagem de sucesso
+    alert(editingPackage ? 'Pacote atualizado com sucesso!' : 'Pacote criado com sucesso!');
   };
 
   const filteredPackages = packages.filter(pkg => {
@@ -143,8 +154,13 @@ const PackageManagement = () => {
     setIsModalOpen(true);
   };
 
+  const handleView = (packageItem) => {
+    setViewingPackage(packageItem);
+    setIsViewModalOpen(true);
+  };
+
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este pacote?')) {
+    if (window.confirm('Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.')) {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -164,11 +180,13 @@ const PackageManagement = () => {
           setPackages(packages.filter(pkg => pkg.id !== id));
           alert('Pacote excluído com sucesso!');
         } else {
-          alert('Erro ao excluir pacote');
+          const errorText = await response.text();
+          console.error('Erro ao excluir pacote:', errorText);
+          alert('Erro ao excluir pacote. Verifique se não há reservas associadas.');
         }
       } catch (error) {
         console.error('Erro ao excluir pacote:', error);
-        alert('Erro de conexão');
+        alert('Erro de conexão ao tentar excluir o pacote.');
       }
     }
   };
@@ -176,6 +194,50 @@ const PackageManagement = () => {
   const handleCreate = () => {
     setEditingPackage(null);
     setIsModalOpen(true);
+  };
+
+  const handleExport = () => {
+    try {
+      // Prepara os dados para exportação
+      const exportData = filteredPackages.map(pkg => ({
+        ID: pkg.id,
+        Nome: pkg.nome,
+        Destino: pkg.destino,
+        Preço: `R$ ${pkg.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        Categoria: pkg.categoria,
+        Status: pkg.status,
+        Reservas: pkg.reservas,
+        'Última Reserva': pkg.dataUltimaReserva,
+        'Capacidade Máxima': pkg.quantidadeMaximaPessoas || 'N/A',
+        Descrição: pkg.descricao || 'N/A'
+      }));
+
+      // Converte para CSV
+      const headers = Object.keys(exportData[0]).join(',');
+      const csvContent = exportData.map(row => 
+        Object.values(row).map(value => 
+          typeof value === 'string' && value.includes(',') ? `"${value}"` : value
+        ).join(',')
+      ).join('\n');
+      
+      const csv = `${headers}\n${csvContent}`;
+      
+      // Cria e baixa o arquivo
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `pacotes_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert('Dados exportados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar dados:', error);
+      alert('Erro ao exportar dados');
+    }
   };
 
   return (
@@ -191,14 +253,15 @@ const PackageManagement = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Button
-            onClick={() => {}} 
+            onClick={handleExport} 
             variant="outline"
             className="border-blue-300 text-blue-700 hover:bg-blue-50 flex items-center justify-center"
+            disabled={filteredPackages.length === 0}
           >
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          {tipoUsuario === 1 && (
+          {(tipoUsuario === 1 || tipoUsuario === 2) && (
             <Button
               onClick={handleCreate}
               className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
@@ -240,6 +303,22 @@ const PackageManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Mensagem de erro */}
+      {error && (
+        <Card className="bg-red-50 border border-red-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-red-700">
+              <Package className="w-5 h-5" />
+              <span className="font-medium">Atenção:</span>
+              <span>{error}</span>
+            </div>
+            <p className="text-sm text-red-600 mt-1">
+              Alguns dados podem estar sendo exibidos offline.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Lista de Pacotes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -323,12 +402,12 @@ const PackageManagement = () => {
                     size="sm"
                     variant="outline"
                     className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 flex items-center justify-center"
-                    onClick={() => {}}
+                    onClick={() => handleView(packageItem)}
                   >
                     <Eye className="w-4 h-4 mr-1" />
                     <span>Ver</span>
                   </Button>
-                  {tipoUsuario === 1 && (
+                  {(tipoUsuario === 1 || tipoUsuario === 2) && (
                     <>
                       <Button
                         size="sm"
@@ -369,7 +448,7 @@ const PackageManagement = () => {
       )}
 
       {/* Modal de Cadastro/Edição */}
-      {tipoUsuario === 1 && (
+      {(tipoUsuario === 1 || tipoUsuario === 2) && (
         <PackageFormModal
           isOpen={isModalOpen}
           onClose={() => {
@@ -380,6 +459,16 @@ const PackageManagement = () => {
           onSave={handleSavePackage}
         />
       )}
+
+      {/* Modal de Visualização */}
+      <PackageViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setViewingPackage(null);
+        }}
+        packageData={viewingPackage}
+      />
     </div>
   );
 };

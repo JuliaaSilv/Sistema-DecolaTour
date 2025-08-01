@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Upload,
@@ -16,23 +16,58 @@ import { estaLogado, obterTipoUsuario } from "../../api/auth";
 
 const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
   const [formData, setFormData] = useState({
-    titulo: editingPackage?.titulo || "",
-    destino: editingPackage?.destino || "",
-    estrelas: editingPackage?.estrelas || 3,
-    valorTotal: editingPackage?.valorTotal || "",
-    descricao: editingPackage?.descricao || "",
-    tipoPacote: editingPackage?.tipoPacote || "nacional",
-    categorias: editingPackage?.categorias || "2em1",
-    duracao: editingPackage?.duracao || 7,
-    dataDisponivel:
-      editingPackage?.dataDisponivel || new Date().toISOString().split("T")[0],
-    quantidadeMaximaPessoas: editingPackage?.quantidadeMaximaPessoas || "",
+    titulo: "",
+    destino: "",
+    estrelas: 3,
+    valorTotal: "",
+    descricao: "",
+    categorias: "2em1",
+    duracao: 7,
+    dataDisponivel: new Date().toISOString().split("T")[0],
+    quantidadeMaximaPessoas: "",
     imagens: [],
     videos: [],
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Atualiza o formulário quando editingPackage muda
+  useEffect(() => {
+    if (editingPackage) {
+      setFormData({
+        titulo: editingPackage.titulo || editingPackage.nome || "",
+        destino: editingPackage.destino || "",
+        estrelas: editingPackage.estrelas || 3,
+        valorTotal: editingPackage.valorTotal || editingPackage.preco || "",
+        descricao: editingPackage.descricao || "",
+        categorias: editingPackage.categorias || "2em1",
+        duracao: editingPackage.duracao || 7,
+        dataDisponivel: editingPackage.dataDisponivel 
+          ? new Date(editingPackage.dataDisponivel).toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
+        quantidadeMaximaPessoas: editingPackage.quantidadeMaximaPessoas || "",
+        imagens: [],
+        videos: [],
+      });
+    } else {
+      // Reset para valores padrão quando não está editando
+      setFormData({
+        titulo: "",
+        destino: "",
+        estrelas: 3,
+        valorTotal: "",
+        descricao: "",
+        categorias: "2em1",
+        duracao: 7,
+        dataDisponivel: new Date().toISOString().split("T")[0],
+        quantidadeMaximaPessoas: "",
+        imagens: [],
+        videos: [],
+      });
+    }
+    setErrors({});
+  }, [editingPackage]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -123,7 +158,6 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       formDataToSend.append("ValorTotal", parseFloat(formData.valorTotal));
       formDataToSend.append("Descricao", formData.descricao);
       formDataToSend.append("Categorias", formData.categorias);
-      formDataToSend.append("TipoPacote", formData.tipoPacote);
       formDataToSend.append("Duracao", parseInt(formData.duracao));
       formDataToSend.append("DataDisponivel", formData.dataDisponivel); // Backend deve aceitar YYYY-MM-DD
       formDataToSend.append(
@@ -163,16 +197,17 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       }
 
       // Envia para o backend
-      const response = await fetch(
-        "http://localhost:5295/api/Pacote/cadastrar-simples/cadastrar-simples",
-        {
-          method: editingPackage ? "PUT" : "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formDataToSend,
-        }
-      );
+      const url = editingPackage 
+        ? `http://localhost:5295/api/Pacote/${editingPackage.id}`
+        : "http://localhost:5295/api/Pacote/cadastrar-simples";
+        
+      const response = await fetch(url, {
+        method: editingPackage ? "PUT" : "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
 
       console.log("Status da resposta:", response.status);
 
@@ -211,11 +246,21 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
 
         try {
           const errorData = JSON.parse(errorText);
-          alert(
-            `Erro ${response.status}: ${
-              errorData.message || errorData.title || "Erro ao salvar pacote"
-            }`
-          );
+          
+          if (errorData.errors && Array.isArray(errorData.errors)) {
+            // Mostra erros de validação específicos
+            const errorMessages = errorData.errors
+              .map(err => `${err.Field}: ${err.Errors.join(', ')}`)
+              .join('\n');
+            alert(`Erro de validação:\n${errorMessages}`);
+          } else {
+            // Mostra erro geral
+            alert(
+              `Erro ${response.status}: ${
+                errorData.message || errorData.title || "Erro ao salvar pacote"
+              }`
+            );
+          }
         } catch (parseError) {
           alert(
             `Erro ${response.status}: ${response.statusText}\nDetalhes: ${errorText}`
@@ -254,21 +299,6 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Informações Básicas */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tipo de Pacote *
-                </label>
-                <select
-                  name="tipoPacote"
-                  value={formData.tipoPacote}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  <option value="nacional">Nacional</option>
-                  <option value="internacional">Internacional</option>
-                </select>
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Título do Pacote *

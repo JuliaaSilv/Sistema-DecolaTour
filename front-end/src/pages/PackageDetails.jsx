@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import fundo from "../assets/fundoHome.jpg";
 import Button from "../components/common/Button";
-import { packageDetails, hotelServices } from "../data/packages";
 import HotelServices from "../components/common/HotelServices";
+import { estaLogado, obterTipoUsuario } from "../api/auth";
 // Componentes de package-details
 import PackageHero from "../components/package-details/PackageHero";
 import HotelInfoCard from "../components/package-details/HotelInfoCard";
@@ -90,15 +90,32 @@ export default function PackageDetails() {
     loadPackage();
   }, [identifier]);
 
-  // // Extraindo dados centralizados com fallbacks inteligentes
-  // const { imagensGaleria: defaultImages, hotelInfo, descricoes } = packageDetails;
-  
   // Sistema híbrido para imagens
  const imagensGaleria = pacote?.imagens?.map(img => `http://localhost:5295${img.url}`) ?? null;
 
   
 
   const handleReserva = () => {
+    // Verifica se o usuário está logado
+    if (!estaLogado()) {
+      console.log('🚫 Usuário não está logado, redirecionando para login');
+      // Salva a URL de destino para redirecionar após o login
+      const bookingUrl = `/booking-form/${pacote.id}`;
+      localStorage.setItem('redirectAfterLogin', bookingUrl);
+      // Redireciona para login
+      navigate('/login');
+      return;
+    }
+
+    // Verifica se é um cliente (tipo 3)
+    const tipoUsuario = obterTipoUsuario();
+    if (tipoUsuario !== '3') {
+      console.log('🚫 Usuário não é cliente, tipo:', tipoUsuario);
+      alert('Apenas clientes podem fazer reservas. Faça login com uma conta de cliente.');
+      return;
+    }
+
+    console.log('✅ Usuário logado como cliente, redirecionando para booking form');
     // Redireciona para a página BookingForm usando o id do pacote
     navigate(`/booking-form/${pacote.id}`);
   };
@@ -173,7 +190,7 @@ export default function PackageDetails() {
 
       {/* Seção de avaliações com espaçamento maior */}
       <div className="mt-16">
-        <ReviewsSection />
+        <ReviewsSection pacoteId={pacote?.id} />
       </div>
     </main>
   );

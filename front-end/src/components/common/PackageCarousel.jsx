@@ -68,13 +68,15 @@ const PackageCarousel = ({ packages}) => {
               style={{ minWidth: `${100 / visibleCards}%`, transition: 'min-width 0.3s' }}
             >
               <SimplePackageCard
+                id={pkg.id}
                 imagem={pkg.imagem}
-                nome={pkg.nome}
+                titulo={pkg.titulo}
                 preco={pkg.preco}
                 duracao={pkg.duracao}
                 destino={pkg.destino}
                 categoria={pkg.categoria}
                 inclusions={pkg.inclusions}
+                estrelas={pkg.estrelas}
               />
             </div>
           ))}

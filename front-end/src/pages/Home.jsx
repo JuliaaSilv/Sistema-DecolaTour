@@ -33,39 +33,51 @@ export default function Home() {
           data.forEach((pkg, idx) => {
             console.log(`Pacote[${idx}]:`, {
               id: pkg.id,
+              // Campos Pascal Case (DTO)
+              Titulo: pkg.Titulo,
+              Destino: pkg.Destino,
+              Estrelas: pkg.Estrelas,
+              ValorTotal: pkg.ValorTotal,
+              Imagens: pkg.Imagens,
+              // Campos camelCase (possível conversão)
               titulo: pkg.titulo,
               nome: pkg.nome,
               destino: pkg.destino,
+              estrelas: pkg.estrelas,
               valorTotal: pkg.valorTotal,
               valorUnitario: pkg.valorUnitario,
               categorias: pkg.categorias,
-              // origem: pkg.origem,
               ImagemUrl: pkg.ImagemUrl,
               descricao: pkg.descricao,
             });
           });
           // Adapta os dados do backend
-          const adaptedPackages = data.slice(0, 8).map((pkg, index) => ({
-            id: pkg.id,
-            nome: pkg.titulo || pkg.nome,
-            destino: pkg.destino,
-            preco: pkg.valorTotal || pkg.valorUnitario || 0,
-            precoOriginal: 10000,
-            duracao: pkg.duracao
-              ? `${pkg.duracao} DIAS / ${pkg.duracao - 1} NOITES`
-              : undefined,
-            categoria: "PACOTE",
-            // origem: pkg.origem || "Saindo de São Paulo",
-            inclusions: "Hotel + Aéreo",
-            economia: 5000,
-            rating: 7.5 + Math.random() * 1.5,
-            ofertaEspecial: index === data.length - 1,
-            imagem:
-              pkg.imagens && pkg.imagens.length > 0
-                ? `http://localhost:5295${pkg.imagens[0].url}`
-                : "/packages/default.jpg",
-            descricao: pkg.descricao,
-          }));
+          const adaptedPackages = data.slice(0, 8).map((pkg, index) => {
+            return {
+              id: pkg.id,
+              titulo: pkg.Titulo || pkg.titulo || pkg.nome,  // Renomeado para titulo
+              destino: pkg.Destino || pkg.destino,
+              estrelas: pkg.Estrelas || pkg.estrelas || 0, // Direto do backend
+              preco: pkg.ValorTotal || pkg.valorTotal || pkg.valorUnitario || 0,
+              precoOriginal: 10000,
+              duracao: pkg.Duracao || pkg.duracao
+                ? `${(pkg.Duracao || pkg.duracao)} DIAS / ${(pkg.Duracao || pkg.duracao) - 1} NOITES`
+                : undefined,
+              categoria: "PACOTE",
+              // origem: pkg.origem || "Saindo de São Paulo",
+              inclusions: "Hotel + Aéreo",
+              economia: 5000,
+              rating: 7.5 + Math.random() * 1.5,
+              ofertaEspecial: index === data.length - 1,
+              imagem:
+                pkg.Imagens && pkg.Imagens.length > 0
+                  ? `http://localhost:5295${pkg.Imagens[0].Url}`
+                  : pkg.imagens && pkg.imagens.length > 0
+                  ? `http://localhost:5295${pkg.imagens[0].url}`
+                  : "/packages/default.jpg",
+              descricao: pkg.Descricao || pkg.descricao,
+            };
+          });
           console.log("Pacotes adaptados para Home:", adaptedPackages);
           setFeaturedPackages(adaptedPackages);
         } else {
@@ -166,13 +178,15 @@ export default function Home() {
                   featuredPackages.map((pkg, index) => (
                     <SimplePackageCard
                       key={`simple-card-${pkg.id || index}`}
+                      id={pkg.id}
                       imagem={pkg.imagem}
-                      nome={pkg.nome}
+                      titulo={pkg.titulo}
                       preco={pkg.preco}
                       duracao={pkg.duracao}
                       destino={pkg.destino}
                       categoria={pkg.categoria}
                       inclusions={pkg.inclusions}
+                      estrelas={pkg.estrelas}
                     />
                   ))
                 ) : (
