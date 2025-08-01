@@ -30,7 +30,12 @@ public class PacoteUploadDTO
     
     [Required(ErrorMessage = "Categorias são obrigatórias")]
     public string Categorias { get; set; } = string.Empty;
-    
+
+    public string? CriadoPor { get; set; } = string.Empty;
+    public DateTime? CriadoEm { get; set; } = DateTime.Now;
+    public string? AtualizadoPor { get; set; } = string.Empty;
+    public DateTime? AtualizadoEm { get; set; } = DateTime.Now;
+
     public List<IFormFile> Imagens { get; set; } = new List<IFormFile>();
     public List<IFormFile> Videos { get; set; } = new List<IFormFile>();
     

@@ -20,14 +20,29 @@ const FunctionalSearchBar = ({ onSearch }) => {
   const [dataVolta, setDataVolta] = useState('');
   const [pessoas, setPessoas] = useState(2);
 
+  // Data mínima (hoje)
+  const hoje = new Date().toISOString().split('T')[0];
+
   // Função para realizar a busca
   const handleBuscar = () => {
+    // Validação básica
+    if (!destino.trim()) {
+      alert('Por favor, informe o destino da viagem.');
+      return;
+    }
+
+    // Formatação das datas para o formato ISO (se fornecidas)
+    const formatDateForAPI = (dateString) => {
+      if (!dateString) return null;
+      const date = new Date(dateString);
+      return date.toISOString();
+    };
+
     const dadosBusca = {
-      // origem,
-      destino,
-      dataIda,
-      dataVolta,
-      pessoas
+      destino: destino.trim(),
+      dataIda: formatDateForAPI(dataIda),
+      dataVolta: formatDateForAPI(dataVolta),
+      pessoas: parseInt(pessoas)
     };
     
     console.log('Realizando busca:', dadosBusca);
@@ -96,6 +111,7 @@ const FunctionalSearchBar = ({ onSearch }) => {
                 type="date"
                 value={dataIda}
                 onChange={(e) => setDataIda(e.target.value)}
+                min={hoje}
                 className="w-full text-sm text-black bg-transparent focus:outline-none cursor-pointer"
               />
             </div>
@@ -114,7 +130,7 @@ const FunctionalSearchBar = ({ onSearch }) => {
                 type="date"
                 value={dataVolta}
                 onChange={(e) => setDataVolta(e.target.value)}
-                min={dataIda}
+                min={dataIda || hoje}
                 className="w-full text-sm text-black bg-transparent focus:outline-none cursor-pointer"
               />
             </div>

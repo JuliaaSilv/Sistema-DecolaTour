@@ -4,6 +4,8 @@ import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import ToastContainer from '../ui/ToastContainer';
+import useToast from '../../hooks/useToast';
 import PackageFormModal from './PackageFormModal';
 import PackageViewModal from './PackageViewModal';
 import { obterTipoUsuario } from '../../api/auth';
@@ -24,6 +26,7 @@ const mockPackages = [
 ];
 
 const PackageManagement = () => {
+  const { toasts, showSuccess, showError, showWarning, removeToast } = useToast();
   const [packages, setPackages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
@@ -125,7 +128,7 @@ const PackageManagement = () => {
     // Atualiza a lista de pacotes
     fetchPackages();
     // Mostra mensagem de sucesso
-    alert(editingPackage ? 'Pacote atualizado com sucesso!' : 'Pacote criado com sucesso!');
+    showSuccess(editingPackage ? 'Pacote atualizado com sucesso!' : 'Pacote criado com sucesso!');
   };
 
   const filteredPackages = packages.filter(pkg => {
@@ -164,7 +167,7 @@ const PackageManagement = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          alert('Você precisa estar logado para excluir um pacote');
+          showError('Você precisa estar logado para excluir um pacote');
           return;
         }
 
@@ -178,15 +181,15 @@ const PackageManagement = () => {
         if (response.ok) {
           // Remove da lista local
           setPackages(packages.filter(pkg => pkg.id !== id));
-          alert('Pacote excluído com sucesso!');
+          showSuccess('Pacote excluído com sucesso! 🗑️');
         } else {
           const errorText = await response.text();
           console.error('Erro ao excluir pacote:', errorText);
-          alert('Erro ao excluir pacote. Verifique se não há reservas associadas.');
+          showError('Erro ao excluir pacote. Verifique se não há reservas associadas.');
         }
       } catch (error) {
         console.error('Erro ao excluir pacote:', error);
-        alert('Erro de conexão ao tentar excluir o pacote.');
+        showError('Erro de conexão ao tentar excluir o pacote.');
       }
     }
   };
@@ -233,15 +236,17 @@ const PackageManagement = () => {
       link.click();
       document.body.removeChild(link);
       
-      alert('Dados exportados com sucesso!');
+      showSuccess('Dados exportados com sucesso!');
     } catch (error) {
       console.error('Erro ao exportar dados:', error);
-      alert('Erro ao exportar dados');
+      showError('Erro ao exportar dados');
     }
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -470,6 +475,7 @@ const PackageManagement = () => {
         packageData={viewingPackage}
       />
     </div>
+    </>
   );
 };
 

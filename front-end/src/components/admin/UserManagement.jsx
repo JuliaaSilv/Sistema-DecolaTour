@@ -4,6 +4,8 @@ import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
+import ToastContainer from '../ui/ToastContainer';
+import useToast from '../../hooks/useToast';
 import { obterTipoUsuario } from '../../api/auth';
 import { fetchUsers, createUser, updateUser, deleteUser, normalizeUserData } from '../../api/users'; 
 
@@ -64,6 +66,7 @@ const mockUsers = [
 ];
 
 const UserManagement = () => {
+  const { toasts, showSuccess, showError, showWarning, removeToast } = useToast();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('todos');
@@ -146,9 +149,9 @@ const UserManagement = () => {
       try {
         await deleteUser(id);
         await loadUsers(); // Recarregar lista
-        alert('Usuário excluído com sucesso!');
+        showSuccess('Usuário excluído com sucesso! 🗑️');
       } catch (error) {
-        alert(`Erro ao excluir usuário: ${error.message}`);
+        showError(`Erro ao excluir usuário: ${error.message}`);
       }
     }
   };
@@ -160,19 +163,45 @@ const UserManagement = () => {
 
   const handleSaveUser = async (userData) => {
     try {
+      console.log('Salvando usuário com dados:', userData);
+      
       if (editingUser) {
+        console.log('Atualizando usuário ID:', editingUser.id);
         await updateUser(editingUser.id, userData);
-        alert('Usuário atualizado com sucesso!');
+        showSuccess('Usuário atualizado com sucesso! ✨');
       } else {
+        console.log('Criando novo usuário');
         await createUser(userData);
-        alert('Usuário criado com sucesso!');
+        showSuccess('Usuário criado com sucesso! 🎉');
       }
       
       setIsModalOpen(false);
       setEditingUser(null);
       await loadUsers(); // Recarregar lista
     } catch (error) {
-      alert(`Erro ao salvar usuário: ${error.message}`);
+      console.error('Erro detalhado ao salvar usuário:', error);
+      
+      let errorMessage = 'Erro desconhecido';
+      
+      try {
+        // Tentar parsear o erro como JSON
+        const errorData = JSON.parse(error.message.replace('Erro ao atualizar usuário: ', '').replace('Erro ao criar usuário: ', ''));
+        
+        if (errorData.errors) {
+          // Mostrar erros de validação específicos
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+            .join('\n');
+          errorMessage = `Erros de validação:\n${errorMessages}`;
+        } else if (errorData.title) {
+          errorMessage = errorData.title;
+        }
+      } catch (parseError) {
+        // Se não conseguir parsear, usar a mensagem original
+        errorMessage = error.message;
+      }
+      
+      showError(`Erro ao salvar usuário: ${errorMessage}`);
     }
   };
 
@@ -202,7 +231,9 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -421,6 +452,7 @@ const UserManagement = () => {
         />
       )}
     </div>
+    </>
   );
 };
 
@@ -563,7 +595,10 @@ const UserFormModal = ({ isOpen, onClose, user, onSave, tipoUsuario }) => {
         telefone: user.telefone || '',
         cpf: user.cpf || '',
         senha: '', // Não preencher senha em edição
-        dataNascimento: user.dataNascimento || '',
+        dataNascimento: user.dataNascimento ? 
+          (user.dataNascimento.includes('T') ? 
+            user.dataNascimento.split('T')[0] : // Se já tem formato ISO, pega só a data
+            user.dataNascimento) : '', // Se já está no formato YYYY-MM-DD
         tipoUsuarioId: user.tipoId || 3,
         ativo: user.status === 'ativo'
       });
@@ -586,21 +621,33 @@ const UserFormModal = ({ isOpen, onClose, user, onSave, tipoUsuario }) => {
     
     // Validações básicas
     if (!formData.nome || !formData.email || !formData.telefone || !formData.cpf) {
-      alert('Todos os campos obrigatórios devem ser preenchidos');
+      showError('Todos os campos obrigatórios devem ser preenchidos');
       return;
     }
 
     if (!user && (!formData.senha || !formData.dataNascimento)) {
-      alert('Senha e data de nascimento são obrigatórias para novos usuários');
+      showError('Senha e data de nascimento são obrigatórias para novos usuários');
+      return;
+    }
+
+    // Validar formato da data
+    if (formData.dataNascimento && formData.dataNascimento.length !== 10) {
+      showError('Data de nascimento deve estar no formato YYYY-MM-DD');
       return;
     }
 
     // Preparar dados para envio
-    const dataToSend = { ...formData };
+    const dataToSend = { 
+      ...formData,
+      tipoUsuarioId: parseInt(formData.tipoUsuarioId)
+    };
+
+    // Se for edição e não tem senha, remove o campo
     if (user && !dataToSend.senha) {
-      delete dataToSend.senha; // Não enviar senha vazia em edição
+      delete dataToSend.senha;
     }
 
+    console.log('Dados preparados para envio:', dataToSend);
     onSave(dataToSend);
   };
 

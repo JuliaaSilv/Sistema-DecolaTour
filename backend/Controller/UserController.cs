@@ -19,7 +19,7 @@ namespace agencia.Controller
             _userService = userService;
         }
 
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1,2,3")]
         [HttpGet("Listar Todos Usuário")]
         public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetAll()
         {
@@ -27,7 +27,7 @@ namespace agencia.Controller
             return Ok(usuarios);
         }
 
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1,2,3")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UsuarioDTO>> GetById(int id)
         {

@@ -20,14 +20,14 @@ namespace agencia.DTOs
         public string? ImagemUrl { get; set; }
         public List<ImagemPacoteDTO>? Imagens { get; set; }
         public List<VideoPacoteDTO>? Videos { get; set; }
-        
+
     }
-    
+
     public class ImagemPacoteDTO
     {
         public string Url { get; set; } = string.Empty;
     }
-    
+
     public class VideoPacoteDTO
     {
         public string Url { get; set; } = string.Empty;

@@ -99,8 +99,8 @@ export default function Home() {
   // Função para lidar com a busca
   const handleSearch = (searchData) => {
     console.log("Realizando busca com:", searchData);
-    // Aqui você implementaria a lógica de busca/navegação
-    // Por exemplo: navegar para página de resultados com os filtros
+    // Navegar para página de resultados com os filtros
+    navigate('/search-results', { state: { searchData } });
   };
 
   return (

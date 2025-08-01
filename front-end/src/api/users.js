@@ -67,23 +67,32 @@ export const fetchUserById = async (id) => {
  */
 export const createUser = async (userData) => {
   try {
+    // Preparar os dados no formato esperado pelo backend
+    const createUserData = {
+      nome: userData.nome,
+      email: userData.email,
+      senha: userData.senha,
+      cpf: userData.cpf,
+      telefone: userData.telefone,
+      // Converter data de nascimento para formato ISO
+      dataNascimento: userData.dataNascimento ? 
+        new Date(userData.dataNascimento).toISOString() : 
+        new Date().toISOString(), // Data padrão se não fornecida
+      tipoUsuarioId: parseInt(userData.tipoUsuarioId)
+    };
+
+    console.log('Dados enviados para criação:', createUserData);
+
     // Usar o endpoint de registro para criar usuários
     const response = await fetch('http://localhost:5295/api/Auth/registrar', {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({
-        nome: userData.nome,
-        email: userData.email,
-        senha: userData.senha,
-        cpf: userData.cpf,
-        telefone: userData.telefone,
-        dataNascimento: new Date().toISOString(), // Data padrão
-        tipoUsuarioId: userData.tipoUsuarioId
-      })
+      body: JSON.stringify(createUserData)
     });
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Erro do backend ao criar:', errorText);
       throw new Error(`Erro ao criar usuário: ${errorText}`);
     }
 
@@ -100,14 +109,33 @@ export const createUser = async (userData) => {
  */
 export const updateUser = async (id, userData) => {
   try {
+    // Preparar os dados no formato esperado pelo backend
+    const usuarioDTO = {
+      id: parseInt(id),
+      nome: userData.nome,
+      email: userData.email,
+      telefone: userData.telefone,
+      cpf: userData.cpf,
+      tipoUsuarioId: parseInt(userData.tipoUsuarioId),
+      // Converter data de nascimento para formato ISO se fornecida
+      dataNascimento: userData.dataNascimento ? 
+        new Date(userData.dataNascimento).toISOString() : 
+        new Date().toISOString(), // Data padrão se não fornecida
+      // Incluir senha apenas se fornecida
+      ...(userData.senha && { senha: userData.senha })
+    };
+
+    console.log('Dados enviados para o backend:', usuarioDTO);
+
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
-      body: JSON.stringify({...userData, id})
+      body: JSON.stringify(usuarioDTO)
     });
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Erro do backend:', errorText);
       throw new Error(`Erro ao atualizar usuário: ${errorText}`);
     }
 

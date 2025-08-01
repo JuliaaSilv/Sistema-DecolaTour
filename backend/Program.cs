@@ -23,6 +23,7 @@ builder.Services.AddScoped<IPacoteRepository, PacoteRepository>();
 builder.Services.AddScoped<IPacoteService, PacoteService>();
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
 builder.Services.AddScoped<IPagamentoService, PagamentoService>();
+builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<IAutenticador, AutenticadorService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -142,7 +143,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try 
     {
-        context.Database.EnsureDeleted(); // Use com cuidado
+      //  context.Database.EnsureDeleted(); // Use com cuidado
         context.Database.EnsureCreated();
 
         // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir

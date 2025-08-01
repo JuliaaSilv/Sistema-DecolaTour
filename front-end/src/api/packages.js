@@ -49,3 +49,35 @@ export const getAllPackages = async () => {
   }
   return [];
 };
+
+// Nova função para buscar pacotes com filtro
+export const searchPackagesWithFilter = async (filtro) => {
+  try {
+    console.log('API - Buscando pacotes com filtro:', filtro);
+    
+    const response = await fetch(`${API_BASE_URL}/Pacote/buscar`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        Destino: filtro.destino || null,
+        DataIda: filtro.dataIda || null,
+        DataVolta: filtro.dataVolta || null,
+        Viajantes: filtro.pessoas || null
+      })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('API - Pacotes encontrados com filtro:', result);
+      return result;
+    } else {
+      console.error('Erro na busca com filtro:', response.status, response.statusText);
+      return [];
+    }
+  } catch (error) {
+    console.error('Erro ao buscar pacotes com filtro:', error);
+    return [];
+  }
+};

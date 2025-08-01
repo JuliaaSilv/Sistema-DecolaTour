@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using agencia.Data;
+using agencia.Models;
+using Microsoft.EntityFrameworkCore;
 
 public class Repository<T> : IRepository<T> where T : class
 {
@@ -45,4 +46,12 @@ public class Repository<T> : IRepository<T> where T : class
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public virtual async Task<List<HistoricoPacote>> BuscarTodosHistoricosAsync()
+    {
+        return await _context.PacotesHistorico
+            .OrderByDescending(h => h.AtualizadoEm)
+            .ToListAsync();
+    }
+
 }

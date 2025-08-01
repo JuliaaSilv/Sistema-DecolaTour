@@ -1,4 +1,4 @@
-using AutoMapper;
+    using AutoMapper;
 using agencia.Models;
 using agencia.DTOs;
 
@@ -15,6 +15,8 @@ namespace agencia.Mapper
 
             CreateMap<TipoUsuario, TipoUsuarioDTO>();
             CreateMap<TipoUsuarioDTO, TipoUsuario>();
+
+
 
 
             CreateMap<TipoDocumento, TipoDocumentoDTO>();
@@ -52,6 +54,9 @@ namespace agencia.Mapper
                 .ForMember(dest => dest.Videos, opt => opt.Ignore())
                 .ForMember(dest => dest.Estrelas, opt => opt.MapFrom(src => src.Estrelas ?? 3));
 
+            CreateMap<PacoteUploadDTO, Pacote>();
+
+
             CreateMap<CreateUsuarioDTO, Usuario>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
 
@@ -79,6 +84,10 @@ namespace agencia.Mapper
             CreateMap<ViajanteDTO, Viajante>()
                 .ForMember(dest => dest.ReservaId, opt => opt.MapFrom(src => src.ReservaId))
                 .ForMember(dest => dest.Reserva, opt => opt.Ignore());
+
+            // Mapeamento para histórico de pacotes
+            CreateMap<HistoricoPacote, HistoricoPacoteDTO>();
+            CreateMap<HistoricoPacoteDTO, HistoricoPacote>();
         }
     }
 }

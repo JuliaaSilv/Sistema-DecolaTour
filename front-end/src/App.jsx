@@ -3,6 +3,7 @@ import Layout from "./layouts/Layout.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Packages from "./pages/Packages.jsx";
+import SearchResults from "./pages/SearchResults.jsx";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import PackageDetails from "./pages/PackageDetails.jsx";
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/packages" element={<Packages />} />
+                <Route path="/search-results" element={<SearchResults />} />
                 <Route path="/packages/:id" element={<PackageDetails />} />
                 <Route path="/booking-form/:id" element={<BookingForm />} />
                 <Route path="/pagamento" element={<Pagamento />} />

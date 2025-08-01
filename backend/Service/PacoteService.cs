@@ -11,14 +11,19 @@ namespace agencia.Service
         private readonly IPacoteRepository _repository;
         private readonly IWebHostEnvironment _env;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PacoteService(IPacoteRepository repository, IWebHostEnvironment env, IMapper mapper)
+        public PacoteService(IPacoteRepository repository, IWebHostEnvironment env, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _env = env;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
-
+        private string ObterUsuarioLogado()
+        {
+            return _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Sistema";
+        }
         public async Task<List<PacoteDTO>> ListarPacotesAsync()
         {
             var pacotes = await _repository.ListarAsync();
@@ -40,10 +45,11 @@ namespace agencia.Service
             }).ToList();
         }
 
-        public async Task<Pacote?> BuscarDetalhesAsync(int id)
-        {
-            return await _repository.BuscarPorIdAsync(id);
-        }
+            public async Task<Pacote?> BuscarDetalhesAsync(int id)
+            {
+                return await _repository.BuscarPorIdAsync(id);
+            }
+
 
         public async Task CadastrarAsync(PacoteUploadDTO dto)
         {
@@ -57,6 +63,9 @@ namespace agencia.Service
                 Categorias = dto.Categorias,
                 DataDisponivel = dto.DataDisponivel,
                 ValorTotal = dto.ValorTotal,
+                CriadoPor = dto.CriadoPor ?? ObterUsuarioLogado(),
+                CriadoEm = dto.CriadoEm ?? DateTime.Now,
+                VERSAO = 1,
                 QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas,
                 Imagens = new List<ImagemPacote>(),
                 Videos = new List<VideoPacote>()
@@ -121,6 +130,14 @@ namespace agencia.Service
             pacote.Imagens = new List<ImagemPacote>();
             pacote.Videos = new List<VideoPacote>();
 
+            var usuarioLogado = ObterUsuarioLogado(); // Obtém o usuário logado
+            
+            // Define quem criou o pacote e quando
+            pacote.CriadoPor = usuarioLogado;
+            pacote.CriadoEm = DateTime.Now;
+            pacote.AtualizadoPor = usuarioLogado;
+            pacote.AtualizadoEm = DateTime.Now;
+
             var root = Path.Combine(_env.ContentRootPath, "wwwroot");
             var pastaPacote = Path.Combine(root, "imagens", pacote.Id.ToString());
             Directory.CreateDirectory(pastaPacote);
@@ -165,6 +182,27 @@ namespace agencia.Service
             }
 
             await _repository.CadastrarAsync(pacote);
+
+            // Criar histórico inicial da criação do pacote
+            var historicoInicial = new HistoricoPacote
+            {
+                PacoteId = pacote.Id,
+                Titulo = pacote.Titulo,
+                Descricao = pacote.Descricao,
+                Destino = pacote.Destino,
+                Estrelas = pacote.Estrelas,
+                Duracao = pacote.Duracao,
+                DataDisponivel = pacote.DataDisponivel,
+                ValorTotal = pacote.ValorTotal,
+                Categorias = pacote.Categorias,
+                QuantidadeMaximaPessoas = pacote.QuantidadeMaximaPessoas,
+                CriadoPor = usuarioLogado,
+                CriadoEm = DateTime.Now,
+                AtualizadoPor = usuarioLogado,
+                AtualizadoEm = DateTime.Now,
+                VERSAO = 1
+            };
+            await _repository.SalvarHistoricoAsync(historicoInicial);
         }
 
         public async Task<List<PacoteDTO>> BuscarComFiltroAsync(FiltroPacoteDTO filtro)
@@ -208,6 +246,28 @@ namespace agencia.Service
             if (pacoteExistente == null)
                 throw new Exception("Pacote não encontrado");
 
+            var usuarioLogado = ObterUsuarioLogado(); // Adiciona a variável usuarioLogado
+
+            var historico = new HistoricoPacote
+            {
+                PacoteId = pacoteExistente.Id,
+                Titulo = pacoteExistente.Titulo,
+                Descricao = pacoteExistente.Descricao,
+                Destino = pacoteExistente.Destino,
+                Estrelas = pacoteExistente.Estrelas,
+                Duracao = pacoteExistente.Duracao,
+                DataDisponivel = pacoteExistente.DataDisponivel,
+                ValorTotal = pacoteExistente.ValorTotal,
+                Categorias = pacoteExistente.Categorias,
+                QuantidadeMaximaPessoas = pacoteExistente.QuantidadeMaximaPessoas,
+                CriadoPor = pacoteExistente.CriadoPor, // Preserva quem criou originalmente
+                CriadoEm = pacoteExistente.CriadoEm,   // Preserva quando foi criado originalmente
+                AtualizadoPor = usuarioLogado, 
+                AtualizadoEm = DateTime.Now,
+                VERSAO = pacoteExistente.VERSAO,
+            };
+            await _repository.SalvarHistoricoAsync(historico);
+
             pacoteExistente.Titulo = dto.Titulo;
             pacoteExistente.Descricao = dto.Descricao;
             pacoteExistente.Categorias = dto.Categorias;
@@ -217,6 +277,9 @@ namespace agencia.Service
             pacoteExistente.DataDisponivel = dto.DataDisponivel;
             pacoteExistente.ValorTotal = dto.ValorTotal;
             pacoteExistente.QuantidadeMaximaPessoas = dto.QuantidadeMaximaPessoas;
+            pacoteExistente.AtualizadoPor = usuarioLogado;
+            pacoteExistente.AtualizadoEm = DateTime.Now;
+            pacoteExistente.VERSAO++;
 
             await _repository.AtualizarAsync(pacoteExistente);
         }
@@ -230,6 +293,33 @@ namespace agencia.Service
             await _repository.RemoverAsync(pacote);
         }
 
+        public async Task<List<HistoricoPacoteDTO>> ListarHistoricoPorPacoteIdAsync(int pacoteId)
+        {
+            var historicos = await _repository.BuscarHistoricoPorPacoteIdAsync(pacoteId);
+
+            return historicos
+                .OrderByDescending(h => h.AtualizadoEm)
+                .Select(h => new HistoricoPacoteDTO
+                {
+                    Id = h.Id,
+                    PacoteId = h.PacoteId,
+                    Titulo = h.Titulo,
+                    Descricao = h.Descricao,
+                    Destino = h.Destino,
+                    Estrelas = h.Estrelas,
+                    Duracao = h.Duracao,
+                    DataDisponivel = h.DataDisponivel,
+                    ValorTotal = h.ValorTotal,
+                    Categorias = h.Categorias,
+                    QuantidadeMaximaPessoas = h.QuantidadeMaximaPessoas,
+                    CriadoPor = h.CriadoPor,
+                    CriadoEm = h.CriadoEm,
+                    AtualizadoPor = h.AtualizadoPor,
+                    AtualizadoEm = h.AtualizadoEm,
+                    VERSAO = h.VERSAO
+                })
+                .ToList();
+        }
 
     }
 }

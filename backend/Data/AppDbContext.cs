@@ -14,6 +14,7 @@ namespace agencia.Data
         public DbSet<Avaliacao> Avaliacoes { get; set; }
         public DbSet<Midia> Midias { get; set; }
         public DbSet<Viajante> Viajantes { get; set; }
+        public DbSet<HistoricoPacote> PacotesHistorico { get; set; }
 
         public DbSet<TipoDocumento> TipoDocumento { get; set; }
         public DbSet<TipoUsuario> TiposUsuario { get; set; }

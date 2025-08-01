@@ -12,9 +12,12 @@ import {
 import Button from "./ui/Button";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
+import ToastContainer from "../ui/ToastContainer";
+import useToast from "../../hooks/useToast";
 import { estaLogado, obterTipoUsuario } from "../../api/auth";
 
 const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   const [formData, setFormData] = useState({
     titulo: "",
     destino: "",
@@ -138,7 +141,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
     try {
       // Verifica se o usuário está logado
       if (!estaLogado()) {
-        alert("Você precisa estar logado para criar um pacote");
+        showError("Você precisa estar logado para criar um pacote");
         return;
       }
 
@@ -231,10 +234,10 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
           videos: [],
         });
 
-        alert(
+        showSuccess(
           editingPackage
-            ? "Pacote atualizado com sucesso!"
-            : "Pacote criado com sucesso!"
+            ? "Pacote atualizado com sucesso! 🎉"
+            : "Pacote criado com sucesso! 🎉"
         );
       } else {
         const errorText = await response.text();
@@ -252,24 +255,24 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
             const errorMessages = errorData.errors
               .map(err => `${err.Field}: ${err.Errors.join(', ')}`)
               .join('\n');
-            alert(`Erro de validação:\n${errorMessages}`);
+            showError(`Erro de validação:\n${errorMessages}`);
           } else {
             // Mostra erro geral
-            alert(
+            showError(
               `Erro ${response.status}: ${
                 errorData.message || errorData.title || "Erro ao salvar pacote"
               }`
             );
           }
         } catch (parseError) {
-          alert(
+          showError(
             `Erro ${response.status}: ${response.statusText}\nDetalhes: ${errorText}`
           );
         }
       }
     } catch (error) {
       console.error("Erro ao salvar pacote:", error);
-      alert("Erro de conexão. Verifique se o servidor está rodando.");
+      showError("Erro de conexão. Verifique se o servidor está rodando.");
     } finally {
       setIsLoading(false);
     }
@@ -278,7 +281,9 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <Card className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <CardContent className="p-0">
           {/* Header */}
@@ -559,6 +564,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 

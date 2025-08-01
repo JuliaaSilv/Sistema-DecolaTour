@@ -10,8 +10,8 @@ namespace agencia.Interfaces.Repository
             Task CadastrarAsync(Pacote pacote);
             Task AtualizarAsync(Pacote pacote);
             Task RemoverAsync(Pacote pacote);
-
-
+            Task SalvarHistoricoAsync(HistoricoPacote historico);
+        Task<List<HistoricoPacote>> BuscarHistoricoPorPacoteIdAsync(int pacoteId);
     }
 }
 

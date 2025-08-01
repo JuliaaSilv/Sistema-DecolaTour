@@ -1,4 +1,5 @@
 ﻿using agencia.Data;
+using agencia.DTOs;
 using agencia.Interfaces.Repository;
 using agencia.Models;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,27 @@ namespace agencia.Repository
             _context.Pacotes.Update(pacote);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SalvarHistoricoAsync(HistoricoPacote historico)
+        {
+            _context.PacotesHistorico.Add(historico);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<HistoricoPacote>> BuscarTodosHistoricosAsync()
+        {
+            return await _context.PacotesHistorico
+                .OrderByDescending(h => h.AtualizadoEm)
+                .ToListAsync();
+        }
+        public async Task<List<HistoricoPacote>> BuscarHistoricoPorPacoteIdAsync(int pacoteId)
+        {
+            return await _context.PacotesHistorico
+                .Where(h => h.PacoteId == pacoteId)
+                .OrderByDescending(h => h.AtualizadoEm)
+                .ToListAsync();
+        }
+
 
         public async Task RemoverAsync(Pacote pacote)
         {

@@ -130,4 +130,11 @@ public class PacoteController : ControllerBase
         var tamanhos = agencia.Service.ImageProcessingService.GetMosaicSizes();
         return Ok(tamanhos);
     }
+
+    [HttpGet("historico/{pacoteId}")]
+    public async Task<IActionResult> ObterHistorico(int pacoteId)
+    {
+        var historico = await _service.ListarHistoricoPorPacoteIdAsync(pacoteId);
+        return Ok(historico);
+    }
 }
