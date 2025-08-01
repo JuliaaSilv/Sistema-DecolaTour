@@ -44,17 +44,17 @@ export default function PopularDestinations() {
   if (loading) {
     return (
       <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-blue-700">
-            <MapPin className="w-5 h-5 mr-2" />
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="flex items-center text-blue-700 text-base md:text-lg">
+            <MapPin className="w-4 h-4 md:w-5 md:h-5 mr-2" />
             Destinos Populares
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-300 flex items-center justify-center">
+        <CardContent className="p-4 md:p-6">
+          <div className="h-64 md:h-80 flex items-center justify-center">
             <div className="animate-pulse text-center">
-              <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Carregando destinos...</p>
+              <Globe className="w-8 h-8 md:w-12 md:h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-sm md:text-base text-gray-500">Carregando destinos...</p>
             </div>
           </div>
         </CardContent>

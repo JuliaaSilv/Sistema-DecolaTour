@@ -73,21 +73,21 @@ export default function FrequentClients() {
 	if (loading) {
 		return (
 			<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-				<CardHeader>
-					<CardTitle className="flex items-center text-blue-700">
-						<Star className="w-5 h-5 mr-2" />
+				<CardHeader className="p-4 md:p-6">
+					<CardTitle className="flex items-center text-blue-700 text-base md:text-lg">
+						<Star className="w-4 h-4 md:w-5 md:h-5 mr-2" />
 						Clientes Frequentes
 					</CardTitle>
 				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
+				<CardContent className="p-4 md:p-6">
+					<div className="space-y-3 md:space-y-4">
 						{[...Array(4)].map((_, index) => (
-							<div key={index} className="p-4 bg-gray-50 rounded-lg animate-pulse">
-								<div className="flex items-center space-x-4">
-									<div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-									<div className="flex-1">
-										<div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
-										<div className="h-3 bg-gray-300 rounded w-1/3"></div>
+							<div key={index} className="p-3 md:p-4 bg-gray-50 rounded-lg animate-pulse">
+								<div className="flex items-center space-x-3 md:space-x-4">
+									<div className="w-8 h-8 md:w-10 md:h-10 bg-gray-300 rounded-full flex-shrink-0"></div>
+									<div className="flex-1 min-w-0">
+										<div className="h-3 md:h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+										<div className="h-2 md:h-3 bg-gray-300 rounded w-1/3"></div>
 									</div>
 								</div>
 							</div>
@@ -150,24 +150,24 @@ export default function FrequentClients() {
 					Clientes Frequentes
 				</CardTitle>
 			</CardHeader>
-			<CardContent>
-				<div className="space-y-4">
+			<CardContent className="p-4 md:p-6">
+				<div className="space-y-3 md:space-y-4">
 					{clients.map((client, index) => (
 						<div
 							key={client.id}
-							className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+							className="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
 						>
-							<div className="flex items-center space-x-4">
-								<div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-600 rounded-full font-bold">
+							<div className="flex items-center space-x-2 md:space-x-4 flex-1 min-w-0">
+								<div className="flex items-center justify-center w-6 h-6 md:w-10 md:h-10 bg-blue-100 text-blue-600 rounded-full font-bold text-xs md:text-base flex-shrink-0">
 									#{index + 1}
 								</div>
-								<div>
-									<div className="flex items-center space-x-2 mb-1">
-										<h4 className="font-semibold text-gray-800">
+								<div className="min-w-0 flex-1">
+									<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-1">
+										<h4 className="font-semibold text-gray-800 text-sm md:text-base truncate">
 											{client.name}
 										</h4>
 										<Badge
-											className={`${getTierColor(client.tier)} px-2 py-1`}
+											className={`${getTierColor(client.tier)} px-1 py-0.5 md:px-2 md:py-1 self-start sm:self-center`}
 										>
 											<div className="flex items-center gap-1">
 												{getTierIcon(client.tier)}
@@ -175,20 +175,20 @@ export default function FrequentClients() {
 											</div>
 										</Badge>
 									</div>
-									<p className="text-sm text-gray-600">
+									<p className="text-xs md:text-sm text-gray-600 truncate">
 										{client.email}
 									</p>
-									<p className="text-xs text-gray-500">
+									<p className="text-xs text-gray-500 hidden sm:block">
 										Última reserva: {client.lastBooking}
 									</p>
 								</div>
 							</div>
-							<div className="text-right">
-								<p className="font-semibold text-gray-900">
+							<div className="text-right flex-shrink-0 ml-2">
+								<p className="font-semibold text-gray-900 text-xs md:text-sm">
 									{client.reservations} reservas
 								</p>
 								{client.totalSpent > 0 && (
-									<p className="text-lg font-bold text-green-600">
+									<p className="text-sm md:text-lg font-bold text-green-600">
 										R$ {client.totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
 									</p>
 								)}

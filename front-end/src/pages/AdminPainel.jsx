@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../components/Admin/admin-sidebar";
-import DashboardMetrics from "../components/Admin/dashboard-metrics";
-import RevenueChart from "../components/Admin/revenue-chart";
-import PopularDestinations from "../components/Admin/popular-destinations";
-import FrequentClients from "../components/Admin/frequent-clients";
-import ExportButtons from "../components/Admin/export-buttons";
-import PackageManagement from "../components/Admin/PackageManagement";
-import ReservationManagement from "../components/Admin/ReservationManagement";
-import UserManagement from "../components/Admin/UserManagement";
+import AdminSidebar from "../components/admin/admin-sidebar";
+import DashboardMetrics from "../components/admin/dashboard-metrics";
+import RevenueChart from "../components/admin/revenue-chart-mobile";
+import PopularDestinations from "../components/admin/popular-destinations";
+import FrequentClients from "../components/admin/frequent-clients";
+import ExportButtons from "../components/admin/export-buttons";
+import PackageManagement from "../components/admin/PackageManagement";
+import ReservationManagement from "../components/admin/ReservationManagement";
+import UserManagement from "../components/admin/UserManagement";
 import { obterTipoUsuario, estaLogado } from "../api/auth"; 
 
 export default function AdminPainel() {
@@ -35,40 +35,38 @@ export default function AdminPainel() {
       <div className="flex">
         <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <main className="flex-1 p-6 space-y-6 overflow-x-hidden min-h-screen">
-          {activeTab === "dashboard" && (tipoUsuario === 1 || tipoUsuario === 2) && (
-            <>
-              <ExportButtons />
-              <DashboardMetrics />
+        <main className="flex-1 min-h-screen lg:ml-0">
+          <div className="p-3 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden pt-16 lg:pt-3">
+            {activeTab === "dashboard" && (tipoUsuario === 1 || tipoUsuario === 2) && (
+              <>
+                <ExportButtons />
+                <DashboardMetrics />
+                <RevenueChart />
+                <PopularDestinations />
 
-              <RevenueChart />
-              <PopularDestinations />
-
-              <div className="grid grid-cols-1 xl:grid-cols-1 gap-6">
-                <FrequentClients />
-              </div>
-            </>
-          )}
-
-          {activeTab !== "dashboard" && (
-            <>
-              {activeTab === "packages" && <PackageManagement />}
-              {activeTab === "reservations" && <ReservationManagement />}
-              {activeTab === "users" && <UserManagement />}
-              
-              {(activeTab === "promotions" || activeTab === "destinations" || activeTab === "reports" || activeTab === "settings") && (
-                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-8 text-center">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    {activeTab === "promotions" && "Gerenciamento de Promoções"}
-                    {activeTab === "destinations" && "Gerenciamento de Destinos"}
-                    {activeTab === "reports" && "Relatórios Detalhados"}
-                    {activeTab === "settings" && "Configurações do Sistema"}
-                  </h2>
-                  <p className="text-gray-600">Esta seção está em desenvolvimento.</p>
+                <div className="grid grid-cols-1 xl:grid-cols-1 gap-4 md:gap-6">
+                  <FrequentClients />
                 </div>
-              )}
-            </>
-          )}
+              </>
+            )}
+
+            {activeTab !== "dashboard" && (
+              <>
+                {activeTab === "packages" && <PackageManagement />}
+                {activeTab === "reservations" && <ReservationManagement />}
+                {activeTab === "users" && <UserManagement />}
+                
+                {activeTab === "promotions" && (
+                  <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 md:p-8 text-center">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
+                      Gerenciamento de Promoções
+                    </h2>
+                    <p className="text-gray-600">Esta seção está em desenvolvimento.</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </main>
       </div>
     </div>
