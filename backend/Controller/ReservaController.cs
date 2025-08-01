@@ -60,7 +60,7 @@ namespace agencia.Controller
         {
             var reservas = await ReservaService.ListaCompletaDeReservasAsync();
             if (reservas == null || !reservas.Any())
-                return NotFound(new ApiResponse(null, new ErrorResponse("Nenhuma reserva encontrada."), 404));
+                 return Ok(new ApiResponse(reservas, null, 200));
 
             return Ok(new ApiResponse(reservas, null, 200));
         }

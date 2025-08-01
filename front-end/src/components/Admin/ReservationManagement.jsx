@@ -156,6 +156,17 @@ const ReservationManagement = () => {
         </CardContent>
       </Card>
 
+      {/* Mensagem quando não há resultados */}
+      {(filteredReservations.length === 0) && !isLoading && (
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+          <CardContent className="p-8 text-center">
+            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhuma reserva encontrada</h3>
+            <p className="text-gray-500">Tente ajustar os filtros ou criar uma nova reserva.</p>
+          </CardContent>
+        </Card>
+      )}      
+
       {/* Lista de Reservas */}
       <div className="space-y-4">
         {filteredReservations.map((reservation) => (
@@ -220,16 +231,7 @@ const ReservationManagement = () => {
         ))}
       </div>
 
-      {/* Mensagem quando não há resultados */}
-      {filteredReservations.length === 0 && !isLoading && (
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-          <CardContent className="p-8 text-center">
-            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhuma reserva encontrada</h3>
-            <p className="text-gray-500">Tente ajustar os filtros ou criar uma nova reserva.</p>
-          </CardContent>
-        </Card>
-      )}
+
 
  
     </div>
