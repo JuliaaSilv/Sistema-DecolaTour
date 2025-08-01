@@ -1,13 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Ca	if (loading) {
-		return (
-			<Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-				<CardHeader className="p-4 md:p-6">
-					<CardTitle className="flex items-center text-blue-700 text-base md:text-lg">
-						<TrendingUp className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-						Receita Mensal
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="p-4 md:p-6">{}d, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useEffect } from "react";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
