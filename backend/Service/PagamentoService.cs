@@ -124,7 +124,7 @@ namespace agencia.Service
             var statusReseva = "";
 
             // Converte a string para o enum (com tratamento de erro)
-            if (Enum.TryParse<StatusPagamento>(status, out StatusPagamento statusEnum))
+            if (Enum.TryParse<StatusPagamento>(pagamento.StatusPagamento.ToString(), out StatusPagamento statusEnum))
             {
                 switch (statusEnum)
                 {
