@@ -51,8 +51,8 @@ export default function Home() {
               descricao: pkg.descricao,
             });
           });
-          // Adapta os dados do backend
-          const adaptedPackages = data.slice(0, 8).map((pkg, index) => {
+          // Adapta os dados do backend (máximo 7 pacotes para a Home)
+          const adaptedPackages = data.slice(0, 7).map((pkg, index) => {
             return {
               id: pkg.id,
               titulo: pkg.Titulo || pkg.titulo || pkg.nome,  // Renomeado para titulo
@@ -173,21 +173,22 @@ export default function Home() {
             {featuredPackages.length > 4 ? (
               <PackageCarousel packages={featuredPackages} />
             ) : (
-              <div className="flex flex-wrap justify-evenly items-stretch">
+              <div className="flex justify-center items-stretch gap-6 flex-wrap xl:flex-nowrap">
                 {featuredPackages.length > 0 ? (
                   featuredPackages.map((pkg, index) => (
-                    <SimplePackageCard
-                      key={`simple-card-${pkg.id || index}`}
-                      id={pkg.id}
-                      imagem={pkg.imagem}
-                      titulo={pkg.titulo}
-                      preco={pkg.preco}
-                      duracao={pkg.duracao}
-                      destino={pkg.destino}
-                      categoria={pkg.categoria}
-                      inclusions={pkg.inclusions}
-                      estrelas={pkg.estrelas}
-                    />
+                    <div key={`simple-card-${pkg.id || index}`} className="flex-shrink-0">
+                      <SimplePackageCard
+                        id={pkg.id}
+                        imagem={pkg.imagem}
+                        titulo={pkg.titulo}
+                        preco={pkg.preco}
+                        duracao={pkg.duracao}
+                        destino={pkg.destino}
+                        categoria={pkg.categoria}
+                        inclusions={pkg.inclusions}
+                        estrelas={pkg.estrelas}
+                      />
+                    </div>
                   ))
                 ) : (
                   <div className="col-span-full text-center py-12">

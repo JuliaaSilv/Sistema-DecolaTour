@@ -6,7 +6,6 @@ import DropdownMenuContent from "./ui/DropdownMenuContent";
 import DropdownMenuItem from "./ui/DropdownMenuItem";
 import DropdownMenuSeparator from "./ui/DropdownMenuSeparator";
 import DropdownMenuTrigger from "./ui/DropdownMenuTrigger";
-import { cn } from "../../lib/utils";
 
 export default function AdminHeader() {
   return (

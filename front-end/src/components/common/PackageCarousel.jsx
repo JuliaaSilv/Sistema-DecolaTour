@@ -56,7 +56,7 @@ const PackageCarousel = ({ packages}) => {
         </button>
       )}
       {/* Carrossel animado */}
-      <div className="overflow-hidden">
+      <div className="overflow-hidden px-3">
         <div
           className="flex transition-transform duration-500"
           style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
@@ -64,7 +64,7 @@ const PackageCarousel = ({ packages}) => {
           {packages.map((pkg, index) => (
             <div
               key={`package-${pkg.id || index}`}
-              className="flex justify-center"
+              className="flex justify-center px-3"
               style={{ minWidth: `${100 / visibleCards}%`, transition: 'min-width 0.3s' }}
             >
               <SimplePackageCard

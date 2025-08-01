@@ -5,7 +5,6 @@ import CardContent from "./ui/CardContent";
 import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import Badge from "./ui/Badge";
-import { cn } from "../../lib/utils";
 import { fetchClientesFrequentes } from "../../api/dashboard";
 
 const getTierIcon = (tier) => {

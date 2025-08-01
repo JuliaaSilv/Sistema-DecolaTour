@@ -2,7 +2,6 @@ import { Calendar, Users, Package, DollarSign, TrendingUp, TrendingDown, AlertTr
 import { useState, useEffect } from "react";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
-import { cn } from "../../lib/utils";
 import { fetchMetricasGerais } from "../../api/dashboard";
 
 export default function DashboardMetrics() {

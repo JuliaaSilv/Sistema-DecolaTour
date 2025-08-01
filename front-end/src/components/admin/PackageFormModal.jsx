@@ -14,6 +14,7 @@ import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
 import ToastContainer from "../ui/ToastContainer";
 import useToast from "../../hooks/useToast";
+import Toast from "../common/Toast";
 import { estaLogado, obterTipoUsuario } from "../../api/auth";
 
 const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
@@ -34,6 +35,25 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
+
+  const handleToastClose = () => {
+    setToast({ ...toast, isOpen: false });
+    
+    // Se foi um sucesso, fechar o modal e chamar onSave
+    if (toast.type === 'success') {
+      if (window.lastPackageResult) {
+        onSave(window.lastPackageResult);
+        delete window.lastPackageResult; // Limpar
+      }
+      onClose(); // Fechar imediatamente para sucesso
+    }
+  };
 
   // Atualiza o formulário quando editingPackage muda
   useEffect(() => {
@@ -142,6 +162,12 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       // Verifica se o usuário está logado
       if (!estaLogado()) {
         showError("Você precisa estar logado para criar um pacote");
+        setToast({
+          isOpen: true,
+          type: 'error',
+          title: 'Acesso Negado',
+          message: 'Você precisa estar logado para criar um pacote'
+        });
         return;
       }
 
@@ -216,9 +242,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
 
       if (response.ok) {
         const result = await response.json();
-        onSave(result);
-        onClose();
-
+        
         // Reset form
         setFormData({
           titulo: "",
@@ -239,6 +263,18 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
             ? "Pacote atualizado com sucesso! 🎉"
             : "Pacote criado com sucesso! 🎉"
         );
+        // Salvar resultado para uso posterior
+        window.lastPackageResult = result;
+
+        // Mostrar toast de sucesso
+        setToast({
+          isOpen: true,
+          type: 'success',
+          title: editingPackage ? 'Pacote Atualizado!' : 'Pacote Criado!',
+          message: editingPackage 
+            ? 'O pacote foi atualizado com sucesso!' 
+            : 'O novo pacote foi criado com sucesso!'
+        });
       } else {
         const errorText = await response.text();
         console.error("Erro detalhado:", {
@@ -256,6 +292,12 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
               .map(err => `${err.Field}: ${err.Errors.join(', ')}`)
               .join('\n');
             showError(`Erro de validação:\n${errorMessages}`);
+            setToast({
+              isOpen: true,
+              type: 'error',
+              title: 'Erro de Validação',
+              message: errorMessages
+            });
           } else {
             // Mostra erro geral
             showError(
@@ -263,16 +305,34 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
                 errorData.message || errorData.title || "Erro ao salvar pacote"
               }`
             );
+            setToast({
+              isOpen: true,
+              type: 'error',
+              title: 'Erro ao Salvar',
+              message: errorData.message || errorData.title || "Erro ao salvar pacote"
+            });
           }
         } catch (parseError) {
           showError(
             `Erro ${response.status}: ${response.statusText}\nDetalhes: ${errorText}`
           );
+          setToast({
+            isOpen: true,
+            type: 'error',
+            title: 'Erro Inesperado',
+            message: `Erro ${response.status}: ${response.statusText}\nDetalhes: ${errorText}`
+          });
         }
       }
     } catch (error) {
       console.error("Erro ao salvar pacote:", error);
       showError("Erro de conexão. Verifique se o servidor está rodando.");
+      setToast({
+        isOpen: true,
+        type: 'error',
+        title: 'Erro de Conexão',
+        message: "Erro de conexão. Verifique se o servidor está rodando."
+      });
     } finally {
       setIsLoading(false);
     }
@@ -563,6 +623,16 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
           </form>
         </CardContent>
       </Card>
+      
+      {/* Toast de Notificação */}
+      <Toast
+        isOpen={toast.isOpen}
+        onClose={handleToastClose}
+        type={toast.type}
+        title={toast.title}
+        message={toast.message}
+        duration={toast.type === 'success' ? 3000 : 0} // Auto-close para sucesso, manual para erros
+      />
     </div>
     </>
   );

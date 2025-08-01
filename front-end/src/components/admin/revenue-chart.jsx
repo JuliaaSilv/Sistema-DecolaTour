@@ -14,7 +14,6 @@ import CardContent from "./ui/CardContent";
 import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import { TrendingUp, AlertTriangle, BarChart3 } from "lucide-react";
-import { cn } from "../../lib/utils";
 import { fetchFaturamentoMensal } from "../../api/dashboard";
 
 export default function RevenueChart() {

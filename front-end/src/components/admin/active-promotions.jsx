@@ -5,7 +5,6 @@ import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import Button from "./ui/Button";
 import Badge from "./ui/Badge";
-import { cn } from "../../lib/utils";
 
 const activePromotions = [
   {

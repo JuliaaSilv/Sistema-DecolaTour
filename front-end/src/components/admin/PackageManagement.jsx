@@ -129,6 +129,7 @@ const PackageManagement = () => {
     fetchPackages();
     // Mostra mensagem de sucesso
     showSuccess(editingPackage ? 'Pacote atualizado com sucesso!' : 'Pacote criado com sucesso!');
+    // Toast já é exibido pelo PackageFormModal, não precisa de alerta aqui
   };
 
   const filteredPackages = packages.filter(pkg => {

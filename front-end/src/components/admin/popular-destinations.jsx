@@ -5,7 +5,6 @@ import CardContent from "./ui/CardContent";
 import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import { MapPin, AlertTriangle, Globe } from "lucide-react";
-import { cn } from "../../lib/utils";
 import { fetchDestinosPopulares } from "../../api/dashboard";
 
 const COLORS = ["#FF6B35", "#4A90E2", "#7ED321", "#F5A623", "#BD10E0"];

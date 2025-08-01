@@ -53,7 +53,7 @@ function CardContent({
   
   // O retorno do componente é um único elemento pai <div>
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col items-center min-h-[340px] pb-4 relative transition-all duration-300 ease-in-out w-[340px] hover:shadow-2xl hover:scale-[1.04]">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col items-center min-h-[340px] pb-4 relative transition-all duration-300 ease-in-out w-[340px] hover:shadow-2xl hover:scale-[1.04] mx-2">
       {/* Badge de duração no topo esquerdo */}
       {duracao && (
         <span className="absolute top-3 left-3 bg-black text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
