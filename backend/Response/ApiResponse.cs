@@ -1,3 +1,4 @@
+
 namespace agencia.Response
 {
      public class ApiResponse
@@ -21,6 +22,11 @@ namespace agencia.Response
         {
             this.v1 = v1;
             this.v2 = v2;
+        }
+
+        internal bool Any()
+        {
+            throw new NotImplementedException();
         }
     }
 

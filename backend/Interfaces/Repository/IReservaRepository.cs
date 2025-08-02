@@ -19,6 +19,8 @@ namespace agencia.Interfaces.Repository
         Task<bool?> DeletarReservaAsync(int id);
 
         // Adicionado para a lista de reservas do dashboard de administrador.
+        Task<List<Reserva>> ListarPorUsuarioAsync(int usuarioId);
+
         Task<IEnumerable<ReservaCompletaDTO>> ListaCompletaDeReservasAsync();
     }
 } 

@@ -83,27 +83,28 @@ const handleSend = async (userText: string) => {
 
         if (pacotes.length > 0) {
           pacotesTexto =
-            `Você mencionou: ${categoriaSelecionada}. Veja até 3 pacotes que combinam com essa categoria:\n\n` +
+            `🎯 Encontrei ${pacotes.length > 3 ? '3' : pacotes.length} pacote(s) para "${categoriaSelecionada}":\n\n` +
             pacotes
               .slice(0, 3)
               .map(
-                (p) =>
-                  `📦 ${p.titulo}\n📍 Destino: ${p.destino}\n💰 Valor: R$ ${p.valorTotal?.toFixed(2) || "N/A"}\n`
+                (p, index) =>
+                  `${index + 1}. 📦 ${p.titulo}\n   📍 ${p.destino}\n   💰 R$ ${p.valorTotal?.toFixed(2) || "Consulte"}\n`
               )
-              .join("\n");
+              .join("\n") + 
+            `\n💡 Gostaria de saber mais sobre algum desses pacotes?`;
         } else {
-          pacotesTexto = `Você mencionou: ${categoriaSelecionada}, mas infelizmente não temos pacotes disponíveis com essa categoria no momento.`;
+          pacotesTexto = `🔍 Você mencionou "${categoriaSelecionada}", mas não encontrei pacotes disponíveis nesta categoria no momento.\n\n💡 Que tal tentar outras categorias como: praia, aventura, cultura ou internacional?`;
         }
       } catch (error) {
-        pacotesTexto = `Ocorreu um erro ao buscar pacotes da categoria: ${categoriaSelecionada}.`;
+        pacotesTexto = `❌ Ops! Ocorreu um erro ao buscar pacotes da categoria "${categoriaSelecionada}".\n\n🔄 Tente novamente ou pergunte sobre outras opções de viagem!`;
         console.error("Erro ao buscar pacotes por categoria:", error);
       }
     }
 
     const promptParts = [
       {
-        text: `Você é o Theo, o assistente virtual da agência de viagens Decola Tour. Seja gentil e educado. Responda de forma clara, curta e objetiva, com no máximo 3 parágrafos curtos. Evite explicações longas e não use asteriscos (*) ou markdown.
-${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
+        text: `Você é o Theo, o assistente virtual da agência de viagens Decola Tour. Seja gentil, educado e use emojis quando apropriado. Responda de forma clara e organizada, com no máximo 2-3 parágrafos curtos. Use quebras de linha para melhor organização. Evite explicações longas e não use asteriscos (*) ou markdown.
+${pacotesTexto ? "\n\n📋 PACOTES ENCONTRADOS:\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
       },
       ...messages.map((msg) => ({
         text: `${msg.sender === "user" ? "Usuário" : "Theo"}: ${msg.text}`
@@ -126,17 +127,21 @@ ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
     );
 
     const candidate = responseIA.data.candidates?.[0];
-    const botText = candidate?.content?.parts?.[0]?.text || "Desculpe, não entendi.";
+    const botText = candidate?.content?.parts?.[0]?.text || "😅 Desculpe, não entendi sua pergunta. Pode reformular?";
 
-    const cleanedText = botText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/[_*`]/g, "");
+    // Remove markdown e limpa o texto, mas preserva quebras de linha e emojis
+    const cleanedText = botText
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/[_`]/g, "")
+      .trim();
 
-    setMessages((prev) => [...prev, { sender: "bot", text: cleanedText.trim() }]);
+    setMessages((prev) => [...prev, { sender: "bot", text: cleanedText }]);
     
   } catch (error) {
     console.error("Erro:", error);
     setMessages((prev) => [
       ...prev,
-      { sender: "bot", text: "Erro ao se comunicar com o servidor." },
+      { sender: "bot", text: "❌ Ops! Estou com dificuldades técnicas no momento.\n\n🔄 Tente novamente em alguns instantes ou reformule sua pergunta." },
     ]);
   }
 
@@ -230,12 +235,17 @@ ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
               ) : (
                 <div
                   key={idx}
-                  className={`max-w-[80%] p-2 rounded-lg whitespace-pre-wrap break-words relative ${
+                  className={`max-w-[85%] p-3 rounded-lg whitespace-pre-wrap break-words relative leading-relaxed ${
                     msg.sender === "bot"
-                      ? "bg-blue-100 text-blue-900 self-start animate-fadeIn shadow"
-                      : "bg-orange-100 text-orange-800 self-end ml-auto"
+                      ? "bg-blue-50 text-blue-900 self-start animate-fadeIn shadow-sm border-l-4 border-blue-300"
+                      : "bg-orange-50 text-orange-800 self-end ml-auto border-l-4 border-orange-300"
                   }`}
-                  style={{ animationDuration: msg.sender === "bot" ? "0.5s" : undefined }}
+                  style={{ 
+                    animationDuration: msg.sender === "bot" ? "0.5s" : undefined,
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: "14px",
+                    lineHeight: "1.5"
+                  }}
                 >
                   {msg.text}
                 </div>

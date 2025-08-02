@@ -433,7 +433,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
                   <p className="text-xs text-gray-500">
                     Selecionadas: {formData.categorias.map(cat => {
                       const categoria = [
-                        { value: "2em1", label: "2 em 1" },
+                       
                         { value: "nacional", label: "Nacional" },
                         { value: "internacional", label: "Internacional" },
                         { value: "praia", label: "Praia" },

@@ -1,14 +1,18 @@
+using agencia.Data;
+using agencia.DTOs;
+using agencia.Interfaces.Repository;
+using agencia.Interfaces.Services;
+using agencia.Models;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using agencia.Interfaces.Repository;
-using agencia.Data;
-using agencia.Models;
-using Microsoft.EntityFrameworkCore;
-using agencia.DTOs;
-using Microsoft.Data.SqlClient;
-using Dapper;
 
 namespace agencia.Repository
 {
@@ -21,11 +25,16 @@ namespace agencia.Repository
         // Preciso de _connectionString para pegar a lista completa de informações de reservas (pagamentos, dasdos do cliente, dados do pacote) direto do banco.
         private readonly string _connectionString;
 
+       
+
+
+
         // Construtor recebe o contexto via injeção de dependência
         public ReservaRepository(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
             _connectionString = configuration.GetConnectionString("DefaultConnection");
+            
         }
 
        
@@ -59,7 +68,9 @@ namespace agencia.Repository
             return reserva;
         }
 
- 
+
+
+
         /// Atualiza o status de uma reserva existente.
         public async Task<bool?> AtualizarStatusAsync(int reservaId, string? novoStatus)
         {
@@ -68,6 +79,14 @@ namespace agencia.Repository
             reserva.Status = novoStatus ?? reserva.Status;
             _context.Reservas.Update(reserva);
             return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<List<Reserva>> ListarPorUsuarioAsync(int usuarioId)
+        {
+            return await _context.Reservas
+                .Include(r => r.Pacote)
+                .Where(r => r.UsuarioId == usuarioId)
+                .OrderByDescending(r => r.DataReserva)
+                .ToListAsync();
         }
 
 

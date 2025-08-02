@@ -35,6 +35,10 @@ namespace agencia.Mapper
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Viajantes, opt => opt.Ignore());
 
+            CreateMap<Reserva, ReservaUsuarioDTO>()
+            .ForMember(dest => dest.TituloPacote, opt => opt.MapFrom(src => src.Pacote.Titulo))
+            .ForMember(dest => dest.ImagemPacoteUrl, opt => opt.MapFrom(src => src.Pacote.Imagens));
+
 
             CreateMap<Pagamento, PagamentoDTO>()
                 .ForMember(dest => dest.FormaDePagamento, opt => opt.MapFrom(src => src.FormaDePagamento.ToString()))

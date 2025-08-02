@@ -9,20 +9,40 @@ import {
   FaChevronDown,
   FaUserShield,
   FaUserTie,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { estaLogado, fazerLogout, obterTipoUsuario } from "../../api/auth";
 
 export default function Header() {
   const navigate = useNavigate();
-  const usuarioLogado = estaLogado();
+  const [usuarioLogado, setUsuarioLogado] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginMenu, setShowLoginMenu] = useState(false);
-  const tipoUsuario = obterTipoUsuario();
+  const [tipoUsuario, setTipoUsuario] = useState(null);
+
+  // Verificar status de login na inicialização e sempre que necessário
+  useEffect(() => {
+    const verificarLogin = () => {
+      const logado = estaLogado();
+      const tipo = obterTipoUsuario();
+      setUsuarioLogado(logado);
+      setTipoUsuario(tipo);
+    };
+
+    verificarLogin();
+    
+    // Verificar a cada 30 segundos se o token ainda é válido
+    const interval = setInterval(verificarLogin, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     fazerLogout();
     setShowProfileMenu(false);
+    setUsuarioLogado(false);
+    setTipoUsuario(null);
     navigate("/home");
   };
 
@@ -95,6 +115,17 @@ export default function Header() {
                     >
                       <FaUser className="mr-2" size={14} />
                       Ver Perfil
+                    </button>
+
+                    <button
+                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                      onClick={() => {
+                        navigate("/minhas-reservas");
+                        setShowProfileMenu(false);
+                      }}
+                    >
+                      <FaCalendarAlt className="mr-2" size={14} />
+                      Minhas Reservas
                     </button>
 
                     {/* Visível apenas para tipoUsuario === "1" */}

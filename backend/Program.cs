@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using agencia.Interfaces.Repository;
+using agencia.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +30,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<IViajanteRepository, ViajanteRepository>();
 builder.Services.AddScoped<IViajanteService, ViajanteService>();
 builder.Services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 

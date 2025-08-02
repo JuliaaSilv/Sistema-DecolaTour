@@ -78,13 +78,37 @@ export async function fazerCadastro(nome, email, senha, cpf, telefone, dataNasci
  */
 export function fazerLogout() {
   localStorage.removeItem('token');
+  localStorage.removeItem('redirectAfterLogin'); // Limpa redirecionamentos pendentes
 }
 
 /**
  * Função para verificar se está logado
  */
 export function estaLogado() {
-  return localStorage.getItem('token') !== null;
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    return false;
+  }
+  
+  try {
+    const decoded = jwtDecode(token);
+    const now = Date.now() / 1000;
+    
+    // Se o token expirou, remove automaticamente e retorna false
+    if (decoded.exp < now) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('redirectAfterLogin');
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    // Se o token é inválido, remove automaticamente e retorna false
+    localStorage.removeItem('token');
+    localStorage.removeItem('redirectAfterLogin');
+    return false;
+  }
 }
 /**
  * Função para obter o tipo de usuário a partir do token JWT
@@ -95,8 +119,79 @@ export function obterTipoUsuario() {
 
   try {
     const decoded = jwtDecode(token);
+    const now = Date.now() / 1000;
+    
+    // Se o token expirou, limpa e retorna null
+    if (decoded.exp < now) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('redirectAfterLogin');
+      return null;
+    }
+    
     return decoded.role; // "role" vem do ClaimTypes.Role
   } catch (error) {
+    // Se o token é inválido, limpa e retorna null
+    localStorage.removeItem('token');
+    localStorage.removeItem('redirectAfterLogin');
+    return null;
+  }
+}
+
+/**
+ * Função para obter o ID do usuário a partir do token JWT
+ */
+export function obterIdUsuario() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode(token);
+    const now = Date.now() / 1000;
+    
+    // Se o token expirou, limpa e retorna null
+    if (decoded.exp < now) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('redirectAfterLogin');
+      return null;
+    }
+    
+    return decoded.nameid || decoded.sub || decoded.userId; // Diferentes possibilidades de ID no token
+  } catch (error) {
+    // Se o token é inválido, limpa e retorna null
+    localStorage.removeItem('token');
+    localStorage.removeItem('redirectAfterLogin');
+    return null;
+  }
+}
+
+/**
+ * Função para obter dados completos do usuário a partir do token JWT
+ */
+export function obterDadosUsuario() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode(token);
+    const now = Date.now() / 1000;
+    
+    // Se o token expirou, limpa e retorna null
+    if (decoded.exp < now) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('redirectAfterLogin');
+      return null;
+    }
+    
+    return {
+      id: decoded.nameid || decoded.sub || decoded.userId,
+      email: decoded.email,
+      nome: decoded.name || decoded.unique_name,
+      role: decoded.role,
+    };
+  } catch (error) {
+    // Se o token é inválido, limpa e retorna null
+    localStorage.removeItem('token');
+    localStorage.removeItem('redirectAfterLogin');
     return null;
   }
 }
@@ -104,4 +199,22 @@ export function obterTipoUsuario() {
 export function temPermissao(rolesPermitidas) {
   const role = obterTipoUsuario();
   return role && rolesPermitidas.includes(role.toString());
+}
+
+/**
+ * Função para limpar completamente a sessão
+ */
+export function limparSessao() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('redirectAfterLogin');
+  // Adicione aqui outros itens do localStorage relacionados à sessão se houver
+}
+
+/**
+ * Função para forçar logout em caso de erro de autenticação
+ */
+export function forcarLogout() {
+  limparSessao();
+  // Redireciona para home
+  window.location.href = '/home';
 }

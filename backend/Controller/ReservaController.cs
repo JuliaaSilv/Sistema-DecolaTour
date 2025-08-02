@@ -1,13 +1,14 @@
+using agencia.DTOs;
+using agencia.Interfaces.Services;
+using agencia.Response;
+using agencia.Service;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using agencia.Response;
-using agencia.Service;
-using agencia.Interfaces.Services;
-using agencia.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace agencia.Controller
 {
@@ -60,7 +61,7 @@ namespace agencia.Controller
         {
             var reservas = await ReservaService.ListaCompletaDeReservasAsync();
             if (reservas == null || !reservas.Any())
-                 return Ok(new ApiResponse(reservas, null, 200));
+                return NotFound(new ApiResponse(null, new ErrorResponse("Nenhuma reserva encontrada."), 404));
 
             return Ok(new ApiResponse(reservas, null, 200));
         }
@@ -103,6 +104,27 @@ namespace agencia.Controller
                 return StatusCode(response.StatusCode, response.Error);
 
             return Ok(response);
+        }
+
+        [HttpGet("minhas")]
+        public async Task<IActionResult> MinhasReservas()
+        {
+            var usuarioId = ObterUsuarioIdDoToken();
+            if (usuarioId <= 0)
+                return Unauthorized();
+
+            var reservas = await ReservaService.ListarMinhasReservasAsync(usuarioId);
+            return Ok(reservas);
+        }
+
+        private int ObterUsuarioIdDoToken()
+        {
+            var idClaim = User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (int.TryParse(idClaim, out var id))
+                return id;
+
+            return 0; // ou lançar exceção se preferir
         }
 
     }

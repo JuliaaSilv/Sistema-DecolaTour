@@ -15,6 +15,8 @@ namespace agencia.Interfaces.Services
 
         Task<ApiResponse> CriarReservaAsync(CreateReservaDTO reservaDTO);
 
+        Task<List<ReservaUsuarioDTO>> ListarMinhasReservasAsync(int usuarioId);
+
         Task<ApiResponse> AtualizarStatusAsync(int reservaId, string novoStatus);
         
         Task<ApiResponse> DeletarReservaAsync(int id);

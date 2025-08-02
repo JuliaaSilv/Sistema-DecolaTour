@@ -68,7 +68,8 @@ namespace agencia.Service
             {
                 new Claim(ClaimTypes.Role, usuario.TipoUsuarioId.ToString()),
                 new Claim(ClaimTypes.Email, usuario.Email),
-                new Claim(ClaimTypes.Name, usuario.Nome)
+                new Claim(ClaimTypes.Name, usuario.Nome),
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString())
             };
 
             

@@ -40,6 +40,17 @@ namespace agencia.Service
             return dto;
         }
 
+
+        public async Task<List<ReservaUsuarioDTO>> ListarMinhasReservasAsync(int usuarioId)
+        {
+            var reservas = await _reservaRepository.ListarPorUsuarioAsync(usuarioId);
+            return _mapper.Map<List<ReservaUsuarioDTO>>(reservas);
+        }
+
+
+
+
+
         // Cria uma nova reserva no sistema, com tratativa de resposta padronizada.
         public async Task<ApiResponse> CriarReservaAsync(CreateReservaDTO reservaDTO)
         {
