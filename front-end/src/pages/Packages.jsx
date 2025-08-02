@@ -41,28 +41,53 @@ export default function Packages() {
 
   return (
     <main className="min-h-screen bg-[#E6E6EB]">
-      {/* Banner de fundo */}
-      <section className="relative w-full min-h-[40vh] sm:min-h-[50vh] lg:min-h-[60vh] mb-10">
-        <div className="w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700">
+      {/* Banner de fundo - Versão moderna */}
+      <section className="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh] mb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800"></div>
+        <div className="absolute inset-0 opacity-30">
           <img
             src={fundo}
             alt="Banner Pacotes - Decola Tour"
-            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 opacity-70"
+            className="w-full h-full object-cover object-center"
             onError={(e) => {
               e.target.style.display = "none";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 via-transparent to-transparent"></div>
         </div>
-        <div className="absolute top-1/2 left-0 right-0 flex items-center justify-center px-2 sm:px-4 md:px-8 transform -translate-y-1/2">
-          <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold text-center font-standard">
-            Conheçam Nossos Pacotes
-          </h1>
+        <div className="absolute inset-0 bg-black/20"></div>
+        
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          <div className="mb-4">
+            <h1 className="text-white text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
+              Descubra o mundo
+              <span className="block text-yellow-300 text-2xl sm:text-4xl md:text-5xl mt-2">
+                Com nossos pacotes
+              </span>
+            </h1>
+            <p className="text-white/90 text-lg sm:text-xl md:text-2xl font-light max-w-2xl mx-auto">
+              Experiências únicas aguardam por você
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <button 
+              onClick={() => document.getElementById('pacotes-nacionais')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Ver Pacotes Nacionais
+            </button>
+            <button 
+              onClick={() => document.getElementById('pacotes-internacionais')?.scrollIntoView({ behavior: 'smooth' })}
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-900 font-bold py-4 px-8 rounded-full transition-all duration-300"
+            >
+              Pacotes Internacionais
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Pacotes Nacionais */}
-      <section className="max-w-full md:max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-12 text-center">
+      <section id="pacotes-nacionais" className="max-w-full md:max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-12 text-center">
         <h2 className="text-blue-900 text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
           Pacotes Nacionais
         </h2>
@@ -103,7 +128,7 @@ export default function Packages() {
       </section>
 
       {/* Pacotes Internacionais */}
-      <section className="max-w-full md:max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-12 text-center">
+      <section id="pacotes-internacionais" className="max-w-full md:max-w-4xl mx-auto px-2 sm:px-4 md:px-8 py-12 text-center">
         <h2 className="text-blue-900 text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
           Pacotes Internacionais
         </h2>

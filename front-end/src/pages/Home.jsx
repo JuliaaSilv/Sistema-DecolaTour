@@ -105,51 +105,90 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#E6E6EB]">
-      {/* Seção do banner principal com busca integrada */}
-      <section className="relative w-full min-h-[40vh] sm:min-h-[50vh] lg:min-h-[60vh] mb-10">
-        <div className="w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] overflow-hidden bg-blue-400">
+      {/* Seção do banner principal - Versão melhorada */}
+      <section className="relative w-full min-h-[25vh] sm:min-h-[30vh] lg:min-h-[35vh] mb-8">
+        <div className="w-full h-[25vh] sm:h-[30vh] lg:h-[35vh] overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
           <img
             src={fundo}
             alt="Banner Home - Decola Tour"
-            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 opacity-60"
+            className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700 opacity-40"
             onError={(e) => {
               e.target.style.display = "none";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/30 via-blue-400/10 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          
+          {/* Overlay com padrão sutil */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20"></div>
+        </div>
+        
+        {/* Conteúdo do banner */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          {/* Texto removido conforme solicitado */}
         </div>
 
-        {/* Barra de busca sobreposta, flutuando entre banner e main */}
-        <div className="absolute left-0 right-0 bottom-[-5rem] flex items-center justify-center z-10 px-4">
-          <div
-            className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px] mx-auto bg-white rounded-xl border border-gray-200"
-            style={{ borderWidth: "0.5px" }}
-          >
-            <FunctionalSearchBar onSearch={handleSearch} />
+        {/* Barra de busca sobreposta */}
+        <div className="absolute left-0 right-0 bottom-[-2rem] sm:bottom-[-2.5rem] md:bottom-[-3rem] flex items-center justify-center z-20 px-4 sm:px-6 md:px-8">
+          <div className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] mx-auto bg-white rounded-xl shadow-xl border border-gray-100">
+            <div className="p-4 sm:p-5 md:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                {/* Campo Destino */}
+                <div className="relative">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Destino</label>
+                  <input
+                    type="text"
+                    placeholder="Para onde vamos?"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-gray-400"
+                  />
+                </div>
+                
+                {/* Campo Quantidade de Passageiros */}
+                <div className="relative">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Passageiros</label>
+                  <select className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    <option>1 passageiro</option>
+                    <option>2 passageiros</option>
+                    <option>3 passageiros</option>
+                    <option>4 passageiros</option>
+                    <option>5+ passageiros</option>
+                  </select>
+                </div>
+                
+                {/* Botão de Busca */}
+                <div className="flex items-end">
+                  <button
+                    onClick={() => navigate("/packages")}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm"
+                  >
+                    Buscar
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* DEBUG: Carrossel de Destinos Populares */}
       {isLoading ? (
-        <section className="relative py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+        <section className="relative py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 mt-8 sm:mt-10 md:mt-12">
           <div className="max-w-7xl mx-auto">
-            <div className="mt-16 mb-8">
-              <div className="h-8 bg-gray-200 rounded-lg w-64 mb-3 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded-lg w-96 animate-pulse"></div>
+            <div className="mb-6 sm:mb-8">
+              <div className="h-5 sm:h-6 md:h-8 bg-gray-200 rounded-lg w-40 sm:w-48 md:w-64 mb-2 sm:mb-3 animate-pulse mx-auto lg:mx-0"></div>
+              <div className="h-3 sm:h-4 bg-gray-200 rounded-lg w-56 sm:w-64 md:w-80 lg:w-96 animate-pulse mx-auto lg:mx-0"></div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {Array.from({ length: 4 }, (_, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse"
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden animate-pulse"
                 >
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-6">
-                    <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded w-full mb-3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-4"></div>
-                    <div className="h-8 bg-gray-200 rounded w-32"></div>
+                  <div className="h-32 sm:h-40 md:h-48 bg-gray-200"></div>
+                  <div className="p-3 sm:p-4 md:p-6">
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-16 sm:w-20 mb-2"></div>
+                    <div className="h-4 sm:h-5 md:h-6 bg-gray-200 rounded w-full mb-2 sm:mb-3"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-20 sm:w-24 mb-3 sm:mb-4"></div>
+                    <div className="h-6 sm:h-7 md:h-8 bg-gray-200 rounded w-24 sm:w-28 md:w-32"></div>
                   </div>
                 </div>
               ))}
@@ -157,13 +196,13 @@ export default function Home() {
           </div>
         </section>
       ) : (
-        <section className="relative mt-16 py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8 bg-[#E6E6EB]">
+        <section className="relative py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 bg-[#E6E6EB]">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-blue-900 text-2xl sm:text-3xl md:text-4xl font-bold text-center lg:text-left">
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-blue-900 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-center lg:text-left">
                 Destinos Populares
               </h1>
-              <p className="text-blue-700 text-sm sm:text-base md:text-lg mt-3 text-center lg:text-left max-w-2xl">
+              <p className="text-blue-700 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
                 Explore os melhores destinos selecionados especialmente para
                 você
               </p>
@@ -173,10 +212,10 @@ export default function Home() {
             {featuredPackages.length > 4 ? (
               <PackageCarousel packages={featuredPackages} />
             ) : (
-              <div className="flex justify-center items-stretch gap-6 flex-wrap xl:flex-nowrap">
+              <div className="flex justify-center items-stretch gap-3 sm:gap-4 md:gap-6 flex-wrap xl:flex-nowrap">
                 {featuredPackages.length > 0 ? (
                   featuredPackages.map((pkg, index) => (
-                    <div key={`simple-card-${pkg.id || index}`} className="flex-shrink-0">
+                    <div key={`simple-card-${pkg.id || index}`} className="flex-shrink-0 w-full sm:w-auto">
                       <SimplePackageCard
                         id={pkg.id}
                         imagem={pkg.imagem}
@@ -191,14 +230,14 @@ export default function Home() {
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full text-center py-12">
+                  <div className="col-span-full text-center py-8 sm:py-12">
                     <div className="text-gray-400 mb-4">
-                      <Package className="w-16 h-16 mx-auto mb-4" />
+                      <Package className="w-12 sm:w-16 h-12 sm:h-16 mx-auto mb-4" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
                       Nenhum pacote disponível
                     </h3>
-                    <p className="text-gray-500">
+                    <p className="text-sm sm:text-base text-gray-500">
                       Não há pacotes cadastrados no momento. Tente novamente
                       mais tarde.
                     </p>
@@ -211,15 +250,15 @@ export default function Home() {
       )}
 
       {/* Seção adicional */}
-      <section className="relative py-8 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <p className="text-blue-700 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 font-medium">
+          <p className="text-blue-700 text-xs sm:text-sm md:text-base lg:text-lg mb-4 sm:mb-6 md:mb-8 font-medium px-2">
             Não encontrou o destino ideal? Temos muito mais opções para você!
           </p>
           <Button
             variant="primary"
             size="large"
-            className="px-8 sm:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="px-4 sm:px-6 md:px-8 lg:px-12 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base lg:text-lg font-semibold rounded-md sm:rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
             onClick={() => navigate("/packages")}
           >
             Ver Todos os Destinos
