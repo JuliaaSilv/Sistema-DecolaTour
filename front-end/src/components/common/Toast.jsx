@@ -1,75 +1,77 @@
-import React, { useEffect } from 'react';
-import { CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
+/**
+ * Componente Toast para notificações
+ */
+import { useEffect } from 'react';
+import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-const Toast = ({ isOpen, onClose, type = 'success', title, message, duration = 4000 }) => {
+const toastIcons = {
+  success: CheckCircle,
+  error: AlertCircle,
+  info: Info,
+  warning: AlertTriangle,
+};
+
+const toastColors = {
+  success: 'bg-green-50 border-green-200 text-green-800',
+  error: 'bg-red-50 border-red-200 text-red-800',
+  info: 'bg-blue-50 border-blue-200 text-blue-800',
+  warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+};
+
+const iconColors = {
+  success: 'text-green-500',
+  error: 'text-red-500',
+  info: 'text-blue-500',
+  warning: 'text-yellow-500',
+};
+
+export function Toast({ toast, onRemove }) {
+  const Icon = toastIcons[toast.type];
+
   useEffect(() => {
-    if (isOpen && duration > 0) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, duration);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, duration, onClose]);
+    const timer = setTimeout(() => {
+      onRemove(toast.id);
+    }, toast.duration);
 
-  if (!isOpen) return null;
-
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="w-5 h-5 text-white" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-white" />;
-      case 'error':
-        return <AlertTriangle className="w-5 h-5 text-white" />;
-      default:
-        return <Info className="w-5 h-5 text-white" />;
-    }
-  };
-
-  const getBackgroundColor = () => {
-    switch (type) {
-      case 'success':
-        return 'bg-green-500';
-      case 'warning':
-        return 'bg-orange-500';
-      case 'error':
-        return 'bg-red-500';
-      default:
-        return 'bg-blue-500';
-    }
-  };
+    return () => clearTimeout(timer);
+  }, [toast.id, toast.duration, onRemove]);
 
   return (
-    <div className="fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out">
-      <div className={`${getBackgroundColor()} text-white px-6 py-4 rounded-lg shadow-lg max-w-sm flex items-start gap-3`}>
-        {/* Ícone */}
-        <div className="flex-shrink-0 mt-0.5">
-          {getIcon()}
+    <div
+      className={cn(
+        'w-96 max-w-sm bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 animate-in slide-in-from-top-full duration-300 mx-auto',
+        toastColors[toast.type]
+      )}
+    >
+      <div className="flex-1 w-0 p-4">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <Icon className={cn('h-5 w-5', iconColors[toast.type])} />
+          </div>
+          <div className="ml-3 flex-1">
+            <p className="text-sm font-medium break-words">{toast.message}</p>
+          </div>
         </div>
-        
-        {/* Conteúdo */}
-        <div className="flex-1 min-w-0">
-          {title && (
-            <h4 className="font-semibold text-sm mb-1">
-              {title}
-            </h4>
-          )}
-          <p className="text-sm leading-relaxed">
-            {message}
-          </p>
-        </div>
-        
-        {/* Botão fechar */}
+      </div>
+      <div className="flex border-l border-gray-200">
         <button
-          onClick={onClose}
-          className="flex-shrink-0 text-white hover:text-gray-200 transition-colors ml-2"
+          onClick={() => onRemove(toast.id)}
+          className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>
   );
-};
+}
 
-export default Toast;
+export function ToastContainer({ toasts, onRemove }) {
+  return (
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 space-y-4 pointer-events-none">
+      {toasts.map((toast) => (
+        <Toast key={toast.id} toast={toast} onRemove={onRemove} />
+      ))}
+    </div>
+  );
+}
