@@ -240,6 +240,8 @@ namespace agencia.Service
             }).ToList();
         }
 
+
+
         public async Task AtualizarAsync(int id, PacoteUploadDTO dto)
         {
             var pacoteExistente = await _repository.BuscarPorIdAsync(id);
@@ -319,6 +321,12 @@ namespace agencia.Service
                     VERSAO = h.VERSAO
                 })
                 .ToList();
+        }
+
+        public async Task<List<PacoteDTO>> ListarPorCategoriaAsync(string categoria)
+        {
+            var pacotes = await _repository.ListarPorCategoriaAsync(categoria);
+            return pacotes.Select(p => _mapper.Map<PacoteDTO>(p)).ToList();
         }
 
     }

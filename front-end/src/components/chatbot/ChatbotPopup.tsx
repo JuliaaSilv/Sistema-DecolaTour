@@ -66,40 +66,43 @@ const handleSend = async (userText: string) => {
     ];
 
     const categoriasDetectadas = categoriasPossiveis.filter((categoria) =>
-      userText.toLowerCase().includes(categoria)
+      userText.toLowerCase().includes(categoria.toLowerCase())
     );
 
     let pacotesTexto = "";
-    let pacotes: Pacote[] = [];
 
     if (categoriasDetectadas.length > 0) {
-      const response = await axios.post("http://localhost:5295/api/pacote/buscar", {
-        Categorias: categoriasDetectadas,
-        // origem: "",
-        destino: "",
-        dataIda: null,
-        dataVolta: null,
-        valorTotal: ""
-      });
+      const categoriaSelecionada = categoriasDetectadas[0];
 
-      pacotes = response.data || [];
+      try {
+        const response = await axios.get(
+          `http://localhost:5295/api/pacote/categorias/${categoriaSelecionada}`
+        );
 
-      pacotesTexto =
-        pacotes.length > 0
-          ? `Você mencionou: ${categoriasDetectadas.join(", ")}. Veja alguns pacotes que combinam:\n\n` +
+        const pacotes: Pacote[] = response.data || [];
+
+        if (pacotes.length > 0) {
+          pacotesTexto =
+            `Você mencionou: ${categoriaSelecionada}. Veja até 3 pacotes que combinam com essa categoria:\n\n` +
             pacotes
-              .slice(0, 5)
+              .slice(0, 3)
               .map(
                 (p) =>
-                  ` ${p.titulo}\n ${p.destino}\n R$ ${p.valorTotal?.toFixed(2) || "N/A"}`
+                  `📦 ${p.titulo}\n📍 Destino: ${p.destino}\n💰 Valor: R$ ${p.valorTotal?.toFixed(2) || "N/A"}\n`
               )
-              .join("\n\n")
-          : `Você mencionou: ${categoriasDetectadas.join(", ")}, mas nenhum pacote foi encontrado com essas preferências.`;
+              .join("\n");
+        } else {
+          pacotesTexto = `Você mencionou: ${categoriaSelecionada}, mas infelizmente não temos pacotes disponíveis com essa categoria no momento.`;
+        }
+      } catch (error) {
+        pacotesTexto = `Ocorreu um erro ao buscar pacotes da categoria: ${categoriaSelecionada}.`;
+        console.error("Erro ao buscar pacotes por categoria:", error);
+      }
     }
 
     const promptParts = [
       {
-        text: `Você é o Theo, o assistente virtual da agência de viagens Decola Tour, especializada em turismo, seja gentil, educada, e não use * nas mensagens...
+        text: `Você é o Theo, o assistente virtual da agência de viagens Decola Tour. Seja gentil e educado. Responda de forma clara, curta e objetiva, com no máximo 3 parágrafos curtos. Evite explicações longas e não use asteriscos (*) ou markdown.
 ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
       },
       ...messages.map((msg) => ({
@@ -125,7 +128,10 @@ ${pacotesTexto ? "\n\n" + pacotesTexto : ""}\n\nHistórico da conversa:\n`
     const candidate = responseIA.data.candidates?.[0];
     const botText = candidate?.content?.parts?.[0]?.text || "Desculpe, não entendi.";
 
-    setMessages((prev) => [...prev, { sender: "bot", text: botText.trim() }]);
+    const cleanedText = botText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/[_*`]/g, "");
+
+    setMessages((prev) => [...prev, { sender: "bot", text: cleanedText.trim() }]);
+    
   } catch (error) {
     console.error("Erro:", error);
     setMessages((prev) => [

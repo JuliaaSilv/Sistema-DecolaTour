@@ -32,7 +32,7 @@ public class PacoteController : ControllerBase
     }
 
     [HttpPost("cadastrar-simples")]
-    [Authorize(Roles = "1,2")]
+    [Authorize(Roles = "1")]
     [SwaggerOperation(Summary = "Cadastra um novo pacote (dados simples)")]
     public async Task<IActionResult> CadastrarSimples([FromForm] CreatePacoteDTO dto)
     {
@@ -62,7 +62,7 @@ public class PacoteController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "1,2")]
+    [Authorize(Roles = "1")]
     [SwaggerOperation(Summary = "Atualiza um pacote existente")]
     public async Task<ActionResult> Atualizar(int id, [FromForm] PacoteUploadDTO dto)
     {
@@ -123,6 +123,16 @@ public class PacoteController : ControllerBase
         return Ok(categorias);
     }
 
+    [HttpGet("categorias/{categoria}")]
+    public async Task<IActionResult> ListarPorCategoria(string categoria)
+    {
+        if (string.IsNullOrWhiteSpace(categoria))
+            return BadRequest("Categoria inválida.");
+
+        var pacotes = await _service.ListarPorCategoriaAsync(categoria);
+        return Ok(pacotes);
+    }
+
     [HttpGet("galeria/tamanhos")]
     [SwaggerOperation(Summary = "Retorna os tamanhos das imagens do mosaico da galeria")]
     public IActionResult ObterTamanhosMosaico()
@@ -137,4 +147,6 @@ public class PacoteController : ControllerBase
         var historico = await _service.ListarHistoricoPorPacoteIdAsync(pacoteId);
         return Ok(historico);
     }
+
+
 }

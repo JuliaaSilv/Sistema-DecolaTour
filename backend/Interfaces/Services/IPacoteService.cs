@@ -12,7 +12,7 @@ namespace agencia.Interfaces.Services
         Task AtualizarAsync(int id, PacoteUploadDTO dto);
         Task RemoverAsync(int id);
         Task CadastrarSimplesAsync(CreatePacoteDTO dto);
-        
+        Task<List<PacoteDTO>> ListarPorCategoriaAsync(string categoria);
         Task<List<HistoricoPacoteDTO>> ListarHistoricoPorPacoteIdAsync(int pacoteId);
 
 

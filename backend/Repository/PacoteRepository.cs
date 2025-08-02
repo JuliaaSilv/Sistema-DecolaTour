@@ -43,6 +43,18 @@ namespace agencia.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<Pacote>> ListarPorCategoriaAsync(string categoria)
+        {
+            if (string.IsNullOrWhiteSpace(categoria))
+                return new List<Pacote>();
+
+            categoria = categoria.Trim().ToLower();
+
+            return await _context.Pacotes
+                .Where(p => p.Categorias != null && p.Categorias.ToLower().Contains(categoria))
+                .ToListAsync();
+        }
+
         public async Task SalvarHistoricoAsync(HistoricoPacote historico)
         {
             _context.PacotesHistorico.Add(historico);

@@ -15,6 +15,7 @@ import CardContent from "./ui/CardContent";
 import ToastContainer from "../ui/ToastContainer";
 import useToast from "../../hooks/useToast";
 import { estaLogado, obterTipoUsuario } from "../../api/auth";
+import axios from "axios";
 
 const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
   const { toasts, showSuccess, showError, removeToast } = useToast();
@@ -24,7 +25,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
     estrelas: 3,
     valorTotal: "",
     descricao: "",
-    categorias: "2em1",
+    categorias: ["2em1"],
     duracao: 7,
     dataDisponivel: new Date().toISOString().split("T")[0],
     quantidadeMaximaPessoas: "",
@@ -44,7 +45,9 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
         estrelas: editingPackage.estrelas || 3,
         valorTotal: editingPackage.valorTotal || editingPackage.preco || "",
         descricao: editingPackage.descricao || "",
-        categorias: editingPackage.categorias || "2em1",
+        categorias: editingPackage.categorias 
+          ? (Array.isArray(editingPackage.categorias) ? editingPackage.categorias : [editingPackage.categorias])
+          : ["2em1"],
         duracao: editingPackage.duracao || 7,
         dataDisponivel: editingPackage.dataDisponivel 
           ? new Date(editingPackage.dataDisponivel).toISOString().split("T")[0]
@@ -61,7 +64,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
         estrelas: 3,
         valorTotal: "",
         descricao: "",
-        categorias: "2em1",
+        categorias: ["2em1"],
         duracao: 7,
         dataDisponivel: new Date().toISOString().split("T")[0],
         quantidadeMaximaPessoas: "",
@@ -83,6 +86,40 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       setErrors((prev) => ({
         ...prev,
         [name]: null,
+      }));
+    }
+  };
+
+  const handleCategoriaChange = (categoria) => {
+    setFormData((prev) => {
+      const currentCategorias = prev.categorias;
+      const isSelected = currentCategorias.includes(categoria);
+      
+      let newCategorias;
+      if (isSelected) {
+        // Remove a categoria se já estiver selecionada
+        newCategorias = currentCategorias.filter(c => c !== categoria);
+      } else {
+        // Adiciona a categoria se não estiver selecionada
+        newCategorias = [...currentCategorias, categoria];
+      }
+      
+      // Garante que pelo menos uma categoria esteja selecionada
+      if (newCategorias.length === 0) {
+        newCategorias = ["2em1"];
+      }
+      
+      return {
+        ...prev,
+        categorias: newCategorias,
+      };
+    });
+    
+    // Limpa o erro do campo categorias
+    if (errors.categorias) {
+      setErrors((prev) => ({
+        ...prev,
+        categorias: null,
       }));
     }
   };
@@ -160,7 +197,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       formDataToSend.append('Estrelas', parseInt(formData.estrelas));
       formDataToSend.append("ValorTotal", parseFloat(formData.valorTotal));
       formDataToSend.append("Descricao", formData.descricao);
-      formDataToSend.append("Categorias", formData.categorias);
+      formDataToSend.append("Categorias", formData.categorias.join(","));
       formDataToSend.append("Duracao", parseInt(formData.duracao));
       formDataToSend.append("DataDisponivel", formData.dataDisponivel); // Backend deve aceitar YYYY-MM-DD
       formDataToSend.append(
@@ -185,7 +222,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       console.log("ValorTotal:", parseFloat(formData.valorTotal));
       console.log("ValorUnitario:", parseFloat(formData.valorTotal));
       console.log("Descricao:", formData.descricao);
-      console.log("Categorias:", formData.categorias);
+      console.log("Categorias:", formData.categorias.join(","));
       console.log("Duracao:", parseInt(formData.duracao));
       console.log("DataDisponivel:", formData.dataDisponivel);
       console.log(
@@ -226,7 +263,7 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
           // origem: '',
           valorTotal: "",
           descricao: "",
-          categorias: "2em1",
+          categorias: ["2em1"],
           duracao: 7,
           dataDisponivel: new Date().toISOString().split("T")[0],
           quantidadeMaximaPessoas: "",
@@ -275,6 +312,20 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
       showError("Erro de conexão. Verifique se o servidor está rodando.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Detecta destinos comuns no texto do usuário
+  const detectarDestino = async (userText) => {
+    const destinosDetectados = ["maceió", "cancún", "rio", "salvador", "recife"]
+      .filter(destino => userText.toLowerCase().includes(destino));
+
+    if (destinosDetectados.length > 0) {
+      // Buscar por destino específico
+      const response = await axios.post("http://localhost:5295/api/pacote/buscar", {
+        destino: destinosDetectados[0],
+        // outros filtros...
+      });
     }
   };
 
@@ -347,12 +398,69 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Categoria * (Selecione uma ou mais)
+                </label>
+                <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto">
+                  {[
+                    { value: "2em1", label: "2 em 1" },
+                    { value: "nacional", label: "Nacional" },
+                    { value: "internacional", label: "Internacional" },
+                    { value: "praia", label: "Praia" },
+                    { value: "cidade", label: "Cidade" },
+                    { value: "aventura", label: "Aventura" },
+                    { value: "cultura", label: "Cultura" },
+                    { value: "romântico", label: "Romântico" },
+                    { value: "familiar", label: "Familiar" },
+                    { value: "ecoturismo", label: "Ecoturismo" },
+                    { value: "histórico", label: "Histórico" },
+                    { value: "gastronômico", label: "Gastronômico" }
+                  ].map((categoria) => (
+                    <label
+                      key={categoria.value}
+                      className="flex items-center space-x-2 mb-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.categorias.includes(categoria.value)}
+                        onChange={() => handleCategoriaChange(categoria.value)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <span className="text-sm text-gray-700">{categoria.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500">
+                    Selecionadas: {formData.categorias.map(cat => {
+                      const categoria = [
+                        { value: "2em1", label: "2 em 1" },
+                        { value: "nacional", label: "Nacional" },
+                        { value: "internacional", label: "Internacional" },
+                        { value: "praia", label: "Praia" },
+                        { value: "cidade", label: "Cidade" },
+                        { value: "aventura", label: "Aventura" },
+                        { value: "cultura", label: "Cultura" },
+                        { value: "romântico", label: "Romântico" },
+                        { value: "familiar", label: "Familiar" },
+                        { value: "ecoturismo", label: "Ecoturismo" },
+                        { value: "histórico", label: "Histórico" },
+                        { value: "gastronômico", label: "Gastronômico" }
+                      ].find(c => c.value === cat);
+                      return categoria ? categoria.label : cat;
+                    }).join(", ")}
+                  </p>
+                </div>
+                {errors.categorias && (
+                  <p className="text-red-500 text-sm mt-1">{errors.categorias}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Estrelas do Hotel *
                 </label>
-
                 <div className="relative">
                   <Star className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-
                   <select
                     name="estrelas"
                     value={formData.estrelas}
@@ -362,7 +470,6 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
                     }`}
                     required
                   >
-                    {/* <option value="" disabled hidden>Selecione</option> */}
                     {[1, 2, 3, 4, 5].map((num) => (
                       <option key={num} value={num}>
                         {num} estrela{num > 1 ? "s" : ""}
@@ -436,6 +543,33 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantidade Máxima de Pessoas *
+                </label>
+                <div className="relative">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="number"
+                    name="quantidadeMaximaPessoas"
+                    value={formData.quantidadeMaximaPessoas}
+                    onChange={handleInputChange}
+                    min="1"
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.quantidadeMaximaPessoas
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="8"
+                  />
+                </div>
+                {errors.quantidadeMaximaPessoas && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.quantidadeMaximaPessoas}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Descrição */}
@@ -455,34 +589,6 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
               />
               {errors.descricao && (
                 <p className="text-red-500 text-sm mt-1">{errors.descricao}</p>
-              )}
-            </div>
-
-            {/* Quantidade Máxima de Pessoas */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Quantidade Máxima de Pessoas *
-              </label>
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="number"
-                  name="quantidadeMaximaPessoas"
-                  value={formData.quantidadeMaximaPessoas}
-                  onChange={handleInputChange}
-                  min="1"
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.quantidadeMaximaPessoas
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                  placeholder="8"
-                />
-              </div>
-              {errors.quantidadeMaximaPessoas && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.quantidadeMaximaPessoas}
-                </p>
               )}
             </div>
 

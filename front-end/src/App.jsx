@@ -15,6 +15,7 @@ import BookingForm from "./pages/BookingForm.jsx";
 import BookingConfirmation from "./pages/BookingConfirmation.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
+import Perfil from "./pages/Perfil.jsx";
 
 
 
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/pagamento" element={<Pagamento />} />
                 <Route path="/booking-confirmation" element={<BookingConfirmation />} />
                 <Route path="/admin" element={<AdminPainel />} />
+                <Route path="/perfil" element={<Perfil />} />
               </Routes>
             </Layout>
           }
