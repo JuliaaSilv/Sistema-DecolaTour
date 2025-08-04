@@ -93,6 +93,13 @@ export default function PackageDetails() {
   // Sistema híbrido para imagens
  const imagensGaleria = pacote?.imagens?.map(img => `http://localhost:5295${img.url}`) ?? null;
 
+  // Verificar se há vídeos
+  const videosGaleria = pacote?.videos?.map(vid => `http://localhost:5295${vid.url}`) ?? [];
+  
+  console.log('🎬 Vídeos encontrados:', videosGaleria);
+  console.log('📸 Imagens encontradas:', imagensGaleria);
+  console.log('📦 Pacote completo:', pacote);
+
   
 
   const handleReserva = () => {
@@ -152,17 +159,20 @@ export default function PackageDetails() {
         <h2 className="text-blue-900 text-xl sm:text-2xl md:text-3xl font-bold mb-8 text-left sm:text-center">
           Conheça os detalhes da nossa hospedagem
         </h2>
-        <div className="bg-white rounded-2xl p-0 overflow-hidden">
-          {/* Galeria de fotos componentizada */}
-          <HotelGallery 
-            imagensGaleria={imagensGaleria}
-            galeriaAberta={galeriaAberta}
-            setGaleriaAberta={setGaleriaAberta}
-            fotoIndex={fotoIndex}
-            setFotoIndex={setFotoIndex}
-          />
+        <div className="bg-white rounded-2xl p-2 md:p-4 overflow-hidden">
+          {/* Galeria de fotos e vídeos componentizada */}
+          <div className="w-full mb-6">
+            <HotelGallery 
+              imagensGaleria={imagensGaleria}
+              videosGaleria={videosGaleria}
+              galeriaAberta={galeriaAberta}
+              setGaleriaAberta={setGaleriaAberta}
+              fotoIndex={fotoIndex}
+              setFotoIndex={setFotoIndex}
+            />
+          </div>
           
-          <div className="flex flex-col md:flex-row justify-between p-4 mt-10 md:p-8 gap-8 bg-transparent">
+          <div className="flex flex-col md:flex-row justify-between p-4 md:p-6 gap-6 md:gap-8 bg-transparent">
             {/* Card de info do hotel componentizado */}
             <HotelInfoCard pacote={pacote} />
             

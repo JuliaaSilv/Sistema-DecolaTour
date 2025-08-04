@@ -34,93 +34,23 @@ const MinhasReservas = () => {
 
     setIsLoading(true);
     try {
-      // Dados estáticos para demonstração
-      const reservasEstaticas = [
-        {
-          id: 1,
-          codigo: "RES-000001",
-          cliente: "Você",
-          email: "usuario@exemplo.com",
-          pacote: "Maceió + Maragogi - Paraíso Nordestino",
-          destino: "Maceió e Maragogi, Alagoas",
-          dataViagem: "15/12/2024",
-          dataReserva: "02/08/2024",
-          valorTotal: 2554.00,
-          valor: 2554.00,
-          status: "confirmada",
-          quantidadePessoas: 2,
-          pessoas: 2,
-          statusPagamento: "pago",
-          pagamento: "pago",
-          categoria: "praia",
-          imagemUrl: "/images/maceio.jpg"
-        },
-        {
-          id: 2,
-          codigo: "RES-000002",
-          cliente: "Você",
-          email: "usuario@exemplo.com",
-          pacote: "Cancún All Inclusive - México",
-          destino: "Cancún, México",
-          dataViagem: "20/01/2025",
-          dataReserva: "28/07/2024",
-          valorTotal: 4200.00,
-          valor: 4200.00,
-          status: "pendente",
-          quantidadePessoas: 4,
-          pessoas: 4,
-          statusPagamento: "pendente",
-          pagamento: "pendente",
-          categoria: "internacional",
-          imagemUrl: "/images/cancun.jpg"
-        },
-        {
-          id: 3,
-          codigo: "RES-000003",
-          cliente: "Você",
-          email: "usuario@exemplo.com",
-          pacote: "Rio de Janeiro Cultural - Cristo e Pão de Açúcar",
-          destino: "Rio de Janeiro, RJ",
-          dataViagem: "10/03/2025",
-          dataReserva: "25/07/2024",
-          valorTotal: 1800.00,
-          valor: 1800.00,
-          status: "confirmada",
-          quantidadePessoas: 1,
-          pessoas: 1,
-          statusPagamento: "pago",
-          pagamento: "pago",
-          categoria: "cidade",
-          imagemUrl: "/images/rio.jpg"
-        },
-        {
-          id: 4,
-          codigo: "RES-000004",
-          cliente: "Você",
-          email: "usuario@exemplo.com",
-          pacote: "Fernando de Noronha - Ilha Paradisíaca",
-          destino: "Fernando de Noronha, PE",
-          dataViagem: "05/06/2024",
-          dataReserva: "15/05/2024",
-          valorTotal: 3500.00,
-          valor: 3500.00,
-          status: "cancelada",
-          quantidadePessoas: 2,
-          pessoas: 2,
-          statusPagamento: "reembolsado",
-          pagamento: "reembolsado",
-          categoria: "ecoturismo",
-          observacoes: "Viagem cancelada devido a condições climáticas. Valor será reembolsado em 5 dias úteis.",
-          imagemUrl: "/images/noronha.jpg"
-        }
-      ];
+      console.log('Carregando reservas do backend...');
       
-      await new Promise((r) => setTimeout(r, 1000));
-      setReservas(reservasEstaticas);
-      showSuccess(`${reservasEstaticas.length} reserva(s) carregada(s) com sucesso!`);
+      // Buscar reservas reais do backend
+      const reservasBackend = await fetchMinhasReservas();
+      console.log('Reservas recebidas do backend:', reservasBackend);
+      
+      // Normalizar os dados para o formato esperado pelo frontend
+      const reservasNormalizadas = reservasBackend.map(reserva => normalizeMinhaReservaData(reserva));
+      
+      setReservas(reservasNormalizadas);
+      showSuccess(`${reservasNormalizadas.length} reserva(s) carregada(s) com sucesso!`);
+      
     } catch (error) {
-      console.error(error);
-      showError("Erro ao carregar suas reservas");
+      console.error('Erro ao carregar reservas:', error);
+      showError("Erro ao carregar suas reservas: " + error.message);
+      // Em caso de erro, deixar a lista vazia ao invés de mostrar dados estáticos
+      setReservas([]);
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,7 @@ using InterfaceService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace agencia.Controller
@@ -36,7 +37,22 @@ namespace agencia.Controller
                 return NotFound();
             return Ok(usuario);
         }
-        [Authorize(Roles = "1,2")]
+
+        [Authorize(Roles = "1,2,3")]
+        [HttpGet("perfil")]
+        public async Task<ActionResult<UsuarioDTO>> GetProfile()
+        {
+            var usuarioId = ObterUsuarioIdDoToken();
+            if (usuarioId == 0)
+                return Unauthorized("Token inválido ou usuário não encontrado.");
+
+            var usuario = await _userService.GetByIdAsync(usuarioId);
+            if (usuario == null)
+                return NotFound("Usuário não encontrado.");
+            
+            return Ok(usuario);
+        }
+        [Authorize(Roles = "1,2,3")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UsuarioDTO usuarioDTO)
         {
@@ -66,6 +82,16 @@ namespace agencia.Controller
                 return StatusCode(response.StatusCode, response.Error);
 
             return StatusCode(response.StatusCode, response.Data);
+        }
+
+        private int ObterUsuarioIdDoToken()
+        {
+            var idClaim = User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (int.TryParse(idClaim, out var id))
+                return id;
+
+            return 0; // ou lançar exceção se preferir
         }
     }
 }

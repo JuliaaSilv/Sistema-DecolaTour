@@ -38,6 +38,10 @@ builder.Services.AddScoped<IViajanteService, ViajanteService>();
 builder.Services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<ICartaoRepository, CartaoRepository>();
+builder.Services.AddScoped<ICartaoService, CartaoService>();
+builder.Services.AddScoped<IEnderecoRepository, EnderecoRepository>();
+builder.Services.AddScoped<IEnderecoService, EnderecoService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -147,7 +151,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try 
     {
-      //  context.Database.EnsureDeleted(); // Use com cuidado
+        //context.Database.EnsureDeleted(); // Use com cuidado
         context.Database.EnsureCreated();
 
         // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir
@@ -171,9 +175,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseStaticFiles();
+
+// Configurar tipos MIME para arquivos de mídia
+var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+provider.Mappings[".mp4"] = "video/mp4";
+provider.Mappings[".webm"] = "video/webm";
+provider.Mappings[".mov"] = "video/quicktime";
+provider.Mappings[".avi"] = "video/x-msvideo";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

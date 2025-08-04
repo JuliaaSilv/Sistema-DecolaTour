@@ -74,7 +74,7 @@ export default function Home() {
                   ? `http://localhost:5295${pkg.Imagens[0].Url}`
                   : pkg.imagens && pkg.imagens.length > 0
                   ? `http://localhost:5295${pkg.imagens[0].url}`
-                  : "/packages/default.jpg",
+                  : `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&q=80`,
               descricao: pkg.Descricao || pkg.descricao,
             };
           });
@@ -105,9 +105,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#E6E6EB]">
-      {/* Seção do banner principal - Versão melhorada */}
-      <section className="relative w-full min-h-[25vh] sm:min-h-[30vh] lg:min-h-[35vh] mb-8">
-        <div className="w-full h-[25vh] sm:h-[30vh] lg:h-[35vh] overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
+      {/* Seção do banner principal - Versão melhorada e responsiva */}
+      <section className="relative w-full min-h-[30vh] sm:min-h-[35vh] md:min-h-[40vh] lg:min-h-[45vh] mb-12 sm:mb-16 md:mb-20">
+        <div className="w-full h-[30vh] sm:h-[35vh] md:h-[40vh] lg:h-[45vh] overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
           <img
             src={fundo}
             alt="Banner Home - Decola Tour"
@@ -127,44 +127,10 @@ export default function Home() {
           {/* Texto removido conforme solicitado */}
         </div>
 
-        {/* Barra de busca sobreposta */}
-        <div className="absolute left-0 right-0 bottom-[-2rem] sm:bottom-[-2.5rem] md:bottom-[-3rem] flex items-center justify-center z-20 px-4 sm:px-6 md:px-8">
-          <div className="w-full max-w-[320px] sm:max-w-[500px] md:max-w-[700px] lg:max-w-[900px] mx-auto bg-white rounded-xl shadow-xl border border-gray-100">
-            <div className="p-4 sm:p-5 md:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                {/* Campo Destino */}
-                <div className="relative">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Destino</label>
-                  <input
-                    type="text"
-                    placeholder="Para onde vamos?"
-                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-gray-400"
-                  />
-                </div>
-                
-                {/* Campo Quantidade de Passageiros */}
-                <div className="relative">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Passageiros</label>
-                  <select className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
-                    <option>1 passageiro</option>
-                    <option>2 passageiros</option>
-                    <option>3 passageiros</option>
-                    <option>4 passageiros</option>
-                    <option>5+ passageiros</option>
-                  </select>
-                </div>
-                
-                {/* Botão de Busca */}
-                <div className="flex items-end">
-                  <button
-                    onClick={() => navigate("/packages")}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 sm:py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm"
-                  >
-                    Buscar
-                  </button>
-                </div>
-              </div>
-            </div>
+        {/* Barra de busca sobreposta - Responsiva */}
+        <div className="absolute left-0 right-0 bottom-[-2rem] sm:bottom-[-2.5rem] md:bottom-[-3rem] lg:bottom-[-3.5rem] flex items-center justify-center z-20 px-2 sm:px-4 md:px-6 lg:px-8">
+          <div className="w-full max-w-[96%] sm:max-w-[95%] md:max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px] mx-auto">
+            <FunctionalSearchBar onSearch={handleSearch} />
           </div>
         </div>
       </section>

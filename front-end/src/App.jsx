@@ -17,6 +17,7 @@ import AdminLogin from "./pages/AdminLogin.jsx";
 import RecuperarSenhaNovaSenha from "./pages/RecuperarSenhaNovaSenha.jsx";
 import Perfil from "./pages/Perfil.jsx";
 import MinhasReservas from "./pages/MinhasReservas.jsx";
+import ReservaDetalhes from "./pages/ReservaDetalhes.jsx";
 
 
 
@@ -57,6 +58,7 @@ function App() {
                 <Route path="/admin" element={<AdminPainel />} />
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/minhas-reservas" element={<MinhasReservas />} />
+                <Route path="/reserva-detalhes/:id" element={<ReservaDetalhes />} />
               </Routes>
             </Layout>
           }

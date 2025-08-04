@@ -22,6 +22,8 @@ namespace agencia.Data
 
         public DbSet<ImagemPacote> ImagensPacote { get; set; }
         public DbSet<VideoPacote> VideosPacote { get; set; }
+        public DbSet<Cartao> Cartoes { get; set; }
+        public DbSet<Endereco> Enderecos { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

@@ -13,6 +13,8 @@ namespace agencia.DTOs
 
         public DateTime DataReserva { get; set; }
 
+        public DateTime? DataViagem { get; set; }
+
         public decimal ValorUnitario { get; set; }
 
         public string Status { get; set; } = string.Empty;

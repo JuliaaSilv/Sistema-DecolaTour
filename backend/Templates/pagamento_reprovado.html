@@ -1,17 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Pagamento Reprovado</title>
+    <meta charset="UTF-8">
+    <title>Pagamento Reprovado</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #dc2626;
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+            .content h2 {
+                color: #dc2626;
+            }
+
+            .content p {
+                margin: 16px 0;
+            }
+
+        .details {
+            background-color: #fef2f2;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+            .details li {
+                margin: 8px 0;
+            }
+
+        .footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-  <h2>Seu pagamento foi reprovado</h2>
-  <p>Olá, infelizmente seu pagamento não foi aprovado. Por favor, tente novamente ou entre em contato com o suporte.</p>
-  <p>Detalhes do pagamento:</p>
-  <ul>
-    <li>Valor: {{valor}}</li>
-    <li>Método: {{metodo}}</li>
-    <li>Status: {{status}}</li>
-  </ul>
+    <div class="email-container">
+        <div class="header">
+            <h1>Decola Tour</h1>
+        </div>
+        <div class="content">
+            <h2>❌ Pagamento Reprovado</h2>
+            <p>Olá {{nome}},</p>
+            <p>Infelizmente, seu pagamento não foi aprovado.</p>
+            <p>Você pode tentar novamente ou entrar em contato com nosso suporte para obter ajuda.</p>
+
+            <div class="details">
+                <h3>🧾 Detalhes do Pagamento:</h3>
+                <ul>
+                    <li><strong>Valor:</strong> {{valor}}</li>
+                    <li><strong>Método:</strong> {{metodo}}</li>
+                    <li><strong>Status:</strong> {{status}}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            &copy; 2025 Decola Tour. Todos os direitos reservados.<br>
+            Este e-mail foi enviado automaticamente. Por favor, não responda.
+        </div>
+    </div>
 </body>
 </html>

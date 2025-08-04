@@ -47,7 +47,7 @@ function CardContent({
   // Debug da imagem recebida
   console.log(`🎯 SimplePackageCard - ${titulo} (título do pacote):`, {
     imagem,
-    isDefault: imagem === "/packages/default.jpg",
+    isDefault: imagem === "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&q=80",
     isBackendUrl: imagem?.includes("localhost:5295")
   });
   
@@ -68,12 +68,24 @@ function CardContent({
           className="w-full h-full object-cover"
           onError={(e) => {
             console.error(`❌ Erro ao carregar imagem: ${imagem}`);
-            e.target.src = "/api/placeholder/300/200";
+            // Usar uma imagem placeholder do Unsplash ou criar um div com gradiente
+            e.target.style.display = 'none';
+            const placeholder = e.target.nextElementSibling;
+            if (placeholder) {
+              placeholder.style.display = 'flex';
+            }
           }}
           onLoad={() => {
             console.log(`✅ Imagem carregada com sucesso: ${imagem}`);
           }}
         />
+        {/* Placeholder quando a imagem falha */}
+        <div 
+          className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
+          style={{ display: 'none' }}
+        >
+          📷 {destino || 'Pacote'}
+        </div>
       </div>
       {/* Categoria próxima da imagem */}
       <div className="text-sm font-bold text-gray-600 text-left w-full pl-3 uppercase tracking-wide mb-2">
@@ -120,7 +132,10 @@ function CardContent({
             })}
           </div>
           {/* Botão Ver Mais navega para PackageDetails do pacote clicado */}
-          <Button size="small" onClick={() => navigate(`/packages/${id || titulo}`)}>
+          <Button size="small" onClick={() => {
+            console.log('🔗 Navegando para PackageDetails com ID:', id);
+            navigate(`/packages/${id}`);
+          }}>
             Ver Mais
           </Button>
         </div>

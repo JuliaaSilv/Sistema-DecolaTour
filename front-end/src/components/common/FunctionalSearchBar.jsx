@@ -27,21 +27,13 @@ const FunctionalSearchBar = ({ onSearch }) => {
   const handleBuscar = () => {
     // Validação básica
     if (!destino.trim()) {
-      alert('Por favor, informe o destino da viagem.');
-      return;
+      return; // Remove o alert conforme solicitado anteriormente
     }
-
-    // Formatação das datas para o formato ISO (se fornecidas)
-    const formatDateForAPI = (dateString) => {
-      if (!dateString) return null;
-      const date = new Date(dateString);
-      return date.toISOString();
-    };
 
     const dadosBusca = {
       destino: destino.trim(),
-      dataIda: formatDateForAPI(dataIda),
-      dataVolta: formatDateForAPI(dataVolta),
+      dataIda: dataIda || null,
+      dataVolta: dataVolta || null,
       pessoas: parseInt(pessoas)
     };
     
@@ -52,129 +44,58 @@ const FunctionalSearchBar = ({ onSearch }) => {
   };
 
   return (
-    <div className="bg-blue-400 bg-opacity-90 rounded-xl p-6 shadow-2xl border border-white border-opacity-20">
-      {/* Título */}
-      <h2 className="text-white text-xl font-semibold mb-4 text-center">
-        Busque seu destino
-      </h2>
-      
-      {/* Campos de busca */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        
-        {/* Origem */}
-        {/* <div className="flex-1">
-          <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-text hover:shadow-md">
-            <FaMapMarkerAlt className="text-gray-400 mr-2" />
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 font-medium mb-1">
-                Origem
-              </label>
-              <input
-                type="text"
-                placeholder="De onde você sai?"
-                value={origem}
-                onChange={(e) => setOrigem(e.target.value)}
-                className="w-full text-sm text-black bg-transparent focus:outline-none cursor-text"
-              />
-            </div>
+    <div className="bg-white rounded-xl shadow-xl border border-gray-100">
+      <div className="p-3 sm:p-4 md:p-5 lg:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+          {/* Campo Destino */}
+          <div className="relative md:col-span-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+              <FaMapMarkerAlt className="inline w-3 h-3 mr-1" />
+              Destino
+            </label>
+            <input
+              type="text"
+              placeholder="Para onde vamos?"
+              value={destino}
+              onChange={(e) => setDestino(e.target.value)}
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base placeholder-gray-400"
+            />
           </div>
-        </div> */}
-        
-        {/* Destino */}
-        <div className="flex-1">
-          <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-text hover:shadow-md">
-            <FaMapMarkerAlt className="text-gray-400 mr-2" />
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 font-medium mb-1">
-                Destino
-              </label>
-              <input
-                type="text"
-                placeholder="Para onde quer ir?"
-                value={destino}
-                onChange={(e) => setDestino(e.target.value)}
-                className="w-full text-sm text-black bg-transparent focus:outline-none cursor-text"
-              />
-            </div>
+          
+          {/* Campo Quantidade de Passageiros */}
+          <div className="relative md:col-span-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+              <FaUsers className="inline w-3 h-3 mr-1" />
+              Passageiros
+            </label>
+            <select 
+              value={pessoas}
+              onChange={(e) => setPessoas(e.target.value)}
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+            >
+              <option value={1}>1 passageiro</option>
+              <option value={2}>2 passageiros</option>
+              <option value={3}>3 passageiros</option>
+              <option value={4}>4 passageiros</option>
+              <option value={5}>5 passageiros</option>
+              <option value={6}>6 passageiros</option>
+              <option value={7}>7 passageiros</option>
+              <option value={8}>8 passageiros</option>
+            </select>
           </div>
-        </div>
-        
-        {/* Data de Ida */}
-        <div className="flex-1">
-          <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-pointer hover:shadow-md">
-            <FaCalendarAlt className="text-gray-400 mr-2" />
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 font-medium mb-1">
-                Data de Ida
-              </label>
-              <input
-                type="date"
-                value={dataIda}
-                onChange={(e) => setDataIda(e.target.value)}
-                min={hoje}
-                className="w-full text-sm text-black bg-transparent focus:outline-none cursor-pointer"
-              />
-            </div>
+          
+          {/* Botão de Busca */}
+          <div className="flex items-end md:col-span-1">
+            <button
+              onClick={handleBuscar}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-sm sm:text-base flex items-center justify-center gap-2"
+            >
+              <FaSearch className="w-4 h-4" />
+              <span className="hidden sm:inline">Buscar Pacotes</span>
+              <span className="sm:hidden">Buscar</span>
+            </button>
           </div>
         </div>
-        
-        {/* Data de Volta */}
-        <div className="flex-1">
-          <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-pointer hover:shadow-md">
-            <FaCalendarAlt className="text-gray-400 mr-2" />
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 font-medium mb-1">
-                Data de Volta
-              </label>
-              <input
-                type="date"
-                value={dataVolta}
-                onChange={(e) => setDataVolta(e.target.value)}
-                min={dataIda || hoje}
-                className="w-full text-sm text-black bg-transparent focus:outline-none cursor-pointer"
-              />
-            </div>
-          </div>
-        </div>
-        
-        {/* Número de Pessoas */}
-        <div className="w-full md:w-40">
-          <div className="bg-white rounded-lg p-3 flex items-center border border-gray-200 hover:border-blue-400 transition-colors cursor-pointer hover:shadow-md">
-            <FaUsers className="text-gray-400 mr-2" />
-            <div className="flex-1">
-              <label className="block text-xs text-gray-600 font-medium mb-1">
-                Viajantes
-              </label>
-              <select
-                value={pessoas}
-                onChange={(e) => setPessoas(e.target.value)}
-                className="w-full text-sm text-black bg-transparent focus:outline-none cursor-pointer"
-              >
-                <option value={1}>1 pessoa</option>
-                <option value={2}>2 pessoas</option>
-                <option value={3}>3 pessoas</option>
-                <option value={4}>4 pessoas</option>
-                <option value={5}>5 pessoas</option>
-                <option value={6}>6 pessoas</option>
-                <option value={7}>7 pessoas</option>
-                <option value={8}>8 pessoas</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Botão de Buscar */}
-      <div className="flex justify-center md:justify-end">
-        <Button
-          onClick={handleBuscar}
-          variant="primary"
-          size="medium"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-lg hover:shadow-xl"
-        >
-          <FaSearch className="text-sm" />
-          Buscar
-        </Button>
       </div>
     </div>
   );

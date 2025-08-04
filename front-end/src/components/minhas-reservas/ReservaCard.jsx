@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
@@ -15,6 +16,14 @@ import {
 } from "lucide-react";
 
 const ReservaCard = ({ reserva, index }) => {
+  const navigate = useNavigate();
+
+  const handleVerDetalhes = () => {
+    navigate(`/reserva-detalhes/${reserva.id}`, { 
+      state: { reserva } 
+    });
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case "confirmada":
@@ -217,7 +226,10 @@ const ReservaCard = ({ reserva, index }) => {
 
         {/* Botões de Ação */}
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+          <button 
+            onClick={handleVerDetalhes}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          >
             <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
             Ver Detalhes
           </button>

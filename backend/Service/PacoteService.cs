@@ -233,10 +233,17 @@ namespace agencia.Service
             {
                 Id = p.Id,
                 Titulo = p.Titulo,
+                Descricao = p.Descricao,
                 Destino = p.Destino,
                 Estrelas = p.Estrelas,
+                Categorias = p.Categorias,
+                Duracao = p.Duracao,
+                DataDisponivel = p.DataDisponivel,
                 ValorTotal = p.ValorTotal,
-                ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty
+                QuantidadeMaximaPessoas = p.QuantidadeMaximaPessoas,
+                ImagemUrl = p.Imagens != null && p.Imagens.Any() ? p.Imagens.First().Url : string.Empty,
+                Imagens = p.Imagens != null ? p.Imagens.Select(img => new ImagemPacoteDTO { Url = img.Url }).ToList() : new List<ImagemPacoteDTO>(),
+                Videos = p.Videos != null ? p.Videos.Select(vid => new VideoPacoteDTO { Url = vid.Url }).ToList() : new List<VideoPacoteDTO>()
             }).ToList();
         }
 

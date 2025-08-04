@@ -1,17 +1,18 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace agencia.Service
 {
     public class ImageProcessingService
     {
-        // Definições de tamanhos para o mosaico de galeria
+        // Definições de tamanhos para o mosaico de galeria - Aumentadas para melhor qualidade
         private static readonly Dictionary<int, (int width, int height)> GalleryMosaicSizes = new()
         {
-            { 0, (850, 380) },   // Primeira imagem - Principal (maior)
-            { 1, (422, 250) },   // Segunda imagem - Secundária superior direita
-            { 2, (208, 125) }    // Terceira imagem - Secundária inferior direita
+            { 0, (1200, 600) },   // Primeira imagem - Principal (maior) - Aumentada de 850x380
+            { 1, (600, 400) },    // Segunda imagem - Secundária superior direita - Aumentada de 422x250
+            { 2, (300, 200) }     // Terceira imagem - Secundária inferior direita - Aumentada de 208x125
         };
 
         public static async Task<byte[]> ResizeImageForGallery(IFormFile imageFile, int imageIndex)
@@ -28,16 +29,17 @@ namespace agencia.Service
 
             using var image = await Image.LoadAsync(imageFile.OpenReadStream());
             
-            // Redimensiona mantendo proporção e preenchendo o espaço
+            // Redimensiona mantendo melhor qualidade
             image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Size = new Size(targetSize.width, targetSize.height),
-                Mode = ResizeMode.Crop, // Corta para manter proporção exata
-                Position = AnchorPositionMode.Center
+                Mode = ResizeMode.Max, // Mantém proporção sem cortar - melhor qualidade
+                Position = AnchorPositionMode.Center,
+                Sampler = KnownResamplers.Lanczos3 // Algoritmo de alta qualidade
             }));
 
             using var output = new MemoryStream();
-            await image.SaveAsync(output, new JpegEncoder { Quality = 85 });
+            await image.SaveAsync(output, new JpegEncoder { Quality = 98 }); // Qualidade máxima
             return output.ToArray();
         }
 

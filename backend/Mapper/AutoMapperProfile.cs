@@ -29,6 +29,9 @@ namespace agencia.Mapper
                 .ForMember(dest => dest.ValorUnitario, opt => opt.MapFrom(src => (float)src.ValorUnitario))
                 .ForMember(dest => dest.UsuarioId, opt => opt.MapFrom(src => src.UsuarioId))
                 .ForMember(dest => dest.PacoteId, opt => opt.MapFrom(src => src.PacoteId))
+                .ForMember(dest => dest.DataViagem, opt => opt.MapFrom(src => src.DataViagem))
+                .ForMember(dest => dest.QuantidadeViajantes, opt => opt.MapFrom(src => src.QuantidadeViajantes))
+                .ForMember(dest => dest.ValorTotal, opt => opt.MapFrom(src => src.ValorTotal))
                 .ForMember(dest => dest.NumeroReserva, opt => opt.Ignore())
                 .ForMember(dest => dest.DataReserva, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
@@ -36,8 +39,20 @@ namespace agencia.Mapper
                 .ForMember(dest => dest.Viajantes, opt => opt.Ignore());
 
             CreateMap<Reserva, ReservaUsuarioDTO>()
-            .ForMember(dest => dest.TituloPacote, opt => opt.MapFrom(src => src.Pacote.Titulo))
-            .ForMember(dest => dest.ImagemPacoteUrl, opt => opt.MapFrom(src => src.Pacote.Imagens));
+            .ForMember(dest => dest.TituloPacote, opt => opt.MapFrom(src => 
+                src.Pacote != null ? src.Pacote.Titulo : "Pacote não informado"))
+            .ForMember(dest => dest.ImagemPacoteUrl, opt => opt.MapFrom(src => 
+                src.Pacote != null && src.Pacote.Imagens != null && src.Pacote.Imagens.Count > 0 
+                    ? src.Pacote.Imagens.First().Url 
+                    : null))
+            .ForMember(dest => dest.QuantidadeViajantes, opt => opt.MapFrom(src => 
+                src.QuantidadeViajantes ?? (src.Viajantes != null ? src.Viajantes.Count : 0)))
+            .ForMember(dest => dest.ValorTotal, opt => opt.MapFrom(src => 
+                src.ValorTotal ?? (src.QuantidadeViajantes.HasValue 
+                    ? (decimal)(src.ValorUnitario * src.QuantidadeViajantes.Value)
+                    : (src.Viajantes != null && src.Viajantes.Count > 0 
+                        ? (decimal)(src.ValorUnitario * src.Viajantes.Count)
+                        : (decimal)src.ValorUnitario))));
 
 
             CreateMap<Pagamento, PagamentoDTO>()
@@ -92,6 +107,29 @@ namespace agencia.Mapper
             // Mapeamento para histórico de pacotes
             CreateMap<HistoricoPacote, HistoricoPacoteDTO>();
             CreateMap<HistoricoPacoteDTO, HistoricoPacote>();
+
+            // Mapeamento para endereços
+            CreateMap<Endereco, EnderecoDTO>()
+                .ForMember(dest => dest.EnderecoCompleto, opt => opt.MapFrom(src => src.EnderecoCompleto));
+            CreateMap<EnderecoDTO, Endereco>();
+            CreateMap<CreateEnderecoDTO, Endereco>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UsuarioId, opt => opt.Ignore())
+                .ForMember(dest => dest.Ativo, opt => opt.MapFrom(src => true));
+            CreateMap<UpdateEnderecoDTO, Endereco>();
+
+            // Mapeamento para cartões
+            CreateMap<Cartao, CartaoDTO>()
+                .ForMember(dest => dest.NumeroCartaoMascarado, opt => opt.MapFrom(src => 
+                    src.NumeroCartao != null && src.NumeroCartao.Length >= 4 
+                        ? "**** **** **** " + src.NumeroCartao.Substring(src.NumeroCartao.Length - 4)
+                        : "****"));
+            CreateMap<CartaoDTO, Cartao>();
+            CreateMap<CreateCartaoDTO, Cartao>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UsuarioId, opt => opt.Ignore())
+                .ForMember(dest => dest.Ativo, opt => opt.MapFrom(src => true));
+            CreateMap<UpdateCartaoDTO, Cartao>();
         }
     }
 }

@@ -84,6 +84,8 @@ namespace agencia.Repository
         {
             return await _context.Reservas
                 .Include(r => r.Pacote)
+                    .ThenInclude(p => p.Imagens)
+                .Include(r => r.Viajantes)
                 .Where(r => r.UsuarioId == usuarioId)
                 .OrderByDescending(r => r.DataReserva)
                 .ToListAsync();

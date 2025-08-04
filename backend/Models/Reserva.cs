@@ -16,6 +16,9 @@ namespace agencia.Models
         [Column("DATA_RESERVA")]
         public DateTime DataReserva { get; set; }
 
+        [Column("DATA_VIAGEM")]
+        public DateTime? DataViagem { get; set; }
+
         [Required]
         [Column("STATUS")]
         public string Status { get; set; } = "PENDENTE";
@@ -23,6 +26,12 @@ namespace agencia.Models
         [Required]
         [Column("VALOR_UNITARIO")]
         public float ValorUnitario { get; set; }
+
+        [Column("QUANTIDADE_VIAJANTES")]
+        public int? QuantidadeViajantes { get; set; }
+
+        [Column("VALOR_TOTAL")]
+        public decimal? ValorTotal { get; set; }
 
         [Required]
         [Column("USUARIO_ID")]

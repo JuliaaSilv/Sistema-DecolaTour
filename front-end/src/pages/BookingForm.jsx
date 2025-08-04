@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Users } from 'lucide-react';
 import { getPackage } from '../api/packages';
 import { estaLogado, obterTipoUsuario } from '../api/auth';
+import { fetchCurrentUserProfile } from '../api/users';
+import { fetchEnderecos } from '../api/enderecos';
 
 // Função para extrair valor numérico do preço
 const extractNumericPrice = (priceValue) => {
@@ -51,9 +53,9 @@ const BookingForm = () => {
 
   const [errors, setErrors] = useState({});
 
-  // Verificar autenticação ao carregar o componente
+  // Verificar autenticação e carregar dados do usuário ao carregar o componente
   useEffect(() => {
-    const verificarAuth = () => {
+    const verificarAuthECarregarDados = async () => {
       if (!estaLogado()) {
         // Salvar URL atual para redirect após login
         localStorage.setItem('redirectAfterLogin', window.location.pathname);
@@ -61,6 +63,61 @@ const BookingForm = () => {
         return;
       }
 
+      try {
+        // Carregar dados do usuário
+        const userProfile = await fetchCurrentUserProfile();
+        
+        // Tentar carregar endereço principal do usuário
+        let enderecoUsuario = null;
+        try {
+          const enderecos = await fetchEnderecos();
+          // Pegar o primeiro endereço ou o principal
+          enderecoUsuario = enderecos.find(e => e.principal) || enderecos[0] || null;
+        } catch (error) {
+          console.log('Usuário não possui endereços cadastrados:', error.message);
+        }
+
+        // Formattar telefone se necessário
+        const formatarTelefone = (telefone) => {
+          if (!telefone) return '';
+          const cleaned = telefone.replace(/\D/g, '');
+          if (cleaned.length === 11) {
+            return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+          }
+          return telefone;
+        };
+
+        // Formattar CPF se necessário
+        const formatarCPF = (cpf) => {
+          if (!cpf) return '';
+          const cleaned = cpf.replace(/\D/g, '');
+          if (cleaned.length === 11) {
+            return `${cleaned.slice(0, 3)}.${cleaned.slice(3, 6)}.${cleaned.slice(6, 9)}-${cleaned.slice(9)}`;
+          }
+          return cpf;
+        };
+
+        // Preencher dados do formulário com dados do usuário
+        setFormData(prev => ({
+          ...prev,
+          nome: userProfile.nome || '',
+          email: userProfile.email || '',
+          telefone: formatarTelefone(userProfile.telefone) || '',
+          cpf: formatarCPF(userProfile.cpf) || '',
+          endereco: enderecoUsuario?.logradouro || '',
+          cidade: enderecoUsuario?.cidade || '',
+          estado: enderecoUsuario?.estado || '',
+          cep: enderecoUsuario?.cep || enderecoUsuario?.CEP || ''
+        }));
+
+        console.log('Dados do usuário carregados e preenchidos automaticamente:', userProfile);
+        
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        // Não impedir o uso do formulário, apenas não preencher automaticamente
+      }
+
+      // Verificar se é cliente
       const tipoUsuario = obterTipoUsuario();
       if (tipoUsuario !== "3") {
         // Se não for cliente (tipo 3), redirecionar para página inicial
@@ -69,7 +126,7 @@ const BookingForm = () => {
       }
     };
 
-    verificarAuth();
+    verificarAuthECarregarDados();
   }, [navigate]);
 
   // Carregar dados do pacote
@@ -394,12 +451,33 @@ const BookingForm = () => {
                     }`}
                   >
                     <option value="">Selecione o estado</option>
-                    <option value="SP">São Paulo</option>
-                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
                     <option value="MG">Minas Gerais</option>
-                    <option value="SC">Santa Catarina</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
                     <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
                     <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
                   </select>
                   {errors.estado && <p className="text-red-500 text-sm mt-1">{errors.estado}</p>}
                 </div>

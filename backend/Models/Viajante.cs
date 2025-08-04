@@ -19,7 +19,7 @@ namespace agencia.Models
 
         [Required]
         [Column("PASSAPORTE")]
-        public string Passaporte { get; set; } = string.Empty;
+        public string Passaporte { get; set; }
 
         [Required]
         [Column("ID_RESERVA")]

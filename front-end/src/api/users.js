@@ -63,6 +63,70 @@ export const fetchUserById = async (id) => {
 };
 
 /**
+ * Busca o perfil do usuário logado
+ */
+export const fetchCurrentUserProfile = async () => {
+  try {
+    const response = await fetch(`${API_URL}/perfil`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Sessão expirada. Por favor, faça login novamente.');
+      }
+      throw new Error(`Erro ao buscar perfil: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao buscar perfil:', error);
+    throw error;
+  }
+};
+
+/**
+ * Atualiza o perfil do usuário logado
+ */
+export const updateCurrentUserProfile = async (userData) => {
+  try {
+    // Primeiro, buscar o perfil atual para obter o ID
+    const currentProfile = await fetchCurrentUserProfile();
+    
+    const updateUserData = {
+      id: currentProfile.id,
+      nome: userData.nome,
+      email: userData.email,
+      cpf: userData.cpf,
+      telefone: userData.telefone,
+      dataNascimento: userData.dataNascimento ? 
+        new Date(userData.dataNascimento).toISOString() : 
+        new Date().toISOString(),
+      tipoUsuarioId: currentProfile.tipoUsuarioId || 3 // Mantém o tipo atual ou padrão cliente
+    };
+
+    const response = await fetch(`${API_URL}/${currentProfile.id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(updateUserData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erro ao atualizar perfil: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao atualizar perfil:', error);
+    throw error;
+  }
+};
+
+/**
  * Cria um novo usuário
  */
 export const createUser = async (userData) => {

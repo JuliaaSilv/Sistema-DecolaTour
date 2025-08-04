@@ -3,25 +3,23 @@ namespace agencia.Response
 {
      public class ApiResponse
     {
-        private bool v1;
-        private string v2;
-
-        public object Data { get; set; }
+        public object? Data { get; set; }
         public ErrorResponse? Error { get; set; }
         public int StatusCode { get; set; }
       
 
-        public ApiResponse(object data, ErrorResponse? error, int statusCode)
+        public ApiResponse(object? data, ErrorResponse? error, int statusCode)
         {
             Data = data;
             Error = error;
             StatusCode = statusCode;
         }
 
-        public ApiResponse(bool v1, string v2)
+        public ApiResponse(bool success, string message)
         {
-            this.v1 = v1;
-            this.v2 = v2;
+            Data = new { success = success, message = message };
+            Error = null;
+            StatusCode = success ? 200 : 400;
         }
 
         internal bool Any()

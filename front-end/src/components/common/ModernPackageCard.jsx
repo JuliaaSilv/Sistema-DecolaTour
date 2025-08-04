@@ -22,10 +22,9 @@ const ModernPackageCard = ({
   console.log('🎴 ModernPackageCard renderizado:', { nome, preco, imagem });
 
   const handleCardClick = () => {
-    // Navegar usando o ID ou nome do pacote
-    const identifier = id || encodeURIComponent(nome);
-    console.log('🔗 Navegando para:', `/package-details/${identifier}`);
-    navigate(`/package-details/${identifier}`);
+    // Navegar usando o ID do pacote
+    console.log('🔗 Navegando para:', `/packages/${id}`);
+    navigate(`/packages/${id}`);
   };
 
   // Formatar preço para exibição

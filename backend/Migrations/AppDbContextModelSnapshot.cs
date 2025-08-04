@@ -61,6 +61,82 @@ namespace agencia.Migrations
                         });
                 });
 
+            modelBuilder.Entity("agencia.Models.HistoricoPacote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AtualizadoEm")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ATUALIZADO_EM");
+
+                    b.Property<string>("AtualizadoPor")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ATUALIZADO_POR");
+
+                    b.Property<string>("Categorias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CATEGORIAS");
+
+                    b.Property<DateTime?>("CriadoEm")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CRIADO_EM");
+
+                    b.Property<string>("CriadoPor")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CRIADO_POR");
+
+                    b.Property<DateTime>("DataDisponivel")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("DATA_DISPONIVEL");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DESCRICAO");
+
+                    b.Property<string>("Destino")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DESTINO");
+
+                    b.Property<int>("Duracao")
+                        .HasColumnType("int")
+                        .HasColumnName("DURACAO");
+
+                    b.Property<int>("Estrelas")
+                        .HasColumnType("int")
+                        .HasColumnName("ESTRELAS");
+
+                    b.Property<int>("PacoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantidadeMaximaPessoas")
+                        .HasColumnType("int")
+                        .HasColumnName("QUANTIDADE_MAXIMA");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("TITULO");
+
+                    b.Property<int>("VERSAO")
+                        .HasColumnType("int")
+                        .HasColumnName("VERSÃO");
+
+                    b.Property<float>("ValorTotal")
+                        .HasColumnType("real")
+                        .HasColumnName("VALOR_TOTAL");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PacotesHistorico");
+                });
+
             modelBuilder.Entity("agencia.Models.ImagemPacote", b =>
                 {
                     b.Property<int>("Id")
@@ -68,6 +144,9 @@ namespace agencia.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("HistoricoPacoteId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PacoteId")
                         .HasColumnType("int");
@@ -77,6 +156,8 @@ namespace agencia.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HistoricoPacoteId");
 
                     b.HasIndex("PacoteId");
 
@@ -127,6 +208,27 @@ namespace agencia.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("AtualizadoEm")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ATUALIZADO_EM");
+
+                    b.Property<string>("AtualizadoPor")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ATUALIZADO_POR");
+
+                    b.Property<string>("Categorias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CATEGORIAS");
+
+                    b.Property<DateTime?>("CriadoEm")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CRIADO_EM");
+
+                    b.Property<string>("CriadoPor")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("CRIADO_POR");
+
                     b.Property<DateTime>("DataDisponivel")
                         .HasColumnType("datetime2")
                         .HasColumnName("DATA_DISPONIVEL");
@@ -145,10 +247,9 @@ namespace agencia.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DURACAO");
 
-                    b.Property<string>("Origem")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("ORIGEM");
+                    b.Property<int>("Estrelas")
+                        .HasColumnType("int")
+                        .HasColumnName("ESTRELAS");
 
                     b.Property<int?>("PromocaoId")
                         .HasColumnType("int");
@@ -161,6 +262,10 @@ namespace agencia.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("TITULO");
+
+                    b.Property<int>("VERSAO")
+                        .HasColumnType("int")
+                        .HasColumnName("VERSÃO");
 
                     b.Property<float>("ValorTotal")
                         .HasColumnType("real")
@@ -193,10 +298,6 @@ namespace agencia.Migrations
                     b.Property<int>("ID_RESERVA")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdReserva")
-                        .HasColumnType("int")
-                        .HasColumnName("ID_RESERVA");
-
                     b.Property<string>("StatusPagamento")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -210,11 +311,7 @@ namespace agencia.Migrations
 
                     b.HasIndex("ID_RESERVA");
 
-                    b.ToTable("TB_PAGAMENTOS", t =>
-                        {
-                            t.Property("ID_RESERVA")
-                                .HasColumnName("ID_RESERVA1");
-                        });
+                    b.ToTable("TB_PAGAMENTOS");
                 });
 
             modelBuilder.Entity("agencia.Models.Promocao", b =>
@@ -268,20 +365,26 @@ namespace agencia.Migrations
                         .HasColumnType("int")
                         .HasColumnName("NUMERO_RESERVA");
 
-                    b.Property<int>("PACOTE_ID")
-                        .HasColumnType("int");
-
                     b.Property<int>("PacoteId")
                         .HasColumnType("int")
                         .HasColumnName("PACOTE_ID");
+
+                    b.Property<int?>("QuantidadeViajantes")
+                        .HasColumnType("int")
+                        .HasColumnName("QUANTIDADE_VIAJANTES");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("STATUS");
 
-                    b.Property<int>("USUARIO_ID")
-                        .HasColumnType("int");
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("USUARIO_ID");
+
+                    b.Property<decimal?>("ValorTotal")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("VALOR_TOTAL");
 
                     b.Property<float>("ValorUnitario")
                         .HasColumnType("real")
@@ -289,15 +392,11 @@ namespace agencia.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PACOTE_ID");
+                    b.HasIndex("PacoteId");
 
-                    b.HasIndex("USUARIO_ID");
+                    b.HasIndex("UsuarioId");
 
-                    b.ToTable("TB_RESERVAS", t =>
-                        {
-                            t.Property("PACOTE_ID")
-                                .HasColumnName("PACOTE_ID1");
-                        });
+                    b.ToTable("TB_RESERVAS");
                 });
 
             modelBuilder.Entity("agencia.Models.TipoDocumento", b =>
@@ -321,19 +420,11 @@ namespace agencia.Migrations
                     b.Property<int>("USUARIO_ID")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int")
-                        .HasColumnName("USUARIO_ID");
-
                     b.HasKey("Id");
 
                     b.HasIndex("USUARIO_ID");
 
-                    b.ToTable("TB_DOCUMENTOS", t =>
-                        {
-                            t.Property("USUARIO_ID")
-                                .HasColumnName("USUARIO_ID1");
-                        });
+                    b.ToTable("TB_DOCUMENTOS");
                 });
 
             modelBuilder.Entity("agencia.Models.TipoUsuario", b =>
@@ -435,13 +526,6 @@ namespace agencia.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DOCUMENTO");
 
-                    b.Property<int>("ID_RESERVA")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdReserva")
-                        .HasColumnType("int")
-                        .HasColumnName("ID_RESERVA");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -452,15 +536,15 @@ namespace agencia.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("PASSAPORTE");
 
+                    b.Property<int>("ReservaId")
+                        .HasColumnType("int")
+                        .HasColumnName("ID_RESERVA");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ID_RESERVA");
+                    b.HasIndex("ReservaId");
 
-                    b.ToTable("TB_VIAGANTES", t =>
-                        {
-                            t.Property("ID_RESERVA")
-                                .HasColumnName("ID_RESERVA1");
-                        });
+                    b.ToTable("TB_VIAGANTES");
                 });
 
             modelBuilder.Entity("agencia.Models.VideoPacote", b =>
@@ -471,6 +555,9 @@ namespace agencia.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("HistoricoPacoteId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PacoteId")
                         .HasColumnType("int");
 
@@ -479,6 +566,8 @@ namespace agencia.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HistoricoPacoteId");
 
                     b.HasIndex("PacoteId");
 
@@ -498,6 +587,10 @@ namespace agencia.Migrations
 
             modelBuilder.Entity("agencia.Models.ImagemPacote", b =>
                 {
+                    b.HasOne("agencia.Models.HistoricoPacote", null)
+                        .WithMany("Imagens")
+                        .HasForeignKey("HistoricoPacoteId");
+
                     b.HasOne("agencia.Models.Pacote", "Pacote")
                         .WithMany("Imagens")
                         .HasForeignKey("PacoteId")
@@ -540,13 +633,13 @@ namespace agencia.Migrations
                 {
                     b.HasOne("agencia.Models.Pacote", "Pacote")
                         .WithMany()
-                        .HasForeignKey("PACOTE_ID")
+                        .HasForeignKey("PacoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("agencia.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("USUARIO_ID")
+                        .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -581,7 +674,7 @@ namespace agencia.Migrations
                 {
                     b.HasOne("agencia.Models.Reserva", "Reserva")
                         .WithMany("Viajantes")
-                        .HasForeignKey("ID_RESERVA")
+                        .HasForeignKey("ReservaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -590,6 +683,10 @@ namespace agencia.Migrations
 
             modelBuilder.Entity("agencia.Models.VideoPacote", b =>
                 {
+                    b.HasOne("agencia.Models.HistoricoPacote", null)
+                        .WithMany("Videos")
+                        .HasForeignKey("HistoricoPacoteId");
+
                     b.HasOne("agencia.Models.Pacote", "Pacote")
                         .WithMany("Videos")
                         .HasForeignKey("PacoteId")
@@ -597,6 +694,13 @@ namespace agencia.Migrations
                         .IsRequired();
 
                     b.Navigation("Pacote");
+                });
+
+            modelBuilder.Entity("agencia.Models.HistoricoPacote", b =>
+                {
+                    b.Navigation("Imagens");
+
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("agencia.Models.Pacote", b =>

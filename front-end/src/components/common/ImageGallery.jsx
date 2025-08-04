@@ -1,4 +1,4 @@
-// Componente de galeria de imagens reutilizável
+// Componente de galeria de mídias (imagens e vídeos) reutilizável
 import React from 'react';
 import Icon from './Icon';
 
@@ -7,13 +7,16 @@ const ImageGallery = ({
   galeriaAberta, 
   setGaleriaAberta, 
   fotoIndex, 
-  setFotoIndex 
+  setFotoIndex,
+  mediaTypes = [] // Array indicando o tipo de cada mídia ('image' ou 'video')
 }) => {
   const nextImage = () => setFotoIndex(prev => prev === imagensGaleria.length - 1 ? 0 : prev + 1);
   const prevImage = () => setFotoIndex(prev => prev === 0 ? imagensGaleria.length - 1 : prev - 1);
   const closeGallery = () => { setGaleriaAberta(false); setFotoIndex(0); };
 
-  if (!galeriaAberta) return null;
+  if (!galeriaAberta || !imagensGaleria || imagensGaleria.length === 0) return null;
+
+  const currentMediaType = mediaTypes[fotoIndex] || 'image';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
@@ -23,24 +26,35 @@ const ImageGallery = ({
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition cursor-pointer"
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}
           onClick={prevImage}
-          aria-label="Foto anterior"
+          aria-label="Mídia anterior"
         >
           <Icon name="chevronLeft" className="w-6 h-6" />
         </button>
 
-        {/* Imagem */}
-        <img
-          src={imagensGaleria[fotoIndex]}
-          alt={`Foto ${fotoIndex + 1} da hospedagem`}
-          className="object-contain max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
-        />
+        {/* Mídia (imagem ou vídeo) */}
+        {currentMediaType === 'video' ? (
+          <video
+            src={imagensGaleria[fotoIndex]}
+            className="object-contain max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+            controls
+            autoPlay
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={imagensGaleria[fotoIndex]}
+            alt={`Mídia ${fotoIndex + 1} da hospedagem`}
+            className="object-contain max-h-[90vh] max-w-[90vw] rounded-2xl shadow-2xl"
+          />
+        )}
 
         {/* Botão próximo */}
         <button
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 text-blue-900 rounded-full p-2 hover:bg-blue-100 transition cursor-pointer"
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}
           onClick={nextImage}
-          aria-label="Próxima foto"
+          aria-label="Próxima mídia"
         >
           <Icon name="chevronRight" className="w-6 h-6" />
         </button>
