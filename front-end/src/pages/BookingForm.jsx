@@ -44,7 +44,6 @@ const BookingForm = () => {
     cep: '',
     dataViagem: '',
     numeroViajantes: 2,
-    observacoes: '',
     viajantes: [
       { nome: '', email: '', telefone: '' },
       { nome: '', email: '', telefone: '' }
@@ -203,6 +202,36 @@ const BookingForm = () => {
     }
   };
 
+  // Função para verificar se o formulário está válido em tempo real
+  const isFormValid = () => {
+    // Verificar campos obrigatórios básicos
+    if (!formData.nome.trim()) return false;
+    if (!formData.email.trim()) return false;
+    if (!formData.telefone.trim()) return false;
+    if (!formData.cpf.trim()) return false;
+    if (!formData.endereco.trim()) return false;
+    if (!formData.cidade.trim()) return false;
+    if (!formData.estado.trim()) return false;
+    if (!formData.cep.trim()) return false;
+    if (!formData.dataViagem) return false;
+    if (!formData.numeroViajantes || formData.numeroViajantes < 1) return false;
+    
+    // Verificar email válido
+    if (!/\S+@\S+\.\S+/.test(formData.email)) return false;
+    
+    // Verificar dados dos viajantes
+    for (let i = 0; i < formData.numeroViajantes; i++) {
+      if (!formData.viajantes[i]?.nome?.trim()) return false;
+      if (!formData.viajantes[i]?.email?.trim()) return false;
+      if (!formData.viajantes[i]?.telefone?.trim()) return false;
+      
+      // Verificar email válido do viajante
+      if (!/\S+@\S+\.\S+/.test(formData.viajantes[i].email)) return false;
+    }
+    
+    return true;
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -216,6 +245,7 @@ const BookingForm = () => {
     if (!formData.estado.trim()) newErrors.estado = 'Estado é obrigatório';
     if (!formData.cep.trim()) newErrors.cep = 'CEP é obrigatório';
     if (!formData.dataViagem) newErrors.dataViagem = 'Data da viagem é obrigatória';
+    if (!formData.numeroViajantes || formData.numeroViajantes < 1) newErrors.numeroViajantes = 'Número de viajantes é obrigatório';
 
     // Validação dos viajantes
     for (let i = 0; i < formData.numeroViajantes; i++) {
@@ -232,6 +262,14 @@ const BookingForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('BookingForm handleSubmit invoked', formData);
+    
+    // Validar formulário antes de prosseguir
+    if (!validateForm()) {
+      console.log('Formulário inválido, não prosseguindo');
+      return;
+    }
+    
+    console.log('Formulário válido, prosseguindo para pagamento');
     const pacoteComPrecoNumerico = {
       ...pacote,
       preco: extractNumericPrice(pacote.valorTotal || pacote.preco)
@@ -526,13 +564,15 @@ const BookingForm = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Número de Viajantes
+                    Número de Viajantes *
                   </label>
                   <select
                     name="numeroViajantes"
                     value={formData.numeroViajantes}
                     onChange={handleChange}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl transition-all duration-300 focus:border-[#F28C38] focus:ring-4 focus:ring-orange-100"
+                    className={`w-full p-4 border-2 rounded-xl transition-all duration-300 focus:ring-4 focus:ring-orange-100 ${
+                      errors.numeroViajantes ? 'border-red-500' : 'border-gray-200 focus:border-[#F28C38]'
+                    }`}
                   >
                     {[1, 2, 3, 4, 5, 6].map(num => (
                       <option key={num} value={num}>
@@ -540,6 +580,7 @@ const BookingForm = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.numeroViajantes && <p className="text-red-500 text-sm mt-1">{errors.numeroViajantes}</p>}
                 </div>
               </div>
               {/* Formulário dos viajantes */}
@@ -594,21 +635,6 @@ const BookingForm = () => {
               </div>
             </div>
 
-            {/* Observações */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Observações (Opcional)
-              </label>
-              <textarea
-                name="observacoes"
-                value={formData.observacoes}
-                onChange={handleChange}
-                rows={4}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl transition-all duration-300 focus:border-[#F28C38] focus:ring-4 focus:ring-orange-100"
-                placeholder="Alguma solicitação especial, preferências ou informações adicionais..."
-              />
-            </div>
-
             {/* Buttons */}
             <div className="flex justify-between pt-6 border-t">
               <button
@@ -620,7 +646,12 @@ const BookingForm = () => {
               </button>
               <button
                 type="submit"
-                className="px-8 py-4 bg-[#F28C38] text-white rounded-xl hover:bg-orange-600 transition-all duration-300 font-semibold cursor-pointer"
+                disabled={!isFormValid()}
+                className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold ${
+                  isFormValid()
+                    ? 'bg-[#F28C38] text-white hover:bg-orange-600 cursor-pointer'
+                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                }`}
               >
                 Continuar para Pagamento
               </button>

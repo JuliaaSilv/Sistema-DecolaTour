@@ -20,6 +20,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import qrCodePix from "../assets/qrcodepix.png";
+import boletoFake from "../assets/boletofake.png";
 
 // Estilos CSS customizados para o efeito 3D
 const customStyles = {
@@ -1011,6 +1012,15 @@ export default function Pagamento() {
                   <div className="text-5xl mb-3">📱</div>
                   <h4 className="text-xl font-bold text-[#F28C38] mb-4">Pagamento via Pix</h4>
                   
+                  {/* QR Code de exemplo */}
+                  <div className="flex justify-center mb-6">
+                    <img 
+                      src={qrCodePix} 
+                      alt="QR Code PIX" 
+                      className="w-48 h-48 object-contain rounded-lg border border-gray-200 shadow-sm"
+                    />
+                  </div>
+                  
                   {/* Campo para chave PIX do usuário */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
@@ -1055,13 +1065,22 @@ export default function Pagamento() {
                 <div className="text-center">
                   <div className="text-5xl mb-3">🧾</div>
                   <h4 className="text-xl font-bold text-[#F28C38] mb-3">Pagamento via Boleto</h4>
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
                     <p className="text-gray-700">
                       O boleto será gerado após a confirmação e enviado para o seu e-mail.
                     </p>
                     <p className="text-sm text-gray-600 mt-2">
                       Prazo de vencimento: 3 dias úteis
                     </p>
+                  </div>
+                  
+                  {/* Imagem do boleto de exemplo */}
+                  <div className="flex justify-center">
+                    <img 
+                      src={boletoFake} 
+                      alt="Exemplo de Boleto" 
+                      className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+                    />
                   </div>
                 </div>
               </div>
