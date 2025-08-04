@@ -27,7 +27,7 @@ namespace agencia.Controller
 
         /// Cria uma nova reserva.
         [HttpPost]
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1,2,3")]
         public async Task<ActionResult> CriarReserva([FromBody] CreateReservaDTO reservaDTO)
         {
             if (reservaDTO == null)

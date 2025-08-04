@@ -25,6 +25,7 @@ builder.Services.AddScoped<IPacoteRepository, PacoteRepository>();
 builder.Services.AddScoped<IPacoteService, PacoteService>();
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
 builder.Services.AddScoped<IPagamentoService, PagamentoService>();
+builder.Services.AddScoped<IPagamentoMockService, PagamentoMockService>();
 builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<IAutenticador, AutenticadorService>();
 builder.Services.AddScoped<IUserService, UserService>();

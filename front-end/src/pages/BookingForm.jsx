@@ -174,21 +174,12 @@ const BookingForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Criar objeto pacote com preço numérico
-      const pacoteComPrecoNumerico = {
-        ...pacote,
-        preco: extractNumericPrice(pacote.valorTotal || pacote.preco)
-      };
-      
-      // Navegar para a página de pagamento com os dados
-      navigate('/pagamento', { 
-        state: { 
-          travelerData: formData, 
-          pacote: pacoteComPrecoNumerico 
-        } 
-      });
-    }
+    console.log('BookingForm handleSubmit invoked', formData);
+    const pacoteComPrecoNumerico = {
+      ...pacote,
+      preco: extractNumericPrice(pacote.valorTotal || pacote.preco)
+    };
+    navigate('/pagamento', { state: { travelerData: formData, pacote: pacoteComPrecoNumerico } });
   };
 
   const handleBack = () => {

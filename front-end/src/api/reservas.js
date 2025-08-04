@@ -8,7 +8,7 @@ const API_BASE_URL = 'http://localhost:5295/api/Reserva';
 /**
  * Função auxiliar para obter o token JWT do localStorage e configurar os headers
  */
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.warn('Nenhum token JWT encontrado no localStorage');

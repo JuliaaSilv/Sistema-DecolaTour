@@ -7,9 +7,9 @@ namespace agencia.Interfaces.Services
     public interface IPagamentoService
     {
         Task<Pagamento> CriarPagamentoAsync(PagamentoRequestDTO dto);
+        Task<RespostaPagamentoDTO> ProcessarPagamentoCompletoAsync(PagamentoCompletoRequestDTO dto);
 
         Task AtualizarStatusPagamentoAsync(string pagamentoId, string status);
-
 
         Task AtualizarStatusAsync(int pagamentoId, string status);
 

@@ -1,0 +1,148 @@
+### Arquivo de testes para API de Pagamento Mocada
+### Teste todos os cenários de pagamento simulados
+
+### 1. Pagamento PIX - Sucesso
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 2,
+  "email": "cliente@exemplo.com",
+  "dadosPix": {
+    "chavePix": "cliente@exemplo.com",
+    "tipoChave": "email"
+  }
+}
+
+###
+
+### 2. Pagamento PIX - Falha (chave inválida)
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 2,
+  "email": "cliente@exemplo.com",
+  "dadosPix": {
+    "chavePix": "teste@falha.com",
+    "tipoChave": "email"
+  }
+}
+
+###
+
+### 3. Pagamento Cartão de Crédito - Sucesso
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 0,
+  "email": "cliente@exemplo.com",
+  "dadosCartao": {
+    "numeroCartao": "4111111111111111",
+    "nomePortador": "João Silva",
+    "validadeMes": "12",
+    "validadeAno": "2028",
+    "cvv": "123",
+    "parcelas": 3
+  }
+}
+
+###
+
+### 4. Pagamento Cartão de Crédito - Falha (cartão inválido)
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 0,
+  "email": "cliente@exemplo.com",
+  "dadosCartao": {
+    "numeroCartao": "4111111111110000",
+    "nomePortador": "João Silva",
+    "validadeMes": "12",
+    "validadeAno": "2028",
+    "cvv": "000",
+    "parcelas": 1
+  }
+}
+
+###
+
+### 5. Pagamento Cartão de Débito - Sucesso
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 1,
+  "email": "cliente@exemplo.com",
+  "dadosCartao": {
+    "numeroCartao": "5555555555554444",
+    "nomePortador": "Maria Santos",
+    "validadeMes": "06",
+    "validadeAno": "2027",
+    "cvv": "456",
+    "parcelas": 1
+  }
+}
+
+###
+
+### 6. Pagamento Boleto - Sempre Sucesso
+POST https://localhost:7042/api/Pagamento/processar
+Content-Type: application/json
+
+{
+  "reservaId": 1,
+  "formaDePagamento": 3,
+  "email": "cliente@exemplo.com",
+  "dadosBoleto": {
+    "cpfPagador": "12345678901",
+    "nomePagador": "Pedro Costa",
+    "dataVencimento": "2024-08-10"
+  }
+}
+
+###
+
+### 7. Listar todos os pagamentos
+GET https://localhost:7042/api/Pagamento
+Authorization: Bearer SEU_TOKEN_AQUI
+
+###
+
+### 8. Buscar pagamento por ID
+GET https://localhost:7042/api/Pagamento/1
+
+###
+
+### 9. Simular Webhook manual (para testes)
+POST https://localhost:7042/api/Pagamento/webhook/simular/1?status=Pago
+
+###
+
+### 10. Webhook padrão (formato externo)
+POST https://localhost:7042/api/Pagamento/webhook
+Content-Type: application/json
+
+{
+  "data": {
+    "id": "1",
+    "status": "Pago"
+  }
+}
+
+###
+
+### Observações sobre os testes:
+### - FormaDePagamento: 0=CartaoCredito, 1=CartaoDebito, 2=Pix, 3=Boleto
+### - O webhook automático será disparado em 1-15 segundos após o pagamento
+### - PIX: Falha se chave for "teste@falha.com"
+### - Cartão: Falha se termina com "0000" ou CVV "000"
+### - Débito: Falha também se valor > R$ 5000
+### - Boleto: Sempre gera com sucesso, pagamento confirmado via webhook em 10-15s

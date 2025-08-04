@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { obterIdUsuario } from "../api/auth";
+import { getAuthHeaders } from "../api/reservas";
 import { ArrowLeft } from "lucide-react";
 import qrCodePix from "../assets/qrcodepix.png";
 
@@ -92,18 +94,30 @@ export default function Pagamento() {
     return `R$ ${total.toLocaleString('pt-BR')}`;
   };
 
-  const handleFinalizarCompra = () => {
-    const paymentData = {
-      method: selected,
-      total: getFinalTotal(),
-      installments: parcelas,
-      ...(selected === 'credito' || selected === 'debito' ? card : {})
-    };
+  // Validação dos campos de pagamento
+  const isFormValid = () => {
+    if (selected === 'credito' || selected === 'debito') {
+      return (
+        card.number.replace(/\s/g, '').length === 16 &&
+        card.name.trim() !== '' &&
+        card.expiry.length === 5 &&
+        card.cvv.length === 3
+      );
+    }
+    return true;
+  };
 
+  // Simplified: apenas navega para confirmação para testar botão
+  const handleFinalizarCompra = () => {
+    // Teste: navega direto à tela de confirmação
     navigate('/booking-confirmation', {
       state: {
         travelerData,
-        paymentData,
+        paymentData: {
+          method: selected,
+          total: getFinalTotal(),
+          installments: parcelas
+        },
         pacote
       }
     });
@@ -178,16 +192,19 @@ export default function Pagamento() {
           </div>
           <div className="p-6">
             <div className="flex items-center gap-4 mb-4">
-              <img 
-                src={pacote.imagem} 
-                alt={pacote.nome}
+              <img
+                src={pacote.imagens && pacote.imagens.length > 0
+                  ? `http://localhost:5295${pacote.imagens[0].url}`
+                  : '/default-package.jpg'
+                }
+                alt={pacote.titulo}
                 className="w-20 h-20 object-cover rounded-lg"
               />
               <div>
-                <h3 className="font-semibold text-gray-800 text-lg">{pacote.nome}</h3>
-                <p className="text-gray-600">{pacote.destino}</p>
+                <h3 className="font-semibold text-gray-800 text-lg">{pacote.titulo}</h3>
+                <h4 className="text-gray-600">{`${pacote.titulo}, ${pacote.destino}`}</h4>
                 <p className="text-gray-600">
-                  {travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'} • 
+                  {travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'} •
                   {' '}{new Date(travelerData.dataViagem).toLocaleDateString('pt-BR')}
                 </p>
               </div>
@@ -213,47 +230,6 @@ export default function Pagamento() {
               <div className="flex justify-between font-bold text-lg border-t pt-2">
                 <span>Total</span>
                 <span className="text-[#F28C38]">R$ {getFinalTotal().toLocaleString('pt-BR')}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Detalhes da reserva */}
-        <div className="mb-8 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-          <div className="bg-[#F28C38] text-white p-4">
-            <h2 className="text-xl font-bold">Detalhes da Reserva</h2>
-          </div>
-          <div className="p-5 flex flex-col lg:flex-row items-center justify-between gap-5">
-            {/* Imagem do destino */}
-            <img
-              src={pacote.imagem}
-              alt={pacote.nome}
-              className="w-28 h-28 lg:w-32 lg:h-32 object-cover rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300"
-            />
-            {/* Informações da reserva */}
-            <div className="flex-1 space-y-2 text-center lg:text-left lg:ml-5">
-              <div className="flex items-center justify-center lg:justify-start">
-                <span className="text-base font-semibold text-gray-700">📍 Destino:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">{pacote.destino}</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start">
-                <span className="text-base font-semibold text-gray-700">📅 Data:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">
-                  {new Date(travelerData.dataViagem).toLocaleDateString('pt-BR')}
-                </span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start">
-                <span className="text-base font-semibold text-gray-700">👥 Pessoas:</span>
-                <span className="ml-2 text-base text-gray-900 font-medium">
-                  {travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'}
-                </span>
-              </div>
-            </div>
-            {/* Valor à direita */}
-            <div className="bg-[#F28C38] text-white px-6 py-3 rounded-xl shadow-lg">
-              <div className="text-center">
-                <p className="text-sm font-medium opacity-90">Total</p>
-                <div className="text-2xl lg:text-3xl font-extrabold">R$ {getFinalTotal().toLocaleString('pt-BR')}</div>
               </div>
             </div>
           </div>
@@ -489,7 +465,8 @@ export default function Pagamento() {
                         <div className="w-10 h-7 bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-lg shadow-inner"></div>
                         
                         {/* Número do cartão */}
-                        <div className="text-lg lg:text-xl font-bold tracking-widest">
+                        <div className="t
+                        ext-lg lg:text-xl font-bold tracking-widest">
                           {card.number || "•••• •••• •••• ••••"}
                         </div>
                         
@@ -592,10 +569,10 @@ export default function Pagamento() {
         </div>
 
         {/* Botão de confirmação */}
-        <div className="mt-8">
-          <button 
-            onClick={handleFinalizarCompra}
-            className="w-full bg-[#F28C38] text-white py-4 px-8 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl focus:ring-4 focus:ring-orange-200 focus:outline-none cursor-pointer"
+        <form onSubmit={e => { e.preventDefault(); handleFinalizarCompra(); }} className="mt-8">
+          <button
+            type="submit"
+            className="w-full bg-[#F28C38] text-white py-4 px-8 rounded-xl font-bold text-lg hover:bg-orange-600 hover:scale-[1.02] hover:shadow-xl cursor-pointer focus:ring-4 focus:ring-orange-200 focus:outline-none transition-all duration-300 transform"
           >
             <div className="flex items-center justify-center gap-3">
               <span>🔒</span>
@@ -603,22 +580,22 @@ export default function Pagamento() {
               <span className="text-sm opacity-90">- {getPaymentButtonText()}</span>
             </div>
           </button>
-          
-          {/* Informações de segurança */}
-          <div className="mt-5 text-center">
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <span>🔒</span>
-                <span>SSL Seguro</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>🛡️</span>
-                <span>Dados Protegidos</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>✅</span>
-                <span>Site Verificado</span>
-              </div>
+        </form>
+        
+        {/* Informações de segurança */}
+        <div className="mt-5 text-center">
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <span>🔒</span>
+              <span>SSL Seguro</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>🛡️</span>
+              <span>Dados Protegidos</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>✅</span>
+              <span>Site Verificado</span>
             </div>
           </div>
         </div>

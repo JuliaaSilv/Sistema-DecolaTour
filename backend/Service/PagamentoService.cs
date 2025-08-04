@@ -14,14 +14,16 @@ namespace agencia.Service
         private readonly IReservaService _reservaService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
+        private readonly IPagamentoMockService _pagamentoMockService;
 
-        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaService reservaService, IReservaRepository reservaRepository, IMapper mapper, IEmailService emailService)
+        public PagamentoService(IPagamentoRepository pagamentoRepository, IReservaService reservaService, IReservaRepository reservaRepository, IMapper mapper, IEmailService emailService, IPagamentoMockService pagamentoMockService)
         {
             _pagamentoRepository = pagamentoRepository;
             _reservaRepository = reservaRepository;
             _reservaService = reservaService;
             _mapper = mapper;
             _emailService = emailService;
+            _pagamentoMockService = pagamentoMockService;
         }
 
         public async Task<PagamentoDTO?> GetPagamentoByIdAsync(int id)
@@ -80,6 +82,82 @@ namespace agencia.Service
             if (!string.IsNullOrEmpty(dto.Email))
                 await _emailService.EnviarStatusPagamentoAsync(dto.Email, pagamentoDTO.StatusPagamento, pagamentoDTO);
             return pagamento;
+        }
+
+        public async Task<RespostaPagamentoDTO> ProcessarPagamentoCompletoAsync(PagamentoCompletoRequestDTO dto)
+        {
+            try
+            {
+                // Validação básica
+                if (dto == null)
+                    throw new ArgumentNullException(nameof(dto), "Dados do pagamento não informados.");
+
+                // Buscar a reserva
+                var reserva = await _reservaRepository.BuscarReservaPorIdAsync(dto.ReservaId);
+                if (reserva == null)
+                    throw new Exception("Reserva não encontrada para o pagamento.");
+
+                if (reserva.Viajantes == null || !reserva.Viajantes.Any())
+                    throw new Exception("Adicione pelo menos um viajante à reserva antes de realizar o pagamento.");
+
+                // Calcular valor total
+                int quantidadeViajantes = reserva.Viajantes.Count;
+                float valorTotal = reserva.ValorUnitario * quantidadeViajantes;
+
+                // Criar o pagamento
+                var pagamento = new Pagamento
+                {
+                    Valor = valorTotal,
+                    FormaDePagamento = dto.FormaDePagamento,
+                    DataPagamento = DateTime.Now,
+                    StatusPagamento = StatusPagamento.Pendente,
+                    Reserva = reserva
+                };
+
+                await _pagamentoRepository.CriarPagamentoAsync(pagamento);
+
+                // Processar o pagamento usando o mock service
+                RespostaPagamentoDTO resposta = dto.FormaDePagamento switch
+                {
+                    FormaDePagamento.Pix => await _pagamentoMockService.ProcessarPagamentoPixAsync(dto, pagamento),
+                    FormaDePagamento.CartaoCredito or FormaDePagamento.CartaoDebito => 
+                        await _pagamentoMockService.ProcessarPagamentoCartaoAsync(dto, pagamento),
+                    FormaDePagamento.Boleto => await _pagamentoMockService.ProcessarPagamentoBoletoAsync(dto, pagamento),
+                    _ => throw new ArgumentException("Forma de pagamento não suportada.")
+                };
+
+                // Se o pagamento foi rejeitado imediatamente, atualizar o status
+                if (!resposta.Sucesso && resposta.Status == StatusPagamento.Rejeitado.ToString())
+                {
+                    await AtualizarStatusAsync(pagamento.Id, StatusPagamento.Rejeitado.ToString());
+                }
+
+                // Enviar email de status do pagamento
+                if (resposta.Sucesso)
+                {
+                    // Usa status 'Aprovado' para template de aprovação
+                    object payload = resposta.Comprovante != null ? (object)resposta.Comprovante : (object)resposta;
+                    await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Aprovado", payload);
+                }
+                else
+                {
+                    // Usa status 'Rejeitado' para template de rejeição
+                    await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Rejeitado", resposta);
+                }
+
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                return new RespostaPagamentoDTO
+                {
+                    Sucesso = false,
+                    Mensagem = ex.Message,
+                    Status = StatusPagamento.Rejeitado.ToString(),
+                    CodigoErro = "ERRO_INTERNO",
+                    DataProcessamento = DateTime.Now
+                };
+            }
         }
 
         public async Task AtualizarStatusPagamentoAsync(string pagamentoId, string status)

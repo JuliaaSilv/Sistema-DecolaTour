@@ -63,6 +63,29 @@ namespace agencia.Controller
             }
         }
 
+        /// Processa um pagamento completo com mock
+        [HttpPost("processar")]
+        public async Task<IActionResult> ProcessarPagamentoCompleto([FromBody] PagamentoCompletoRequestDTO dto)
+        {
+            try
+            {
+                var resposta = await _pagamentoService.ProcessarPagamentoCompletoAsync(dto);
+                
+                if (resposta.Sucesso)
+                {
+                    return Ok(resposta);
+                }
+                else
+                {
+                    return BadRequest(resposta);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { erro = ex.Message });
+            }
+        }
+
         [HttpPost("webhook")]
         public async Task<IActionResult> Webhook([FromBody] dynamic data)
         {
@@ -70,6 +93,21 @@ namespace agencia.Controller
             string status = data.data.status;
             await _pagamentoService.AtualizarStatusPagamentoAsync(pagamentoId, status);
             return Ok();
+        }
+
+        /// Simula webhook manualmente para testes
+        [HttpPost("webhook/simular/{pagamentoId}")]
+        public async Task<IActionResult> SimularWebhook(int pagamentoId, [FromQuery] string status = "Pago")
+        {
+            try
+            {
+                await _pagamentoService.AtualizarStatusAsync(pagamentoId, status);
+                return Ok(new { mensagem = $"Webhook simulado com sucesso. Pagamento {pagamentoId} alterado para {status}" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { erro = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

@@ -30,7 +30,7 @@ const BookingConfirmation = () => {
     if (navigator.share) {
       navigator.share({
         title: 'Minha Reserva - Decola Tour',
-        text: `Reserva confirmada para ${pacote?.nome}! ID: ${bookingId}`,
+        text: `Reserva confirmada para ${pacote?.titulo}! ID: ${bookingId}`,
         url: window.location.href
       });
     }
@@ -75,7 +75,7 @@ const BookingConfirmation = () => {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8 text-center">
           <div className="bg-[#F28C38] bg-opacity-10 border border-[#F28C38] rounded-xl p-6">
             <div className="text-sm text-gray-600 mb-1">Número da Reserva</div>
-            <div className="text-3xl font-bold text-[#F28C38] mb-2">{bookingId}</div>
+            <div className="text-3xl font-bold text-gray-800 mb-2">{bookingId}</div>
             <div className="text-sm text-gray-600">
               Guarde este número para acompanhar sua reserva
             </div>
@@ -101,20 +101,26 @@ const BookingConfirmation = () => {
 
         {/* Detalhes da reserva */}
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Detalhes da Reserva</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            Detalhes da Reserva - {pacote.titulo}{pacote.destino ? `, ${pacote.destino}` : ''}
+          </h2>
           
           {/* Pacote */}
           <div className="flex items-start gap-6 mb-8 p-6 bg-gray-50 rounded-xl">
             <img 
-              src={pacote.imagem} 
-              alt={pacote.nome}
+              src={
+                pacote.imagens && pacote.imagens.length > 0
+                  ? `http://localhost:5295${pacote.imagens[0].url}`
+                  : '/default-package.jpg'
+              } 
+              alt={pacote.titulo}
               className="w-24 h-24 object-cover rounded-lg"
             />
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-800 text-xl mb-2">{pacote.nome}</h3>
+              <h3 className="font-semibold text-gray-800 text-xl mb-2">{pacote.titulo}</h3>
               <div className="flex items-center gap-2 text-gray-600 mb-3">
                 <MapPin size={18} />
-                <span>{pacote.destino}</span>
+                <span>{`${pacote.titulo}, ${pacote.destino}`}</span>
               </div>
               <div className="text-[#F28C38] font-bold text-2xl">
                 R$ {(paymentData.total && !isNaN(paymentData.total)) ? paymentData.total.toLocaleString('pt-BR') : '0,00'}
