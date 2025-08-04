@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Plus, Search, Edit, Trash2, Eye, Filter, Download } from 'lucide-react';
+import { Package, Plus, Search, Edit, Trash2, Eye, Filter, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
@@ -36,6 +36,10 @@ const PackageManagement = () => {
   const [viewingPackage, setViewingPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const packagesPerPage = 9;
 
   // Obtenha o tipo do usuário
   const tipoUsuario = parseInt(obterTipoUsuario());
@@ -89,11 +93,29 @@ const PackageManagement = () => {
             status: 'ativo', // Status padrão até implementar no backend
             reservas: Math.floor(Math.random() * 50), // Dados fictícios até implementar
             dataUltimaReserva: new Date().toISOString().split('T')[0],
-            imagem: pkg.imagemUrl && pkg.imagemUrl.trim() !== ''
-              ? pkg.imagemUrl
-              : (pkg.imagens && pkg.imagens.length > 0
-                  ? `http://localhost:5295${pkg.imagens[0].url}`
-                  : ''), // Deixe vazio se não houver imagem
+            // Lógica de imagem igual aos outros componentes (Packages.jsx, SearchResults.jsx)
+            imagem: (() => {
+              // Prioridade 1: Coleção Imagens (maiúsculo)
+              if (pkg.Imagens && pkg.Imagens.length > 0) {
+                return `http://localhost:5295${pkg.Imagens[0].Url}`;
+              }
+              // Prioridade 2: Coleção imagens (minúsculo)
+              else if (pkg.imagens && pkg.imagens.length > 0) {
+                return `http://localhost:5295${pkg.imagens[0].url || pkg.imagens[0].Url}`;
+              }
+              // Prioridade 3: Campo ImagemUrl
+              else if (pkg.ImagemUrl) {
+                return `http://localhost:5295${pkg.ImagemUrl}`;
+              }
+              // Prioridade 4: Campo imagemUrl
+              else if (pkg.imagemUrl) {
+                return `http://localhost:5295${pkg.imagemUrl}`;
+              }
+              // Fallback: Placeholder
+              else {
+                return `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&q=80`;
+              }
+            })(),
             descricao: pkg.descricao,
             quantidadeMaximaPessoas: pkg.quantidadeMaximaPessoas,
             duracao: pkg.duracao,
@@ -138,6 +160,23 @@ const PackageManagement = () => {
     const matchesStatus = filterStatus === 'todos' || pkg.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  // Lógica de paginação
+  const totalPages = Math.ceil(filteredPackages.length / packagesPerPage);
+  const startIndex = (currentPage - 1) * packagesPerPage;
+  const endIndex = startIndex + packagesPerPage;
+  const currentPackages = filteredPackages.slice(startIndex, endIndex);
+
+  // Reset da página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    // Scroll para o topo da lista de pacotes
+    document.querySelector('.space-y-6')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const getStatusColor = (status) => {
     return status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
@@ -326,26 +365,37 @@ const PackageManagement = () => {
       )}
 
       {/* Lista de Pacotes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {isLoading ? (
-          // Loading skeleton
-          Array.from({ length: 6 }, (_, index) => (
-            <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="p-0">
-                <div className="h-48 bg-gray-200 rounded-t-lg animate-pulse"></div>
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                  <div className="flex justify-between">
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
-                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
+      <div className="space-y-4">
+        {/* Informações da paginação */}
+        {!isLoading && filteredPackages.length > 0 && (
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>
+              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredPackages.length)} de {filteredPackages.length} pacotes
+            </span>
+            <span>Página {currentPage} de {totalPages}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }, (_, index) => (
+              <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+                <CardContent className="p-0">
+                  <div className="h-48 bg-gray-200 rounded-t-lg animate-pulse"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                    <div className="flex justify-between">
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                      <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          filteredPackages.map((packageItem) => (
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            currentPackages.map((packageItem) => (
           <Card key={packageItem.id} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
               {/* Imagem do pacote */}
@@ -438,6 +488,68 @@ const PackageManagement = () => {
             </CardContent>
           </Card>
           ))
+        )}
+        </div>
+
+        {/* Controles de Paginação */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Anterior
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, index) => {
+                const page = index + 1;
+                const isCurrentPage = page === currentPage;
+                
+                // Mostra apenas algumas páginas ao redor da atual
+                if (
+                  page === 1 || 
+                  page === totalPages || 
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors cursor-pointer ${
+                        isCurrentPage
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (
+                  page === currentPage - 2 || 
+                  page === currentPage + 2
+                ) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2"
+            >
+              Próxima
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         )}
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Search, Edit, Trash2, Eye, Filter, Download, Mail, Phone, Star, Crown, Award, X } from 'lucide-react';
+import { Users, Plus, Search, Edit, Trash2, Eye, Filter, Download, Mail, Phone, Star, Crown, Award, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
@@ -77,6 +77,10 @@ const UserManagement = () => {
   const [error, setError] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingUser, setViewingUser] = useState(null);
+  
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 9;
 
   // Obtenha o tipo do usuário
   const tipoUsuario = parseInt(obterTipoUsuario());
@@ -107,6 +111,23 @@ const UserManagement = () => {
     const matchesStatus = filterStatus === 'todos' || user.status === filterStatus;
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  // Lógica de paginação
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const endIndex = startIndex + usersPerPage;
+  const currentUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset da página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, filterStatus]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    // Scroll para o topo da lista
+    document.querySelector('.space-y-6')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const getStatusColor = (status) => {
     return status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
@@ -307,8 +328,19 @@ const UserManagement = () => {
       </Card>
 
       {/* Lista de Usuários */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredUsers.map((user) => (
+      <div className="space-y-4">
+        {/* Informações da paginação */}
+        {!isLoading && filteredUsers.length > 0 && (
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>
+              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredUsers.length)} de {filteredUsers.length} usuários
+            </span>
+            <span>Página {currentPage} de {totalPages}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {currentUsers.map((user) => (
           <Card key={user.id} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="space-y-4">
@@ -413,6 +445,67 @@ const UserManagement = () => {
             </CardContent>
           </Card>
         ))}
+        </div>
+
+        {/* Controles de Paginação */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Anterior
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, index) => {
+                const page = index + 1;
+                const isCurrentPage = page === currentPage;
+                
+                if (
+                  page === 1 || 
+                  page === totalPages || 
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors cursor-pointer ${
+                        isCurrentPage
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (
+                  page === currentPage - 2 || 
+                  page === currentPage + 2
+                ) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2"
+            >
+              Próxima
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Mensagem quando não há resultados */}

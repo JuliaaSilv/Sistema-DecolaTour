@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Search, Edit, Trash2, Eye, Download, User, MapPin } from 'lucide-react';
+import { Calendar, Plus, Search, Edit, Trash2, Eye, Download, User, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
@@ -15,6 +15,10 @@ const ReservationManagement = () => {
   const [editingReservation, setEditingReservation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const reservationsPerPage = 9;
 
   const tipoUsuario = parseInt(obterTipoUsuario());
 
@@ -44,6 +48,23 @@ const ReservationManagement = () => {
     const matchesStatus = filterStatus === 'todos' || reservation.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  // Lógica de paginação
+  const totalPages = Math.ceil(filteredReservations.length / reservationsPerPage);
+  const startIndex = (currentPage - 1) * reservationsPerPage;
+  const endIndex = startIndex + reservationsPerPage;
+  const currentReservations = filteredReservations.slice(startIndex, endIndex);
+
+  // Reset da página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    // Scroll para o topo da lista
+    document.querySelector('.space-y-6')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -169,7 +190,17 @@ const ReservationManagement = () => {
 
       {/* Lista de Reservas */}
       <div className="space-y-4">
-        {filteredReservations.map((reservation) => (
+        {/* Informações da paginação */}
+        {!isLoading && filteredReservations.length > 0 && (
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>
+              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredReservations.length)} de {filteredReservations.length} reservas
+            </span>
+            <span>Página {currentPage} de {totalPages}</span>
+          </div>
+        )}
+
+        {currentReservations.map((reservation) => (
           <Card key={reservation.id} className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -229,6 +260,66 @@ const ReservationManagement = () => {
             </CardContent>
           </Card>
         ))}
+
+        {/* Controles de Paginação */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Anterior
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, index) => {
+                const page = index + 1;
+                const isCurrentPage = page === currentPage;
+                
+                if (
+                  page === 1 || 
+                  page === totalPages || 
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors cursor-pointer ${
+                        isCurrentPage
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (
+                  page === currentPage - 2 || 
+                  page === currentPage + 2
+                ) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2"
+            >
+              Próxima
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
