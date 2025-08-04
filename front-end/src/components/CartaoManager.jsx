@@ -122,7 +122,7 @@ export default function CartaoManager() {
         <h3 className="text-xl font-semibold text-gray-800">Formas de Pagamento</h3>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
         >
           <FaPlus /> Adicionar Cartão
         </button>
@@ -182,7 +182,7 @@ export default function CartaoManager() {
                   setShowForm(false);
                   setEditingCartao(null);
                 }}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 cursor-pointer"
               >
                 <FaTimes />
               </button>
@@ -284,13 +284,13 @@ export default function CartaoManager() {
                     setShowForm(false);
                     setEditingCartao(null);
                   }}
-                  className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
                 >
                   {editingCartao ? 'Atualizar' : 'Adicionar'}
                 </button>

@@ -167,7 +167,7 @@ export default function Perfil() {
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                            className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
                                                 activeTab === tab.id
                                                     ? 'border-blue-500 text-blue-600'
                                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -201,7 +201,7 @@ export default function Perfil() {
                                                             <FaUserCircle className="w-20 h-20 text-blue-400" />
                                                         </div>
                                                     )}
-                                                    <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors">
+                                                    <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors cursor-pointer">
                                                         <FaPen className="w-3 h-3" />
                                                     </button>
                                                 </div>

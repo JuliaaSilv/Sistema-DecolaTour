@@ -87,37 +87,28 @@ export default function Packages() {
     }
   };
 
-  // Separar por categorias baseado na categoria do pacote
+  // Prioriza categorias explícitas e garante exclusividade entre Nacional/Internacional
   const nacionais = packages.filter(pkg => {
     const categoria = (pkg.categoria || '').toLowerCase();
+    
+    // Se contém 'internacional', NÃO é nacional (prioriza internacional sobre nacional)
+    if (categoria.includes('internacional') || categoria.includes('exterior')) {
+      return false;
+    }
+    
+    // É nacional se explicitamente marcado como nacional OU se é brasileiro
     return categoria.includes('nacional') || 
            categoria.includes('brasil') || 
-           categoria.includes('domestico') ||
-           categoria.includes('nacional');
+           categoria.includes('domestico');
   });
   
   const internacionais = packages.filter(pkg => {
     const categoria = (pkg.categoria || '').toLowerCase();
-    return categoria.includes('internacional') || 
-           categoria.includes('exterior') ||
-           categoria.includes('internacional');
-  });
-
-  // Se não há nenhum pacote categorizado especificamente, distribuir por destino
-  if (nacionais.length === 0 && internacionais.length === 0 && packages.length > 0) {
-    const destinosBrasil = ['rio de janeiro', 'são paulo', 'salvador', 'fortaleza', 'recife', 'brasília', 'manaus', 'curitiba'];
     
-    packages.forEach(pkg => {
-      const destino = (pkg.destino || '').toLowerCase();
-      const ehBrasil = destinosBrasil.some(cidade => destino.includes(cidade));
-      
-      if (ehBrasil) {
-        nacionais.push(pkg);
-      } else {
-        internacionais.push(pkg);
-      }
-    });
-  }
+    // É internacional se explicitamente marcado como internacional
+    return categoria.includes('internacional') || 
+           categoria.includes('exterior');
+  });
 
   console.log("Total de pacotes:", packages.length);
   console.log("Pacotes nacionais:", nacionais.length, nacionais);
@@ -178,15 +169,17 @@ export default function Packages() {
         <p className="text-blue-700 text-base sm:text-lg mb-8 font-medium max-w-2xl mx-auto">
           Descubra destinos incríveis pelo Brasil com toda comodidade e segurança.
         </p>
-        {/* Layout responsivo - mobile: 1 coluna, tablet: 2 colunas, desktop: 3-4 colunas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        {/* Layout flex responsivo igual à Home */}
+        <div className="flex justify-center items-stretch gap-3 sm:gap-4 md:gap-6 flex-wrap">
           {isLoading ? (
             Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="w-full max-w-[340px] h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+              <div key={i} className="flex-shrink-0 w-full sm:w-auto">
+                <div className="w-full max-w-[340px] h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+              </div>
             ))
           ) : nacionais.length > 0 ? (
             nacionais.map((pkg, idx) => (
-              <div key={`nacional-${pkg.id || idx}`} className="w-full max-w-[340px]">
+              <div key={`nacional-${pkg.id || idx}`} className="flex-shrink-0 w-full sm:w-auto">
                 <SimplePackageCard
                   id={pkg.id}
                   imagem={pkg.imagem}
@@ -201,7 +194,7 @@ export default function Packages() {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-xl shadow p-8 mt-6 w-full max-w-md col-span-full">
+            <div className="bg-white rounded-xl shadow p-8 mt-6 w-full max-w-md">
               <h3 className="text-blue-800 text-xl font-semibold mb-2">Em breve!</h3>
               <p className="text-gray-600">Estamos preparando ofertas especiais para você aproveitar o melhor do turismo nacional.</p>
             </div>
@@ -217,15 +210,17 @@ export default function Packages() {
         <p className="text-blue-700 text-base sm:text-lg mb-8 font-medium max-w-2xl mx-auto">
           Viva experiências únicas em destinos ao redor do mundo com a Decola Tour.
         </p>
-        {/* Layout responsivo - mobile: 1 coluna, tablet: 2 colunas, desktop: 3-4 colunas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        {/* Layout flex responsivo igual à Home */}
+        <div className="flex justify-center items-stretch gap-3 sm:gap-4 md:gap-6 flex-wrap">
           {isLoading ? (
             Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="w-full max-w-[340px] h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+              <div key={i} className="flex-shrink-0 w-full sm:w-auto">
+                <div className="w-full max-w-[340px] h-[400px] bg-gray-200 rounded-xl animate-pulse"></div>
+              </div>
             ))
           ) : internacionais.length > 0 ? (
             internacionais.map((pkg, idx) => (
-              <div key={`internacional-${pkg.id || idx}`} className="w-full max-w-[340px]">
+              <div key={`internacional-${pkg.id || idx}`} className="flex-shrink-0 w-full sm:w-auto">
                 <SimplePackageCard
                   id={pkg.id}
                   imagem={pkg.imagem}
@@ -240,7 +235,7 @@ export default function Packages() {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-xl shadow p-8 mt-6 w-full max-w-md col-span-full">
+            <div className="bg-white rounded-xl shadow p-8 mt-6 w-full max-w-md">
               <h3 className="text-blue-800 text-xl font-semibold mb-2">Em breve!</h3>
               <p className="text-gray-600">Em breve você poderá conferir nossos pacotes internacionais exclusivos.</p>
             </div>
