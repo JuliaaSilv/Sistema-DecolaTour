@@ -101,7 +101,7 @@ export default function Cadastro() {
     if (resultado.sucesso) {
 
       // Mostra mensagem de sucesso
-      setSucesso('Cadastro realizado com sucesso!');
+      showSuccess('Cadastro realizado com sucesso!');
 
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {

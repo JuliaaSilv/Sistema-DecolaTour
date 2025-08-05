@@ -65,7 +65,26 @@ export async function fazerCadastro(nome, email, senha, cpf, telefone, dataNasci
       localStorage.setItem('token', data.token);
       return { sucesso: true, dados: data };
     } else {
-      const erro = await response.text();
+      let erro = 'Erro desconhecido';
+      
+      try {
+        const errorData = await response.text();
+        
+        // Tratamento específico para diferentes códigos de erro
+        switch (response.status) {
+          case 409:
+            erro = 'Este email ou CPF já está cadastrado no sistema';
+            break;
+          case 400:
+            erro = 'Dados inválidos. Verifique as informações fornecidas';
+            break;
+          default:
+            erro = errorData || `Erro ${response.status}: ${response.statusText}`;
+        }
+      } catch (parseError) {
+        erro = `Erro ${response.status}: ${response.statusText}`;
+      }
+      
       return { sucesso: false, erro: erro };
     }
   } catch (error) {
