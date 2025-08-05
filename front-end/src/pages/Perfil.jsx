@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaPen, FaUserCircle, FaCheck, FaUser, FaCreditCard, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPen, FaUserCircle, FaCheck, FaUser, FaCreditCard, FaMapMarkerAlt, FaEnvelope, FaPhone, FaCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { fetchCurrentUserProfile, updateCurrentUserProfile } from "../api/users";
 import CartaoManager from "../components/CartaoManager";
@@ -215,7 +215,8 @@ export default function Perfil() {
                                         <div className="lg:w-2/3">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                        <FaUser className="text-blue-500" />
                                                         Nome Completo
                                                     </label>
                                                     <input
@@ -227,7 +228,8 @@ export default function Perfil() {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                        <FaCreditCard className="text-blue-500" />
                                                         CPF
                                                     </label>
                                                     <input
@@ -240,7 +242,8 @@ export default function Perfil() {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                        <FaEnvelope className="text-blue-500" />
                                                         E-mail
                                                     </label>
                                                     <input
@@ -252,7 +255,8 @@ export default function Perfil() {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                        <FaPhone className="text-blue-500" />
                                                         Telefone
                                                     </label>
                                                     <input
@@ -265,7 +269,8 @@ export default function Perfil() {
                                                 </div>
 
                                                 <div className="md:col-span-2">
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                                                        <FaCalendarAlt className="text-blue-500" />
                                                         Data de Nascimento
                                                     </label>
                                                     <input

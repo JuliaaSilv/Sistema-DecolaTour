@@ -399,7 +399,8 @@ const BookingForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Mail className="text-[#F28C38]" size={16} />
                     Email *
                   </label>
                   <input
@@ -416,7 +417,8 @@ const BookingForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Phone className="text-[#F28C38]" size={16} />
                     Telefone *
                   </label>
                   <input
@@ -563,7 +565,8 @@ const BookingForm = () => {
                   {errors.dataViagem && <p className="text-red-500 text-sm mt-1">{errors.dataViagem}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Users className="text-[#F28C38]" size={16} />
                     Número de Viajantes *
                   </label>
                   <select
@@ -591,7 +594,10 @@ const BookingForm = () => {
                     <div className="font-medium text-[#F28C38] mb-2">Viajante {idx + 1}</div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nome *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <User className="text-[#F28C38]" size={14} />
+                          Nome *
+                        </label>
                         <input
                           type="text"
                           value={viajante.nome}
@@ -604,7 +610,10 @@ const BookingForm = () => {
                         {errors[`viajante_${idx}_nome`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_nome`]}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Mail className="text-[#F28C38]" size={14} />
+                          Email *
+                        </label>
                         <input
                           type="email"
                           value={viajante.email}
@@ -617,7 +626,10 @@ const BookingForm = () => {
                         {errors[`viajante_${idx}_email`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_email`]}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Telefone *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Phone className="text-[#F28C38]" size={14} />
+                          Telefone *
+                        </label>
                         <input
                           type="text"
                           value={viajante.telefone}
