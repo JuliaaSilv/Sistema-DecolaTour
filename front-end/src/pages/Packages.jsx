@@ -244,13 +244,13 @@ export default function Packages() {
           <div className="flex flex-col sm:flex-row gap-4 mt-6 px-4 sm:px-0">
             <button 
               onClick={() => document.getElementById('pacotes-nacionais')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+              className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base cursor-pointer"
             >
               Ver Pacotes Nacionais
             </button>
             <button 
               onClick={() => document.getElementById('pacotes-internacionais')?.scrollIntoView({ behavior: 'smooth' })}
-              className="border-2 border-white text-white hover:bg-white hover:text-blue-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 text-sm sm:text-base"
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 text-sm sm:text-base cursor-pointer"
             >
               Pacotes Internacionais
             </button>
