@@ -9,6 +9,7 @@ import PackageCarousel from "../components/common/PackageCarousel";
 import ModernPackageCard from "../components/common/ModernPackageCard";
 import SimplePackageCard from "../components/common/SimplePackageCard";
 import { Package } from "lucide-react";
+import { estaLogado, obterTipoUsuario } from "../api/auth";
 
 // Componente principal da página Home
 export default function Home() {

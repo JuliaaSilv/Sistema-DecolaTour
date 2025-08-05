@@ -65,16 +65,16 @@ export default function AdminSidebar({ activeTab, onTabChange }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-white/95 backdrop-blur-sm border-r border-blue-200/50 transition-all duration-300 overflow-y-auto",
+          "bg-white/95 backdrop-blur-sm border-r border-blue-200/50 transition-all duration-300",
           // Desktop (768px+)
           "hidden lg:block lg:sticky lg:top-[73px] lg:h-[calc(100vh-73px)]",
           collapsed ? "lg:w-20" : "lg:w-64",
           // Mobile e Tablet (até 1023px)
-          "fixed top-0 left-0 h-full w-72 z-50 shadow-2xl",
+          "fixed top-0 left-0 h-full w-72 z-50 shadow-2xl overflow-y-auto",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        <div className="p-4">
+        <div className="p-4 h-full overflow-y-auto lg:overflow-visible">
           {/* Desktop Collapse Button */}
           <Button
             variant="ghost"

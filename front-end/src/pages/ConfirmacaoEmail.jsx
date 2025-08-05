@@ -2,19 +2,21 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { FaPlaneDeparture, FaArrowLeft } from "react-icons/fa";
+import ToastContainer from "../components/ui/ToastContainer";
+import useToast from "../hooks/useToast";
 
 export default function ConfirmacaoEmail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   const token = searchParams.get("token");
 
-  const [mensagem, setMensagem] = useState("");
   const [status, setStatus] = useState("carregando");
 
   useEffect(() => {
     if (!token) {
       setStatus("erro");
-      setMensagem("Token não encontrado na URL.");
+      showError("Token não encontrado na URL.");
       return;
     }
 
@@ -25,26 +27,28 @@ export default function ConfirmacaoEmail() {
 
         if (resposta.ok || dados.mensagem === "E-mail já confirmado.") {
           setStatus("sucesso");
-          setMensagem(dados.mensagem);
+          showSuccess(dados.mensagem, 0);
 
           setTimeout(() => {
             navigate("/login");
-          }, 5000);
+          }, 3000);
         } else {
           setStatus("erro");
-          setMensagem(dados.mensagem || "Erro ao confirmar o e-mail.");
+          showError(dados.mensagem || "Erro ao confirmar o e-mail.");
         }
       } catch (erro) {
         setStatus("erro");
-        setMensagem("Erro na conexão com o servidor.");
+        showError("Erro na conexão com o servidor.");
       }
     };
 
     confirmarEmail();
-  }, [token, navigate]);
+  }, [token, navigate, showSuccess, showError]);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
       {/* Elementos decorativos de fundo */}
       <div className="absolute inset-0 opacity-15">
         <div className="absolute top-10 left-10 w-32 h-32 bg-blue-200 rounded-full blur-xl"></div>
@@ -133,5 +137,6 @@ export default function ConfirmacaoEmail() {
         </div>
       </div>
     </section>
+    </>
   );
 }

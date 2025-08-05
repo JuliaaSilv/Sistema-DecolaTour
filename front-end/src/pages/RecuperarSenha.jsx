@@ -2,17 +2,24 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaArrowLeft } from 'react-icons/fa';
+import ToastContainer from "../components/ui/ToastContainer";
+import useToast from "../hooks/useToast";
 
 export default function RecuperarSenha() {
   const navigate = useNavigate();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   const [email, setEmail] = useState('');
-  const [mensagem, setMensagem] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   const enviarRecuperacao = async (e) => {
     e.preventDefault();
-    setMensagem('');
     setCarregando(true);
+
+    if (!email) {
+      showError('Email é obrigatório');
+      setCarregando(false);
+      return;
+    }
 
     try {
       const response = await fetch('http://localhost:5295/api/auth/solicitar-recuperacao', {
@@ -24,17 +31,24 @@ export default function RecuperarSenha() {
       });
 
       const texto = await response.text();
-      setMensagem(texto);
+      
+      if (response.ok) {
+        showSuccess(texto, 0);
+      } else {
+        showError(texto || 'Erro ao solicitar recuperação de senha');
+      }
     } catch (error) {
       console.error(error);
-      setMensagem('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+      showError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
     } finally {
       setCarregando(false);
     }
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
       {/* Elementos decorativos de fundo */}
       <div className="absolute inset-0 opacity-15">
         <div className="absolute top-10 left-10 w-32 h-32 bg-blue-200 rounded-full blur-xl"></div>
@@ -68,13 +82,6 @@ export default function RecuperarSenha() {
               </p>
             </div>
 
-            {/* Mensagem de feedback */}
-            {mensagem && (
-              <div className="p-4 bg-green-500/30 border border-green-400/60 text-white rounded-lg backdrop-blur-sm">
-                <span className="font-semibold">{mensagem}</span>
-              </div>
-            )}
-
             {/* Campo Email */}
             <div>
               <input
@@ -105,5 +112,6 @@ export default function RecuperarSenha() {
         </div>
       </div>
     </section>
+    </>
   );
 }

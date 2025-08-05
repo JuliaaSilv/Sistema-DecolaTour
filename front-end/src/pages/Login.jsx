@@ -1,34 +1,33 @@
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { fazerLogin } from "../api/auth";
+import { fazerLogin, obterTipoUsuario } from "../api/auth";
 import { FaArrowLeft } from 'react-icons/fa';
+import ToastContainer from "../components/ui/ToastContainer";
+import useToast from "../hooks/useToast";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   
   // Estados simples para os campos
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   // Função para enviar o formulário
   const enviarFormulario = async (e) => {
     e.preventDefault(); // Impede o reload da página
-    setErro(''); // Limpa erros anteriores
-    setSucesso(''); // Limpa mensagem de sucesso anterior
     setCarregando(true); // Mostra loading
 
     // Validações simples
     if (!email) {
-      setErro('Email é obrigatório');
+      showError('Email é obrigatório');
       setCarregando(false);
       return;
     }
     if (!senha) {
-      setErro('Senha é obrigatória');
+      showError('Senha é obrigatória');
       setCarregando(false);
       return;
     }
@@ -37,35 +36,44 @@ export default function Login() {
     const resultado = await fazerLogin(email, senha);
 
     if (resultado.sucesso) {
-      // Mostra mensagem de sucesso
-      setSucesso('Login realizado com sucesso! 🎉');
-      
-      // Verifica se há uma URL de redirecionamento salva
-      const redirectUrl = localStorage.getItem('redirectAfterLogin');
+      // Mostra toast de sucesso
+      showSuccess('Login realizado com sucesso! 🎉', 0);
       
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {
+        // Verifica o tipo de usuário após login bem-sucedido
+        const userRole = obterTipoUsuario();
+        
+        // Verifica se há uma URL de redirecionamento salva
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        
         if (redirectUrl) {
           // Remove a URL de redirecionamento do localStorage
           localStorage.removeItem('redirectAfterLogin');
           console.log('🔄 Redirecionando para:', redirectUrl);
           // Redireciona para a URL salva
           navigate(redirectUrl);
+        } else if (userRole === "1" || userRole === "2") {
+          // Se for administrador (1) ou atendente (2), redireciona para admin
+          console.log('🔄 Administrador detectado, redirecionando para admin');
+          navigate('/admin');
         } else {
-          // Redireciona para home se não há URL salva
+          // Redireciona para home se não há URL salva e não é admin
           navigate('/home');
         }
-      }, 2000);
+      }, 1200); // Reduzido de 2000ms para 1200ms para redirecionamento mais rápido
     } else {
-      // Deu erro, mostra a mensagem
-      setErro(resultado.erro);
+      // Deu erro, mostra toast de erro
+      showError(resultado.erro);
     }
     
     setCarregando(false);
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden flex items-center justify-center px-4">
       {/* Elementos decorativos de fundo */}
       <div className="absolute inset-0 opacity-15">
         <div className="absolute top-10 left-10 w-32 h-32 bg-blue-200 rounded-full blur-xl"></div>
@@ -97,20 +105,6 @@ export default function Login() {
               <h2 className="text-2xl font-bold text-white">Bem-vindo de volta!</h2>
               <p className="text-white/90 mt-2 font-medium">Entre na sua conta para continuar</p>
             </div>
-
-            {/* Mostrar erro se houver */}
-            {erro && (
-              <div className="p-4 bg-red-500/30 border border-red-400/60 text-white rounded-lg backdrop-blur-sm">
-                <span className="font-semibold">{erro}</span>
-              </div>
-            )}
-
-            {/* Mostrar sucesso se houver */}
-            {sucesso && (
-              <div className="p-4 bg-green-500/30 border border-green-400/60 text-white rounded-lg backdrop-blur-sm">
-                <span className="font-semibold">{sucesso}</span>
-              </div>
-            )}
 
             {/* Campo Email */}
             <div>
@@ -186,5 +180,6 @@ export default function Login() {
         </div>
       </div>
     </section>
+    </>
   );
 }

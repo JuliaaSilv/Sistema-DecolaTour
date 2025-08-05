@@ -159,7 +159,7 @@ ${pacotesTexto ? "\n\nðŸ“‹ PACOTES ENCONTRADOS:\n" + pacotesTexto : ""}\n\nHistÃ
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-20 h-20 bg-blue-600 border-4 border-blue-700 rounded-full shadow-md flex items-center justify-center text-white text-3xl font-semibold hover:scale-105 transition focus:outline-none"
+          className="w-20 h-20 bg-blue-600 border-4 border-blue-700 rounded-full shadow-md flex items-center justify-center text-white text-3xl font-semibold hover:scale-105 transition focus:outline-none cursor-pointer"
           aria-label="Abrir chat Theo"
           style={{ fontFamily: "'Inter', 'Poppins', 'Segoe UI', Arial, sans-serif" }}
         >
@@ -203,7 +203,7 @@ ${pacotesTexto ? "\n\nðŸ“‹ PACOTES ENCONTRADOS:\n" + pacotesTexto : ""}\n\nHistÃ
             <span className="font-bold text-lg select-none">Theo</span>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white text-xl font-bold"
+              className="text-white text-xl font-bold cursor-pointer"
             >
               Ã—
             </button>
