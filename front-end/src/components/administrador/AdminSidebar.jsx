@@ -6,6 +6,7 @@ import {
   Calendar,
   Users,
   Gift,
+  Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -37,6 +38,7 @@ export default function AdminSidebar({ activeTab, onTabChange }) {
     { id: "packages", label: "Pacotes", icon: Package, rolesPermitidas: [1, 2] },
     { id: "reservations", label: "Reservas", icon: Calendar, rolesPermitidas: [1, 2] },
     { id: "users", label: "Usuários", icon: Users, rolesPermitidas: [1, 2] },
+    { id: "reviews", label: "Avaliações", icon: Star, rolesPermitidas: [1] },
     { id: "promotions", label: "Promoções", icon: Gift, rolesPermitidas: [1] },
   ];
 

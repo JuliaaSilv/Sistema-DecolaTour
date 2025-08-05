@@ -4,6 +4,7 @@ using agencia.Models;
 using agencia.Response;
 using agencia.Interfaces.Repository;
 using agencia.Interfaces.Services;
+using agencia.Enum;
 
 namespace agencia.Service
 {
@@ -23,43 +24,45 @@ namespace agencia.Service
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse> CriarAvaliacaoAsync(AvaliacaoDTO avaliacaoDTO)
+        public async Task<ApiResponse> CriarAvaliacaoAsync(AvaliacaoDTO dto, int usuarioId)
         {
-            try
+            // Buscar a reserva informada
+            var reserva = await _reservaRepository.BuscarReservaPorIdAsync(dto.ReservaId);
+
+            if (reserva == null)
             {
-                // Validar se a reserva existe
-                var reserva = await _reservaRepository.BuscarReservaPorIdAsync(avaliacaoDTO.ReservaId);
-                if (reserva == null)
-                {
-                    return new ApiResponse(null, new ErrorResponse("Reserva não encontrada!"), 404);
-                }
-
-                // Validar nota (1-5)
-                if (avaliacaoDTO.Nota < 1 || avaliacaoDTO.Nota > 5)
-                {
-                    return new ApiResponse(null, new ErrorResponse("A nota deve estar entre 1 e 5!"), 400);
-                }
-
-                // Verificar se já existe avaliação para esta reserva
-                var avaliacoesExistentes = await _avaliacaoRepository.ListarAvaliacoesPorReservaAsync(avaliacaoDTO.ReservaId);
-                if (avaliacoesExistentes.Any())
-                {
-                    return new ApiResponse(null, new ErrorResponse("Já existe uma avaliação para esta reserva!"), 400);
-                }
-
-                var avaliacao = _mapper.Map<Avaliacao>(avaliacaoDTO);
-                avaliacao.Data = DateTime.Now;
-
-                var avaliacaoCriada = await _avaliacaoRepository.AdicionarAsync(avaliacao);
-                var resultado = _mapper.Map<AvaliacaoDTO>(avaliacaoCriada);
-
-                return new ApiResponse(resultado, null, 201);
+                return new ApiResponse(null, new ErrorResponse("Reserva não encontrada!"), 404);
             }
-            catch (Exception ex)
+
+            // Verifica se a reserva pertence ao usuário logado
+            if (reserva.UsuarioId != usuarioId)
             {
-                return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
+                return new ApiResponse(null, new ErrorResponse("Você não tem permissão para avaliar essa reserva!"), 403);
             }
+
+            // Verifica se esse usuário já avaliou essa reserva
+            var avaliacaoExistente = await _avaliacaoRepository.ObterPorReservaEUsuarioAsync(dto.ReservaId, usuarioId);
+            if (avaliacaoExistente != null)
+            {
+                return new ApiResponse(null, new ErrorResponse("Você já avaliou essa reserva!"), 400);
+            }
+
+            // Criar avaliação
+            var avaliacao = new Avaliacao
+            {
+                Comentario = dto.Comentario,
+                Nota = dto.Nota,
+                Data = DateTime.Now,
+                ReservaId = dto.ReservaId,
+                Status = StatusAvaliacao.Pendente // Usar enum em vez de string
+            };
+
+            await _avaliacaoRepository.CriarAvaliacaoAsync(avaliacao);
+
+            return new ApiResponse(new { mensagem = "Avaliação criada com sucesso!" }, null, 201);
         }
+
+
 
         public async Task<ApiResponse> ListarAvaliacoesAsync()
         {
@@ -196,6 +199,97 @@ namespace agencia.Service
                 };
 
                 return new ApiResponse(resultado, null, 200);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
+            }
+        }
+
+        public async Task<ApiResponse> VerificarSeUsuarioPodeAvaliarPacoteAsync(int pacoteId, int usuarioId)
+        {
+            try
+            {
+                // Buscar todas as reservas do usuário para o pacote específico
+                var reservasUsuario = await _reservaRepository.ListarPorUsuarioAsync(usuarioId);
+                var reservasDoPacote = reservasUsuario.Where(r => r.PacoteId == pacoteId).ToList();
+
+                if (!reservasDoPacote.Any())
+                {
+                    return new ApiResponse(new { podeAvaliar = false, motivo = "Usuário não possui reservas para este pacote" }, null, 200);
+                }
+
+                // Verificar se já existe avaliação para alguma das reservas deste pacote
+                foreach (var reserva in reservasDoPacote)
+                {
+                    var avaliacaoExistente = await _avaliacaoRepository.ObterPorReservaEUsuarioAsync(reserva.Id, usuarioId);
+                    if (avaliacaoExistente != null)
+                    {
+                        return new ApiResponse(new { podeAvaliar = false, motivo = "Usuário já avaliou este pacote", avaliacaoId = avaliacaoExistente.Id }, null, 200);
+                    }
+                }
+
+                // Se chegou até aqui, o usuário tem reserva(s) e ainda não avaliou
+                var reservaParaAvaliar = reservasDoPacote.OrderByDescending(r => r.DataReserva).First();
+                return new ApiResponse(new { 
+                    podeAvaliar = true, 
+                    reservaId = reservaParaAvaliar.Id,
+                    numeroReserva = reservaParaAvaliar.NumeroReserva 
+                }, null, 200);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
+            }
+        }
+
+        // Métodos para moderação
+        public async Task<ApiResponse> ListarAvaliacoesPendentesAsync()
+        {
+            try
+            {
+                var avaliacoesPendentes = await _avaliacaoRepository.ListarAvaliacoesPendentesAsync();
+                var avaliacoesDTO = _mapper.Map<IEnumerable<AvaliacaoCompletaDTO>>(avaliacoesPendentes);
+
+                return new ApiResponse(avaliacoesDTO, null, 200);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
+            }
+        }
+
+        public async Task<ApiResponse> AprovarAvaliacaoAsync(int avaliacaoId)
+        {
+            try
+            {
+                var sucesso = await _avaliacaoRepository.AtualizarStatusAsync(avaliacaoId, StatusAvaliacao.Aprovada);
+                
+                if (!sucesso)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada"), 404);
+                }
+
+                return new ApiResponse(new { mensagem = "Avaliação aprovada com sucesso!" }, null, 200);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
+            }
+        }
+
+        public async Task<ApiResponse> RejeitarAvaliacaoAsync(int avaliacaoId)
+        {
+            try
+            {
+                var sucesso = await _avaliacaoRepository.AtualizarStatusAsync(avaliacaoId, StatusAvaliacao.Rejeitada);
+                
+                if (!sucesso)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada"), 404);
+                }
+
+                return new ApiResponse(new { mensagem = "Avaliação rejeitada com sucesso!" }, null, 200);
             }
             catch (Exception ex)
             {

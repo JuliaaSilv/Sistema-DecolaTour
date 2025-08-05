@@ -9,6 +9,7 @@ import ExportButtons from "../components/administrador/ExportButtons";
 import PackageManagement from "../components/administrador/PackageManagement";
 import ReservationManagement from "../components/administrador/ReservationManagement";
 import UserManagement from "../components/administrador/UserManagement";
+import ReviewManagement from "../components/administrador/ReviewManagement";
 import { obterTipoUsuario, estaLogado } from "../api/auth"; 
 
 export default function AdminPainel() {
@@ -56,6 +57,7 @@ export default function AdminPainel() {
                 {activeTab === "packages" && <PackageManagement />}
                 {activeTab === "reservations" && <ReservationManagement />}
                 {activeTab === "users" && <UserManagement />}
+                {activeTab === "reviews" && <ReviewManagement />}
                 
                 {activeTab === "promotions" && (
                   <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 md:p-8 text-center">

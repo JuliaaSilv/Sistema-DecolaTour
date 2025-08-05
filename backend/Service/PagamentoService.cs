@@ -71,7 +71,7 @@ namespace agencia.Service
             var pagamento = new Pagamento
             {
                 Valor = valorTotal,
-                FormaDePagamento = Enum.Parse<FormaDePagamento>(dto.Metodo, true),
+                FormaDePagamento = System.Enum.Parse<FormaDePagamento>(dto.Metodo, true),
                 DataPagamento = DateTime.Now,
                 StatusPagamento = StatusPagamento.Pendente,
                 Reserva = reserva!
@@ -171,7 +171,7 @@ namespace agencia.Service
                 throw new Exception("Pagamento não encontrado.");
 
             // Atualizar status
-            if (!Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
+            if (!System.Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
                 throw new Exception("Status de pagamento inválido.");
 
             pagamento.StatusPagamento = novoStatus;
@@ -193,7 +193,7 @@ namespace agencia.Service
                 throw new Exception("Pagamento não encontrado.");
 
             // Atualizar status
-            if (!Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
+            if (!System.Enum.TryParse<StatusPagamento>(status, true, out var novoStatus))
                 throw new Exception("Status de pagamento inválido.");
 
             pagamento.StatusPagamento = novoStatus;
@@ -202,7 +202,7 @@ namespace agencia.Service
             var statusReseva = "";
 
             // Converte a string para o enum (com tratamento de erro)
-            if (Enum.TryParse<StatusPagamento>(pagamento.StatusPagamento.ToString(), out StatusPagamento statusEnum))
+            if (System.Enum.TryParse<StatusPagamento>(pagamento.StatusPagamento.ToString(), out StatusPagamento statusEnum))
             {
                 switch (statusEnum)
                 {

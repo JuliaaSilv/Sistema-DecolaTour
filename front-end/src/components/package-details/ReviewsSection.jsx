@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Star, ThumbsUp, Calendar, User } from 'lucide-react';
+import AvaliacaoModal from './AvaliacaoModal';
+import { 
+  verificarSeUsuarioPodeAvaliar, 
+  buscarAvaliacoesPorPacote, 
+  formatarAvaliacoesParaFrontend 
+} from '../../api/avaliacoes';
+import { estaLogado } from '../../api/auth';
 
 const ReviewsSection = ({ pacoteId }) => {
   const [filter, setFilter] = useState('all');
@@ -7,10 +14,46 @@ const ReviewsSection = ({ pacoteId }) => {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [averageRating, setAverageRating] = useState(0);
+  const [podeAvaliar, setPodeAvaliar] = useState(false);
+  const [dadosParaAvaliacao, setDadosParaAvaliacao] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  // Verifica se o usuário está logado
+  useEffect(() => {
+    setIsUserLoggedIn(estaLogado());
+  }, []);
+
+  // Verifica se o usuário pode avaliar este pacote
+  useEffect(() => {
+    const verificarPermissaoAvaliacao = async () => {
+      if (!isUserLoggedIn || !pacoteId) {
+        setPodeAvaliar(false);
+        return;
+      }
+
+      try {
+        const resultado = await verificarSeUsuarioPodeAvaliar(pacoteId);
+        setPodeAvaliar(resultado.podeAvaliar);
+        
+        if (resultado.podeAvaliar) {
+          setDadosParaAvaliacao({
+            reservaId: resultado.reservaId,
+            numeroReserva: resultado.numeroReserva
+          });
+        }
+      } catch (error) {
+        console.error('❌ Erro ao verificar se pode avaliar:', error.message || error.toString());
+        setPodeAvaliar(false);
+      }
+    };
+
+    verificarPermissaoAvaliacao();
+  }, [pacoteId, isUserLoggedIn]);
 
   // Busca avaliações do backend
   useEffect(() => {
-    const fetchReviews = async () => {
+    const carregarAvaliacoes = async () => {
       if (!pacoteId) {
         setIsLoading(false);
         return;
@@ -18,52 +61,26 @@ const ReviewsSection = ({ pacoteId }) => {
 
       try {
         console.log('🔍 Buscando avaliações para pacote:', pacoteId);
-        const response = await fetch(`http://localhost:5295/api/Avaliacao/pacote/${pacoteId}`);
+        const avaliacoesData = await buscarAvaliacoesPorPacote(pacoteId);
+        console.log('📝 Avaliações encontradas:', avaliacoesData);
         
-        if (response.ok) {
-          const data = await response.json();
-          console.log('📝 Avaliações encontradas:', data);
-          console.log('📝 Estrutura da primeira avaliação:', data[0]);
-          
-          // Transforma os dados do backend para o formato esperado
-          const formattedReviews = data.map(avaliacao => {
-            console.log('🔍 Processando avaliação:', {
-              id: avaliacao.id,
-              reserva: avaliacao.reserva,
-              usuario: avaliacao.reserva?.usuario
-            });
-            
-            return {
-              id: avaliacao.id,
-              name: avaliacao.reserva?.usuario?.nome || 'Usuário Anônimo',
-              rating: avaliacao.nota,
-              date: avaliacao.data,
-              comment: avaliacao.comentario,
-              helpful: 0, // Começamos com 0, pode ser implementado depois
-              verified: true // Por enquanto todos são verificados
-            };
-          });
-          
-          setReviews(formattedReviews);
-          
-          // Calcula média
-          if (formattedReviews.length > 0) {
-            const avg = formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length;
-            setAverageRating(avg);
-          }
-        } else {
-          console.log('⚠️ Nenhuma avaliação encontrada para este pacote');
-          setReviews([]);
+        const formattedReviews = formatarAvaliacoesParaFrontend(avaliacoesData);
+        setReviews(formattedReviews);
+        
+        // Calcula média
+        if (formattedReviews.length > 0) {
+          const avg = formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length;
+          setAverageRating(avg);
         }
       } catch (error) {
-        console.error('❌ Erro ao buscar avaliações:', error);
+        console.error('❌ Erro ao buscar avaliações:', error.message || error.toString());
         setReviews([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReviews();
+    carregarAvaliacoes();
   }, [pacoteId]);
 
   const totalReviews = reviews.length;
@@ -81,10 +98,10 @@ const ReviewsSection = ({ pacoteId }) => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('pt-BR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
@@ -97,6 +114,47 @@ const ReviewsSection = ({ pacoteId }) => {
 
   const getHelpfulCount = (reviewId, originalCount) => {
     return originalCount + (reviewHelpful[reviewId] || 0);
+  };
+
+  const handleAvaliacaoSuccess = () => {
+    // Recarregar as avaliações após sucesso
+    const carregarAvaliacoes = async () => {
+      try {
+        const avaliacoesData = await buscarAvaliacoesPorPacote(pacoteId);
+        const formattedReviews = formatarAvaliacoesParaFrontend(avaliacoesData);
+        setReviews(formattedReviews);
+        
+        // Recalcula média
+        if (formattedReviews.length > 0) {
+          const avg = formattedReviews.reduce((acc, review) => acc + review.rating, 0) / formattedReviews.length;
+          setAverageRating(avg);
+        }
+        
+        // Atualiza o estado de avaliação (agora o usuário não pode mais avaliar)
+        setPodeAvaliar(false);
+        setDadosParaAvaliacao(null);
+      } catch (error) {
+        console.error('❌ Erro ao recarregar avaliações:', error.message || error.toString());
+      }
+    };
+    
+    carregarAvaliacoes();
+  };
+
+  const handleAbrirModal = () => {
+    if (!isUserLoggedIn) {
+      alert('Você precisa estar logado para avaliar um pacote. Por favor, faça login.');
+      // Redirecionar para login seria ideal
+      window.location.href = '/login';
+      return;
+    }
+    
+    if (!podeAvaliar) {
+      alert('Você só pode avaliar pacotes que já reservou e ainda não avaliou.');
+      return;
+    }
+    
+    setIsModalOpen(true);
   };
 
   // Se ainda está carregando
@@ -127,13 +185,33 @@ const ReviewsSection = ({ pacoteId }) => {
 
           {/* CTA para deixar avaliação */}
           <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white text-center">
-            <h3 className="text-xl font-semibold mb-2">Já se hospedou conosco?</h3>
-            <p className="mb-4 opacity-90">Compartilhe sua experiência e ajude outros viajantes!</p>
-            <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
-              Deixar Primeira Avaliação
+            <h3 className="text-xl font-semibold mb-2">Seja o primeiro a avaliar!</h3>
+            <p className="mb-4 opacity-90">Você já se hospedou conosco? Compartilhe sua experiência!</p>
+            <button 
+              onClick={handleAbrirModal}
+              disabled={!isUserLoggedIn || !podeAvaliar}
+              className={`px-6 py-3 rounded-xl font-semibold transition-colors duration-300 ${
+                !isUserLoggedIn || !podeAvaliar 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-white text-[#F28C38] hover:bg-gray-100 cursor-pointer'
+              }`}
+            >
+              {!isUserLoggedIn ? 'Faça Login para Avaliar' : 
+               !podeAvaliar ? 'Reserve para Avaliar' : 
+               'Deixar Primeira Avaliação'}
             </button>
           </div>
         </div>
+
+        {/* Modal de Avaliação */}
+        <AvaliacaoModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          pacoteId={pacoteId}
+          reservaId={dadosParaAvaliacao?.reservaId}
+          numeroReserva={dadosParaAvaliacao?.numeroReserva}
+          onSuccess={handleAvaliacaoSuccess}
+        />
       </section>
     );
   }
@@ -239,11 +317,31 @@ const ReviewsSection = ({ pacoteId }) => {
           <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-6 text-white text-center">
             <h3 className="text-xl font-semibold mb-2">Já se hospedou conosco?</h3>
             <p className="mb-4 opacity-90">Compartilhe sua experiência e ajude outros viajantes!</p>
-            <button className="bg-white text-[#F28C38] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300 cursor-pointer">
-              Deixar Avaliação
+            <button 
+              onClick={handleAbrirModal}
+              disabled={!isUserLoggedIn || !podeAvaliar}
+              className={`px-6 py-3 rounded-xl font-semibold transition-colors duration-300 ${
+                !isUserLoggedIn || !podeAvaliar 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-white text-[#F28C38] hover:bg-gray-100 cursor-pointer'
+              }`}
+            >
+              {!isUserLoggedIn ? 'Faça Login para Avaliar' : 
+               !podeAvaliar ? 'Reserve para Avaliar' : 
+               'Deixar Avaliação'}
             </button>
           </div>
         </div>
+
+        {/* Modal de Avaliação */}
+        <AvaliacaoModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          pacoteId={pacoteId}
+          reservaId={dadosParaAvaliacao?.reservaId}
+          numeroReserva={dadosParaAvaliacao?.numeroReserva}
+          onSuccess={handleAvaliacaoSuccess}
+        />
       </div>
     </section>
   );

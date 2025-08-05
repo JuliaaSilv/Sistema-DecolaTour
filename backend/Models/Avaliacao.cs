@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using agencia.Enum;
 
 namespace agencia.Models
 {
@@ -7,7 +8,11 @@ namespace agencia.Models
     public class Avaliacao
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
+
+        [Required]
+        [Column("STATUS")]
+        public StatusAvaliacao Status { get; set; } = StatusAvaliacao.Pendente;
 
         [Required]
         [Column("NOTA")]    
@@ -25,8 +30,8 @@ namespace agencia.Models
         [Column("ID_RESERVA")]
         public int ReservaId { get; set; }
 
-        [ForeignKey("ID_RESERVA")]
+        [ForeignKey("ReservaId")]
         public Reserva Reserva { get; set; }
-        
+
     }
 }

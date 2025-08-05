@@ -151,7 +151,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try 
     {
-        //context.Database.EnsureDeleted(); // Use com cuidado
+       // context.Database.EnsureDeleted(); // Use com cuidado
         context.Database.EnsureCreated();
 
         // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir

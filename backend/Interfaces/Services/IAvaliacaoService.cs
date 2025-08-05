@@ -5,7 +5,7 @@ namespace agencia.Interfaces.Services
 {
     public interface IAvaliacaoService
     {
-        Task<ApiResponse> CriarAvaliacaoAsync(AvaliacaoDTO avaliacaoDTO);
+        Task<ApiResponse> CriarAvaliacaoAsync(AvaliacaoDTO avaliacaoDTO, int usuarioId);
         Task<ApiResponse> ListarAvaliacoesAsync();
         Task<ApiResponse> BuscarAvaliacaoPorIdAsync(int id);
         Task<ApiResponse> ListarAvaliacoesPorPacoteAsync(int pacoteId);
@@ -13,5 +13,11 @@ namespace agencia.Interfaces.Services
         Task<ApiResponse> AtualizarAvaliacaoAsync(int id, AvaliacaoDTO avaliacaoDTO);
         Task<ApiResponse> RemoverAvaliacaoAsync(int id);
         Task<ApiResponse> CalcularMediaAvaliacoesAsync(int pacoteId);
+        Task<ApiResponse> VerificarSeUsuarioPodeAvaliarPacoteAsync(int pacoteId, int usuarioId);
+        
+        // Métodos para moderação
+        Task<ApiResponse> ListarAvaliacoesPendentesAsync();
+        Task<ApiResponse> AprovarAvaliacaoAsync(int avaliacaoId);
+        Task<ApiResponse> RejeitarAvaliacaoAsync(int avaliacaoId);
     }
 }

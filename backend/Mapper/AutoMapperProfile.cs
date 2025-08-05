@@ -60,8 +60,8 @@ namespace agencia.Mapper
                 .ForMember(dest => dest.StatusPagamento, opt => opt.MapFrom(src => src.StatusPagamento.ToString()))
                 .ForMember(dest => dest.DataPagamento, opt => opt.MapFrom(src => src.DataPagamento));
             CreateMap<PagamentoDTO, Pagamento>()
-                .ForMember(dest => dest.FormaDePagamento, opt => opt.MapFrom(src => Enum.Parse(typeof(FormaDePagamento), src.FormaDePagamento)))
-                .ForMember(dest => dest.StatusPagamento, opt => opt.MapFrom(src => Enum.Parse(typeof(StatusPagamento), src.StatusPagamento)))
+                .ForMember(dest => dest.FormaDePagamento, opt => opt.MapFrom(src => System.Enum.Parse(typeof(FormaDePagamento), src.FormaDePagamento)))
+                .ForMember(dest => dest.StatusPagamento, opt => opt.MapFrom(src => System.Enum.Parse(typeof(StatusPagamento), src.StatusPagamento)))
                 .ForMember(dest => dest.DataPagamento, opt => opt.MapFrom(src => src.DataPagamento));
 
 
@@ -89,6 +89,10 @@ namespace agencia.Mapper
 
             // Mapeamento para avaliação completa com dados de usuário
             CreateMap<Avaliacao, AvaliacaoCompletaDTO>()
+                .ForMember(dest => dest.DataAvaliacao, opt => opt.MapFrom(src => src.Data))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Usuario, opt => opt.MapFrom(src => src.Reserva.Usuario))
+                .ForMember(dest => dest.Pacote, opt => opt.MapFrom(src => src.Reserva.Pacote))
                 .ForMember(dest => dest.Reserva, opt => opt.MapFrom(src => src.Reserva));
             
             CreateMap<Reserva, ReservaParaAvaliacaoDTO>()

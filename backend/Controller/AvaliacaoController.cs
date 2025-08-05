@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using agencia.Interfaces.Services;
 using agencia.DTOs;
 using agencia.Response;
+using System.Security.Claims;
+using System.Linq;
 
 namespace agencia.Controller
 {
@@ -19,13 +21,28 @@ namespace agencia.Controller
 
         // Cria uma nova avaliação para uma reserva
         [HttpPost]
-        [Authorize(Roles = "2")] // Apenas viajantes podem criar avaliações
-        public async Task<ActionResult> CriarAvaliacao([FromBody] AvaliacaoDTO avaliacaoDTO)
+        [Authorize] // Qualquer usuário logado pode tentar criar avaliação (validação no service)
+        public async Task<ActionResult> CriarAvaliacao([FromBody] CreateAvaliaçãoDTO createAvaliacaoDTO)
         {
-            if (avaliacaoDTO == null)
+            if (createAvaliacaoDTO == null)
                 return BadRequest(new ApiResponse(null, new ErrorResponse("Dados da avaliação não informados!"), 400));
 
-            var response = await _avaliacaoService.CriarAvaliacaoAsync(avaliacaoDTO);
+            // Obtém o ID do usuário autenticado
+            var usuarioId = ObterUsuarioIdDoToken();
+
+            if (usuarioId == 0)
+                return Unauthorized("Token inválido ou usuário não encontrado.");
+
+            // Converte CreateAvaliacaoDTO para AvaliacaoDTO
+            var avaliacaoDTO = new AvaliacaoDTO
+            {
+                Comentario = createAvaliacaoDTO.Comentario,
+                Nota = createAvaliacaoDTO.Nota,
+                ReservaId = createAvaliacaoDTO.ReservaId,
+                Data = DateTime.Now
+            };
+
+            var response = await _avaliacaoService.CriarAvaliacaoAsync(avaliacaoDTO, usuarioId);
 
             if (response.Error != null)
                 return StatusCode(response.StatusCode, response.Error);
@@ -48,7 +65,7 @@ namespace agencia.Controller
 
         // Busca avaliação por ID
         [HttpGet("{id}")]
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1,3")]
         public async Task<ActionResult> BuscarAvaliacaoPorId(int id)
         {
             var response = await _avaliacaoService.BuscarAvaliacaoPorIdAsync(id);
@@ -77,7 +94,6 @@ namespace agencia.Controller
        
         // Lista avaliações de uma reserva específica
         [HttpGet("reserva/{reservaId}")]
-        [Authorize(Roles = "1,2")]
         public async Task<ActionResult> ListarAvaliacoesPorReserva(int reservaId)
         {
             var response = await _avaliacaoService.ListarAvaliacoesPorReservaAsync(reservaId);
@@ -90,7 +106,7 @@ namespace agencia.Controller
 
         // Atualiza uma avaliação existente
         [HttpPut("{id}")]
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1")]
         public async Task<ActionResult> AtualizarAvaliacao(int id, [FromBody] AvaliacaoDTO avaliacaoDTO)
         {
             if (avaliacaoDTO == null)
@@ -128,6 +144,72 @@ namespace agencia.Controller
                 return StatusCode(response.StatusCode, response.Error);
 
             return StatusCode(response.StatusCode, response.Data);
+        }
+
+        // Verifica se o usuário logado pode avaliar um pacote específico
+        [HttpGet("pode-avaliar/{pacoteId}")]
+        [Authorize] // Qualquer usuário logado pode verificar se pode avaliar
+        public async Task<ActionResult> VerificarSeUsuarioPodeAvaliarPacote(int pacoteId)
+        {
+            // Obtém o ID do usuário autenticado
+            var usuarioId = ObterUsuarioIdDoToken();
+
+            if (usuarioId == 0)
+                return Unauthorized("Token inválido ou usuário não encontrado.");
+
+            var response = await _avaliacaoService.VerificarSeUsuarioPodeAvaliarPacoteAsync(pacoteId, usuarioId);
+
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            return StatusCode(response.StatusCode, response.Data);
+        }
+
+        // Endpoints para moderação - apenas administradores
+        [HttpGet("pendentes")]
+        [Authorize(Roles = "1")] // Apenas administradores
+        public async Task<ActionResult> ListarAvaliacoesPendentes()
+        {
+            var response = await _avaliacaoService.ListarAvaliacoesPendentesAsync();
+
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            return StatusCode(response.StatusCode, response.Data);
+        }
+
+        [HttpPut("aprovar/{avaliacaoId}")]
+        [Authorize(Roles = "1")] // Apenas administradores
+        public async Task<ActionResult> AprovarAvaliacao(int avaliacaoId)
+        {
+            var response = await _avaliacaoService.AprovarAvaliacaoAsync(avaliacaoId);
+
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            return StatusCode(response.StatusCode, response.Data);
+        }
+
+        [HttpPut("rejeitar/{avaliacaoId}")]
+        [Authorize(Roles = "1")] // Apenas administradores
+        public async Task<ActionResult> RejeitarAvaliacao(int avaliacaoId)
+        {
+            var response = await _avaliacaoService.RejeitarAvaliacaoAsync(avaliacaoId);
+
+            if (response.Error != null)
+                return StatusCode(response.StatusCode, response.Error);
+
+            return StatusCode(response.StatusCode, response.Data);
+        }
+
+        private int ObterUsuarioIdDoToken()
+        {
+            var idClaim = User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (int.TryParse(idClaim, out var id))
+                return id;
+
+            return 0;
         }
     }
 }
