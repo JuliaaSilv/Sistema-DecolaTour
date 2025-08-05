@@ -36,8 +36,13 @@ export default function Login() {
     const resultado = await fazerLogin(email, senha);
 
     if (resultado.sucesso) {
-      // Mostra toast de sucesso
-      showSuccess('Login realizado com sucesso! 🎉', 0);
+
+      // Mostra mensagem de sucesso
+      setSucesso('Login realizado com sucesso!');
+      
+      // Verifica se há uma URL de redirecionamento salva
+      const redirectUrl = localStorage.getItem('redirectAfterLogin');
+
       
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {

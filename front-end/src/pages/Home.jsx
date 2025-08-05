@@ -9,7 +9,11 @@ import PackageCarousel from "../components/common/PackageCarousel";
 import ModernPackageCard from "../components/common/ModernPackageCard";
 import SimplePackageCard from "../components/common/SimplePackageCard";
 import { Package } from "lucide-react";
+
 import { estaLogado, obterTipoUsuario } from "../api/auth";
+
+import { buscarMediaAvaliacoes } from "../api/avaliacoes";
+
 
 // Componente principal da página Home
 export default function Home() {
@@ -53,12 +57,23 @@ export default function Home() {
             });
           });
           // Adapta os dados do backend (máximo 7 pacotes para a Home)
-          const adaptedPackages = data.slice(0, 7).map((pkg, index) => {
+          const adaptedPackages = await Promise.all(data.slice(0, 7).map(async (pkg, index) => {
+            // Buscar média de avaliações do pacote
+            let mediaAvaliacao = { mediaNota: 0, totalAvaliacoes: 0 };
+            try {
+              mediaAvaliacao = await buscarMediaAvaliacoes(pkg.id);
+              console.log(`Média de avaliações para ${pkg.Titulo}:`, mediaAvaliacao);
+            } catch (error) {
+              console.error(`Erro ao buscar média de avaliações para pacote ${pkg.id}:`, error);
+            }
+
             return {
               id: pkg.id,
               titulo: pkg.Titulo || pkg.titulo || pkg.nome,  // Renomeado para titulo
               destino: pkg.Destino || pkg.destino,
-              estrelas: pkg.Estrelas || pkg.estrelas || 0, // Direto do backend
+              estrelas: Math.round(mediaAvaliacao.mediaNota || 0), // Usar média das avaliações arredondada
+              mediaAvaliacao: mediaAvaliacao.mediaNota || 0, // Valor exato da média
+              totalAvaliacoes: mediaAvaliacao.totalAvaliacoes || 0,
               preco: pkg.ValorTotal || pkg.valorTotal || pkg.valorUnitario || 0,
               precoOriginal: 10000,
               duracao: pkg.Duracao || pkg.duracao
@@ -78,7 +93,7 @@ export default function Home() {
                   : `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&q=80`,
               descricao: pkg.Descricao || pkg.descricao,
             };
-          });
+          }));
           console.log("Pacotes adaptados para Home:", adaptedPackages);
           setFeaturedPackages(adaptedPackages);
         } else {
@@ -192,6 +207,7 @@ export default function Home() {
                         categoria={pkg.categoria}
                         inclusions={pkg.inclusions}
                         estrelas={pkg.estrelas}
+                        totalAvaliacoes={pkg.totalAvaliacoes}
                       />
                     </div>
                   ))

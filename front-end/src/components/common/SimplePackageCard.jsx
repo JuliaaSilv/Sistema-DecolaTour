@@ -14,6 +14,7 @@ const SimplePackageCard = ({
   categoria = "PACOTE",
   inclusions = "Hotel + Aéreo",
   estrelas = 0,
+  totalAvaliacoes = 0,
   id,
 }) => {
   return (
@@ -26,6 +27,7 @@ const SimplePackageCard = ({
       categoria={categoria}
       inclusions={inclusions}
       estrelas={estrelas}
+      totalAvaliacoes={totalAvaliacoes}
       id={id}
     />
   );
@@ -40,6 +42,7 @@ function CardContent({
   categoria,
   inclusions,
   estrelas,
+  totalAvaliacoes,
   id,
 }) {
   const navigate = useNavigate();
@@ -100,7 +103,7 @@ function CardContent({
         <div className="text-lg text-blue-700 font-semibold text-left w-full pl-3 mb-1">
           {destino}
         </div>
-        {/* Avaliação com estrelas */}
+        {/* Avaliação com estrelas dos usuários */}
         {estrelas > 0 && (
           <div className="flex items-center gap-1 w-full pl-3 mb-2">
             {[...Array(5)].map((_, i) => (
@@ -112,7 +115,14 @@ function CardContent({
                 }`}
               />
             ))}
-            <span className="text-sm text-gray-600 ml-1">({estrelas}/5)</span>
+            <span className="text-sm text-gray-600 ml-1">
+              ({estrelas}/5) • {totalAvaliacoes || 0} avaliação{(totalAvaliacoes || 0) !== 1 ? 'ões' : ''}
+            </span>
+          </div>
+        )}
+        {estrelas === 0 && (
+          <div className="text-sm text-gray-500 w-full pl-3 mb-2">
+            Seja o primeiro a avaliar!
           </div>
         )}
         {/* Inclusões */}

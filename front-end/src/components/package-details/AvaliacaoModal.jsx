@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Star, X, Send } from 'lucide-react';
 import { criarAvaliacao } from '../../api/avaliacoes';
+import useToast from '../../hooks/useToast';
+import ToastContainer from '../common/ToastContainer';
 
 const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, onSuccess }) => {
   const [nota, setNota] = useState(0);
@@ -8,6 +10,7 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
   const [comentario, setComentario] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +36,7 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
       });
 
       // Sucesso - mostrar mensagem e chamar callback
-      alert('Avaliação enviada com sucesso! Ela será analisada pela moderação antes de aparecer no site.');
+      showSuccess('Avaliação enviada com sucesso! Ela será analisada pela moderação antes de aparecer no site.', 5000);
       onSuccess();
       handleClose();
       
@@ -177,6 +180,9 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
           </div>
         </form>
       </div>
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

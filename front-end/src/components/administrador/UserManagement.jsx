@@ -174,7 +174,7 @@ const UserManagement = () => {
       try {
         await deleteUser(id);
         await loadUsers(); // Recarregar lista
-        showSuccess('Usuário excluído com sucesso! 🗑️');
+        showSuccess('Usuário excluído com sucesso!');
       } catch (error) {
         showError(`Erro ao excluir usuário: ${error.message}`);
       }
@@ -193,11 +193,11 @@ const UserManagement = () => {
       if (editingUser) {
         console.log('Atualizando usuário ID:', editingUser.id);
         await updateUser(editingUser.id, userData);
-        showSuccess('Usuário atualizado com sucesso! ✨');
+        showSuccess('Usuário atualizado com sucesso!');
       } else {
         console.log('Criando novo usuário');
         await createUser(userData);
-        showSuccess('Usuário criado com sucesso! 🎉');
+        showSuccess('Usuário criado com sucesso!');
       }
       
       setIsModalOpen(false);
@@ -341,7 +341,7 @@ const UserManagement = () => {
               >
                 <option value="todos">Todos os Status</option>
                 <option value="ativo">Ativo</option>
-                <option value="inativo">Inativo</option>
+                {/* <option value="inativo">Inativo</option> */}
               </select>
             </div>
           </div>
@@ -384,9 +384,9 @@ const UserManagement = () => {
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Badge className={getStatusColor(user.status)}>
+                        {/* <Badge className={getStatusColor(user.status)}>
                           {user.status}
-                        </Badge>
+                        </Badge> */}
                         <Badge className={getTypeColor(user.tipo)}>
                           {user.tipo}
                         </Badge>
@@ -408,7 +408,7 @@ const UserManagement = () => {
                 </div>
 
                 {/* Estatísticas (apenas para clientes) */}
-                {user.tipo === 'Cliente' && (
+                {/* {user.tipo === 'Cliente' && (
                   <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-blue-600">{user.reservas}</p>
@@ -421,13 +421,13 @@ const UserManagement = () => {
                       <p className="text-xs text-gray-600">Total Gasto</p>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Datas */}
-                <div className="text-xs text-gray-500 space-y-1">
+                {/* <div className="text-xs text-gray-500 space-y-1">
                   <p>Registrado em: {user.dataRegistro}</p>
                   <p>Último login: {user.ultimoLogin}</p>
-                </div>
+                </div> */}
 
                 {/* Ações */}
                 <div className="flex gap-2 pt-2">
@@ -636,22 +636,15 @@ const UserViewModal = ({ isOpen, onClose, user }) => {
 
           <div>
             <label className="text-sm font-medium text-gray-600">Status</label>
-            <Badge className={user.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+            {/* <Badge className={user.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
               {user.status}
-            </Badge>
+            </Badge> */}
+            <p className="text-gray-800">Ativo</p>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-600">Data de Registro</label>
-            <p className="text-gray-800">{user.dataRegistro}</p>
-          </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-600">Último Login</label>
-            <p className="text-gray-800">{user.ultimoLogin}</p>
-          </div>
 
-          {user.tipo === 'Cliente' && (
+          {/* {user.tipo === 'Cliente' && (
             <>
               <div>
                 <label className="text-sm font-medium text-gray-600">Total de Reservas</label>
@@ -675,7 +668,7 @@ const UserViewModal = ({ isOpen, onClose, user }) => {
                 </div>
               )}
             </>
-          )}
+          )} */}
         </div>
 
         <div className="flex justify-end mt-6">

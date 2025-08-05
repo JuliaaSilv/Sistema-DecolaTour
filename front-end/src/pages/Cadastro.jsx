@@ -99,8 +99,10 @@ export default function Cadastro() {
     const resultado = await fazerCadastro(nome, email, senha, cpf, telefone, dataNascimento);
 
     if (resultado.sucesso) {
-      // Mostra toast de sucesso
-      showSuccess('Cadastro realizado com sucesso! 🎉', 0);
+
+      // Mostra mensagem de sucesso
+      setSucesso('Cadastro realizado com sucesso!');
+
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {
         navigate('/login');

@@ -54,7 +54,7 @@ namespace agencia.Service
                 Nota = dto.Nota,
                 Data = DateTime.Now,
                 ReservaId = dto.ReservaId,
-                Status = StatusAvaliacao.Pendente // Usar enum em vez de string
+                Status = StatusAvaliacao.Pendente
             };
 
             await _avaliacaoRepository.CriarAvaliacaoAsync(avaliacao);
@@ -243,18 +243,44 @@ namespace agencia.Service
             }
         }
 
-        // Métodos para moderação
+        // Métodos para moderação de avaliações
         public async Task<ApiResponse> ListarAvaliacoesPendentesAsync()
         {
             try
             {
+                Console.WriteLine("🔍 Iniciando ListarAvaliacoesPendentesAsync");
+                
                 var avaliacoesPendentes = await _avaliacaoRepository.ListarAvaliacoesPendentesAsync();
+                
+                Console.WriteLine($"🔍 Avaliações encontradas: {avaliacoesPendentes.Count()}");
+                
+                foreach (var avaliacao in avaliacoesPendentes.Take(1)) // Log apenas da primeira para não poluir
+                {
+                    Console.WriteLine($"🔍 Avaliação ID: {avaliacao.Id}");
+                    Console.WriteLine($"🔍 Reserva: {(avaliacao.Reserva != null ? "Carregada" : "NULL")}");
+                    if (avaliacao.Reserva != null)
+                    {
+                        Console.WriteLine($"🔍 Usuario na Reserva: {(avaliacao.Reserva.Usuario != null ? avaliacao.Reserva.Usuario.Nome : "NULL")}");
+                        Console.WriteLine($"🔍 Pacote na Reserva: {(avaliacao.Reserva.Pacote != null ? avaliacao.Reserva.Pacote.Titulo : "NULL")}");
+                    }
+                }
+                
                 var avaliacoesDTO = _mapper.Map<IEnumerable<AvaliacaoCompletaDTO>>(avaliacoesPendentes);
+                
+                Console.WriteLine($"🔍 DTOs mapeados: {avaliacoesDTO.Count()}");
+                foreach (var dto in avaliacoesDTO.Take(1)) // Log apenas do primeiro DTO
+                {
+                    Console.WriteLine($"🔍 DTO ID: {dto.Id}");
+                    Console.WriteLine($"🔍 DTO Usuario: {(dto.Usuario != null ? dto.Usuario.Nome : "NULL")}");
+                    Console.WriteLine($"🔍 DTO Pacote: {(dto.Pacote != null ? dto.Pacote.Titulo : "NULL")}");
+                }
 
                 return new ApiResponse(avaliacoesDTO, null, 200);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"❌ Erro em ListarAvaliacoesPendentesAsync: {ex.Message}");
+                Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
                 return new ApiResponse(null, new ErrorResponse($"Erro interno: {ex.Message}"), 500);
             }
         }
@@ -263,11 +289,21 @@ namespace agencia.Service
         {
             try
             {
+                var avaliacao = await _avaliacaoRepository.BuscarPorIdAsync(avaliacaoId);
+                if (avaliacao == null)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada!"), 404);
+                }
+
+                if (avaliacao.Status != StatusAvaliacao.Pendente)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Apenas avaliações pendentes podem ser aprovadas!"), 400);
+                }
+
                 var sucesso = await _avaliacaoRepository.AtualizarStatusAsync(avaliacaoId, StatusAvaliacao.Aprovada);
-                
                 if (!sucesso)
                 {
-                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada"), 404);
+                    return new ApiResponse(null, new ErrorResponse("Erro ao aprovar avaliação!"), 500);
                 }
 
                 return new ApiResponse(new { mensagem = "Avaliação aprovada com sucesso!" }, null, 200);
@@ -282,11 +318,21 @@ namespace agencia.Service
         {
             try
             {
+                var avaliacao = await _avaliacaoRepository.BuscarPorIdAsync(avaliacaoId);
+                if (avaliacao == null)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada!"), 404);
+                }
+
+                if (avaliacao.Status != StatusAvaliacao.Pendente)
+                {
+                    return new ApiResponse(null, new ErrorResponse("Apenas avaliações pendentes podem ser rejeitadas!"), 400);
+                }
+
                 var sucesso = await _avaliacaoRepository.AtualizarStatusAsync(avaliacaoId, StatusAvaliacao.Rejeitada);
-                
                 if (!sucesso)
                 {
-                    return new ApiResponse(null, new ErrorResponse("Avaliação não encontrada"), 404);
+                    return new ApiResponse(null, new ErrorResponse("Erro ao rejeitar avaliação!"), 500);
                 }
 
                 return new ApiResponse(new { mensagem = "Avaliação rejeitada com sucesso!" }, null, 200);

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import fundo from "../assets/fundoHome.jpg";
 import SimplePackageCard from "../components/common/SimplePackageCard";
 import Button from "../components/common/Button";
+import { buscarMediaAvaliacoes } from "../api/avaliacoes";
 
 export default function Packages() {
   const [packages, setPackages] = useState([]);
@@ -24,8 +25,8 @@ export default function Packages() {
         const data = await response.json();
         console.log("Pacotes carregados da API:", data);
         
-        // Usar o mesmo mapeamento da Home.jsx
-        const adaptedPackages = data.map((pkg, index) => {
+        // Mapear pacotes e buscar médias de avaliação
+        const adaptedPackages = await Promise.all(data.map(async (pkg, index) => {
           // Log detalhado das imagens para debug
           console.log(`Pacote ${index + 1} - ${pkg.Titulo}:`, {
             'pkg.Imagens': pkg.Imagens,
@@ -60,11 +61,22 @@ export default function Packages() {
 
           console.log(`Imagem final para ${pkg.Titulo}: ${imagemUrl}`);
 
+          // Buscar média de avaliações do pacote
+          let mediaAvaliacao = { mediaNota: 0, totalAvaliacoes: 0 };
+          try {
+            mediaAvaliacao = await buscarMediaAvaliacoes(pkg.id);
+            console.log(`Média de avaliações para ${pkg.Titulo}:`, mediaAvaliacao);
+          } catch (error) {
+            console.error(`Erro ao buscar média de avaliações para pacote ${pkg.id}:`, error);
+          }
+
           return {
             id: pkg.id,
             titulo: pkg.Titulo || pkg.titulo || pkg.nome,
             destino: pkg.Destino || pkg.destino,
-            estrelas: pkg.Estrelas || pkg.estrelas || 0,
+            estrelas: Math.round(mediaAvaliacao.mediaNota || 0), // Usar média das avaliações arredondada
+            mediaAvaliacao: mediaAvaliacao.mediaNota || 0, // Valor exato da média
+            totalAvaliacoes: mediaAvaliacao.totalAvaliacoes || 0,
             preco: pkg.ValorTotal || pkg.valorTotal || pkg.valorUnitario || 0,
             precoOriginal: 10000,
             duracao: pkg.Duracao || pkg.duracao
@@ -78,9 +90,9 @@ export default function Packages() {
             imagem: imagemUrl,
             descricao: pkg.Descricao || pkg.descricao,
           };
-        });
+        }));
         
-        console.log("Pacotes adaptados:", adaptedPackages);
+        console.log("Pacotes adaptados com avaliações:", adaptedPackages);
         setPackages(adaptedPackages);
       } else {
         setPackages([]);
@@ -298,6 +310,7 @@ export default function Packages() {
                   categoria={pkg.categoria}
                   inclusions={pkg.inclusions}
                   estrelas={pkg.estrelas}
+                  totalAvaliacoes={pkg.totalAvaliacoes}
                 />
               </div>
             ))
@@ -357,6 +370,7 @@ export default function Packages() {
                   categoria={pkg.categoria}
                   inclusions={pkg.inclusions}
                   estrelas={pkg.estrelas}
+                  totalAvaliacoes={pkg.totalAvaliacoes}
                 />
               </div>
             ))

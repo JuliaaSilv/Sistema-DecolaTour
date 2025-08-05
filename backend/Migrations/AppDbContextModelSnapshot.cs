@@ -47,8 +47,9 @@ namespace agencia.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ID_RESERVA");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("STATUS");
 
                     b.HasKey("Id");

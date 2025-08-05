@@ -131,9 +131,9 @@ export const usePagamentoUtils = () => {
   const formatarStatusPagamento = useCallback((status) => {
     const statusMap = {
       'Pendente': { label: 'Pendente', color: 'yellow', icon: '⏳' },
-      'Pago': { label: 'Pago', color: 'green', icon: '✅' },
-      'Rejeitado': { label: 'Rejeitado', color: 'red', icon: '❌' },
-      'Reembolsado': { label: 'Reembolsado', color: 'blue', icon: '↩️' }
+      'Pago': { label: 'Pago', color: 'green', icon: '' },
+      'Rejeitado': { label: 'Rejeitado', color: 'red', icon: '' },
+      'Reembolsado': { label: 'Reembolsado', color: 'blue', icon: '' }
     };
     
     return statusMap[status] || { label: status, color: 'gray', icon: '❓' };
@@ -141,13 +141,13 @@ export const usePagamentoUtils = () => {
 
   const formatarFormaPagamento = useCallback((forma) => {
     const formaMap = {
-      'CartaoCredito': { label: 'Cartão de Crédito', icon: '💳' },
-      'CartaoDebito': { label: 'Cartão de Débito', icon: '💳' },
-      'Pix': { label: 'PIX', icon: '🔄' },
-      'Boleto': { label: 'Boleto', icon: '📄' }
+      'CartaoCredito': { label: 'Cartão de Crédito', icon: '' },
+      'CartaoDebito': { label: 'Cartão de Débito', icon: '' },
+      'Pix': { label: 'PIX', icon: '' },
+      'Boleto': { label: 'Boleto', icon: '' }
     };
     
-    return formaMap[forma] || { label: forma, icon: '💰' };
+    return formaMap[forma] || { label: forma, icon: '' };
   }, []);
 
   const obterClassesStatusPagamento = useCallback((status) => {

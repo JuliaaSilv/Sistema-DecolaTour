@@ -6,9 +6,10 @@ const BookingConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const { travelerData, paymentData, pacote } = location.state || {};
+  const { travelerData, paymentData, pacote, reservaId } = location.state || {};
   
-  const bookingId = `DCT${Date.now().toString().slice(-6)}`;
+  // Usar o ID da reserva real se disponível, senão gerar um código temporal
+  const bookingId = reservaId ? (reservaId + 100000) : `DCT${Date.now().toString().slice(-6)}`;
   
   const formatPaymentMethod = (method) => {
     const methods = {
@@ -278,7 +279,7 @@ const BookingConfirmation = () => {
         {/* Mensagem de agradecimento */}
         <div className="bg-gradient-to-r from-[#F28C38] to-orange-500 rounded-xl p-8 text-white text-center">
           <h3 className="text-2xl font-semibold mb-3">Obrigado por escolher a Decola Tour!</h3>
-          <p className="text-lg opacity-90">Desejamos uma excelente viagem! ✈️</p>
+          <p className="text-lg opacity-90">Desejamos uma excelente viagem!</p>
         </div>
       </div>
     </div>

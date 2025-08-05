@@ -33,7 +33,7 @@ export default function AdminLogin() {
     const resultado = await fazerLogin(usuario, senha);
 
     if (resultado.sucesso) {
-      setSucesso('Login de administrador realizado com sucesso! 🎉');
+      setSucesso('Login de administrador realizado com sucesso!');
       setTimeout(() => {
         navigate('/admin-painel'); // Redireciona para área administrativa
       }, 2000);

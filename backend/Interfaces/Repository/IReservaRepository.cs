@@ -16,6 +16,8 @@ namespace agencia.Interfaces.Repository
 
         Task<bool?> AtualizarStatusAsync(int reservaId, string? novoStatus);
 
+        Task<bool?> AtualizarNumeroReservaAsync(int reservaId, int numeroReserva);
+
         Task<bool?> DeletarReservaAsync(int id);
 
         // Adicionado para a lista de reservas do dashboard de administrador.

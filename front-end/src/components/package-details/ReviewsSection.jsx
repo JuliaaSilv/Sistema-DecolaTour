@@ -7,6 +7,8 @@ import {
   formatarAvaliacoesParaFrontend 
 } from '../../api/avaliacoes';
 import { estaLogado } from '../../api/auth';
+import useToast from '../../hooks/useToast';
+import ToastContainer from '../common/ToastContainer';
 
 const ReviewsSection = ({ pacoteId }) => {
   const [filter, setFilter] = useState('all');
@@ -18,6 +20,7 @@ const ReviewsSection = ({ pacoteId }) => {
   const [dadosParaAvaliacao, setDadosParaAvaliacao] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const { toasts, showError, showWarning, removeToast } = useToast();
 
   // Verifica se o usuário está logado
   useEffect(() => {
@@ -43,7 +46,7 @@ const ReviewsSection = ({ pacoteId }) => {
           });
         }
       } catch (error) {
-        console.error('❌ Erro ao verificar se pode avaliar:', error.message || error.toString());
+        console.error('Erro ao verificar se pode avaliar:', error.message || error.toString());
         setPodeAvaliar(false);
       }
     };
@@ -60,9 +63,9 @@ const ReviewsSection = ({ pacoteId }) => {
       }
 
       try {
-        console.log('🔍 Buscando avaliações para pacote:', pacoteId);
+        console.log('Buscando avaliações para pacote:', pacoteId);
         const avaliacoesData = await buscarAvaliacoesPorPacote(pacoteId);
-        console.log('📝 Avaliações encontradas:', avaliacoesData);
+        console.log('Avaliações encontradas:', avaliacoesData);
         
         const formattedReviews = formatarAvaliacoesParaFrontend(avaliacoesData);
         setReviews(formattedReviews);
@@ -73,7 +76,7 @@ const ReviewsSection = ({ pacoteId }) => {
           setAverageRating(avg);
         }
       } catch (error) {
-        console.error('❌ Erro ao buscar avaliações:', error.message || error.toString());
+        console.error('Erro ao buscar avaliações:', error.message || error.toString());
         setReviews([]);
       } finally {
         setIsLoading(false);
@@ -134,7 +137,7 @@ const ReviewsSection = ({ pacoteId }) => {
         setPodeAvaliar(false);
         setDadosParaAvaliacao(null);
       } catch (error) {
-        console.error('❌ Erro ao recarregar avaliações:', error.message || error.toString());
+        console.error('Erro ao recarregar avaliações:', error.message || error.toString());
       }
     };
     
@@ -143,14 +146,16 @@ const ReviewsSection = ({ pacoteId }) => {
 
   const handleAbrirModal = () => {
     if (!isUserLoggedIn) {
-      alert('Você precisa estar logado para avaliar um pacote. Por favor, faça login.');
+      showWarning('Você precisa estar logado para avaliar um pacote. Por favor, faça login.');
       // Redirecionar para login seria ideal
-      window.location.href = '/login';
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
       return;
     }
     
     if (!podeAvaliar) {
-      alert('Você só pode avaliar pacotes que já reservou e ainda não avaliou.');
+      showError('Você só pode avaliar pacotes que já reservou e ainda não avaliou.');
       return;
     }
     
@@ -261,7 +266,7 @@ const ReviewsSection = ({ pacoteId }) => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {rating} ⭐ ({count})
+                {rating} estrelas ({count})
               </button>
             );
           })}
@@ -343,6 +348,9 @@ const ReviewsSection = ({ pacoteId }) => {
           onSuccess={handleAvaliacaoSuccess}
         />
       </div>
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </section>
   );
 };

@@ -495,20 +495,6 @@ const ReservaDetalhes = () => {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">
-                            CPF/Documento: {viajante.documento || 'Não informado'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <IdCard className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">
-                            Passaporte: {viajante.passaporte || 'Não informado'}
-                          </span>
-                        </div>
-                      </div>
                     </div>
                   ))
                 ) : (

@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { FaPen, FaUserCircle, FaCheck, FaUser, FaCreditCard, FaMapMarkerAlt, FaEnvelope, FaPhone, FaCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { fetchCurrentUserProfile, updateCurrentUserProfile } from "../api/users";
+import useToast from "../hooks/useToast";
+import ToastContainer from "../components/ui/ToastContainer";
 import CartaoManager from "../components/CartaoManager";
 import EnderecoManager from "../components/EnderecoManager";
 
 export default function Perfil() {
+    const { showSuccess, showError } = useToast();
     const [activeTab, setActiveTab] = useState('perfil');
     const [nome, setNome] = useState("");
     const [telefone, setTelefone] = useState("");
@@ -82,7 +85,7 @@ export default function Perfil() {
             };
 
             await updateCurrentUserProfile(updateData);
-            alert('Perfil atualizado com sucesso!');
+            showSuccess('Perfil atualizado com sucesso!');
             
             // Atualizar valores originais
             setNomeOriginal(nome);
@@ -93,7 +96,7 @@ export default function Perfil() {
         } catch (error) {
             console.error('Erro ao atualizar perfil:', error);
             setError(error.message);
-            alert('Erro ao atualizar perfil: ' + error.message);
+            showError('Erro ao atualizar perfil: ' + error.message);
         } finally {
             setIsSaving(false);
         }
@@ -315,6 +318,7 @@ export default function Perfil() {
                         </div>
                     </div>
                 )}
+                <ToastContainer />
             </div>
         </div>
     );

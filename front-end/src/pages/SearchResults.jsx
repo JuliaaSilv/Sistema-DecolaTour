@@ -4,6 +4,7 @@ import { Package, ArrowLeft, Filter, MapPin, Calendar, Users, DollarSign, Chevro
 import { searchPackagesWithFilter } from '../api/packages';
 import SimplePackageCard from '../components/common/SimplePackageCard';
 import Button from '../components/common/Button';
+import { buscarMediaAvaliacoes } from '../api/avaliacoes';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -39,8 +40,8 @@ const SearchResults = () => {
         console.log('- pkg.imagemUrl:', results[0].imagemUrl);
       }
       
-      // Usar o mesmo mapeamento da Home.jsx
-      const adaptedPackages = results.map((pkg, index) => {
+      // Mapear pacotes e buscar médias de avaliação
+      const adaptedPackages = await Promise.all(results.map(async (pkg, index) => {
         // Log detalhado do mapeamento de imagem
         console.log(`Mapeando pacote ${index + 1}:`, {
           'pkg.Imagens': pkg.Imagens,
@@ -75,11 +76,22 @@ const SearchResults = () => {
 
         console.log(`Imagem final para ${pkg.Titulo}: ${imagemUrl}`);
 
+        // Buscar média de avaliações do pacote
+        let mediaAvaliacao = { mediaNota: 0, totalAvaliacoes: 0 };
+        try {
+          mediaAvaliacao = await buscarMediaAvaliacoes(pkg.id);
+          console.log(`Média de avaliações para ${pkg.Titulo}:`, mediaAvaliacao);
+        } catch (error) {
+          console.error(`Erro ao buscar média de avaliações para pacote ${pkg.id}:`, error);
+        }
+
         return {
           id: pkg.id,
           titulo: pkg.Titulo || pkg.titulo || pkg.nome,
           destino: pkg.Destino || pkg.destino,
-          estrelas: pkg.Estrelas || pkg.estrelas || 0,
+          estrelas: Math.round(mediaAvaliacao.mediaNota || 0), // Usar média das avaliações arredondada
+          mediaAvaliacao: mediaAvaliacao.mediaNota || 0, // Valor exato da média
+          totalAvaliacoes: mediaAvaliacao.totalAvaliacoes || 0,
           preco: pkg.ValorTotal || pkg.valorTotal || pkg.valorUnitario || 0,
           precoOriginal: 10000,
           duracao: pkg.Duracao || pkg.duracao
@@ -93,7 +105,7 @@ const SearchResults = () => {
           imagem: imagemUrl,
           descricao: pkg.Descricao || pkg.descricao,
         };
-      });
+      }));
 
       console.log('Pacotes adaptados para SearchResults:', adaptedPackages);
       setPackages(adaptedPackages);

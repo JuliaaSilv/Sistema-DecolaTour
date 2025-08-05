@@ -273,8 +273,8 @@ const PackageFormModal = ({ isOpen, onClose, editingPackage, onSave }) => {
 
         showSuccess(
           editingPackage
-            ? "Pacote atualizado com sucesso! 🎉"
-            : "Pacote criado com sucesso! 🎉"
+            ? "Pacote atualizado com sucesso!"
+            : "Pacote criado com sucesso!"
         );
       } else {
         const errorText = await response.text();

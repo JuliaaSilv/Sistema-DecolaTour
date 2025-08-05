@@ -133,7 +133,7 @@ const ReservationManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          {(tipoUsuario === 1 || tipoUsuario === 2) && (
+          {/* {(tipoUsuario === 1 || tipoUsuario === 2) && (
             <Button
               onClick={handleCreate}
               className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
@@ -141,7 +141,7 @@ const ReservationManagement = () => {
               <Plus className="w-4 h-4 mr-2" />
               <span>Nova Reserva</span>
             </Button>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -208,7 +208,7 @@ const ReservationManagement = () => {
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
-                      <h3 className="font-bold text-lg text-blue-900">#RES{reservation.codigo}</h3>
+                      <h3 className="font-bold text-lg text-blue-900">#{reservation.codigo}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={getStatusColor(reservation.status)}>
                           {reservation.status}
@@ -238,8 +238,8 @@ const ReservationManagement = () => {
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-orange-600" />
                       <div>
-                        <p className="font-semibold text-gray-900">{reservation.pacote}</p>
-                        <p className="text-gray-600">{reservation.destino}</p>
+                        <p className="font-semibold text-gray-900">{reservation.destino}</p>
+                        {/* Remove destino que está mostrando "aa" - mostrar apenas o título do pacote */}
                       </div>
                     </div>
                     

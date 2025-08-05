@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Star, Calendar, User, Package, RefreshCw } from 'lucide-react';
+import { Check, X, Star, Calendar, User, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const ReviewManagement = () => {
@@ -164,7 +164,7 @@ const ReviewManagement = () => {
       ) : (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <Package size={16} />
+            <Star size={16} />
             <span>{avaliacoesPendentes.length} avaliações aguardando moderação</span>
           </div>
 
@@ -189,9 +189,6 @@ const ReviewManagement = () => {
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                         <Calendar size={14} />
                         {formatDate(avaliacao.dataAvaliacao)}
-                        <span>•</span>
-                        <Package size={14} />
-                        {avaliacao.pacote?.nome || 'Pacote não encontrado'}
                       </div>
                     </div>
                   </div>

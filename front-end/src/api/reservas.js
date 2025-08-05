@@ -169,7 +169,7 @@ export const normalizeMinhaReservaData = (reserva) => {
   
   const reservaNormalizada = {
     id: reserva.id,
-    codigo: `RES-${reserva.id.toString().padStart(6, '0')}`,
+    codigo: reserva.numeroReserva || (reserva.id + 100000), // Usar numeroReserva do backend ou gerar baseado no ID
     cliente: 'Você',
     email: '',
     pacote: reserva.tituloPacote || 'Pacote de Viagem',

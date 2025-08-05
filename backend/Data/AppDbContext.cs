@@ -40,6 +40,11 @@ namespace agencia.Data
                 .Property(p => p.FormaDePagamento)
                 .HasConversion<string>();
 
+            // Configuração para StatusAvaliacao - temporariamente usando int até migração ser aplicada
+            modelBuilder.Entity<Avaliacao>()
+                .Property(a => a.Status)
+                .HasConversion<int>();
+
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Pacote>()
         .HasMany(p => p.Imagens)

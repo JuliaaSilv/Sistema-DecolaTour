@@ -3,6 +3,7 @@
     public class ReservaUsuarioDTO
     {
         public int Id { get; set; }
+        public int NumeroReserva { get; set; }
         public string TituloPacote { get; set; } = string.Empty;
         public string ImagemPacoteUrl { get; set; } = string.Empty;
         public DateTime DataReserva { get; set; }

@@ -12,8 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using agencia.Interfaces.Repository;
-using agencia.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -61,7 +61,7 @@ namespace agencia.Repository
 
       
         /// Adiciona uma nova reserva ao banco de dados.
-        public async Task<Reserva> CriarReservaAsync(Reserva reserva)
+        public async Task<Reserva?> CriarReservaAsync(Reserva reserva)
         {
             _context.Reservas.Add(reserva);
             await _context.SaveChangesAsync();
@@ -77,6 +77,16 @@ namespace agencia.Repository
             var reserva = await _context.Reservas.FindAsync(reservaId);
             if (reserva == null) return null;
             reserva.Status = novoStatus ?? reserva.Status;
+            _context.Reservas.Update(reserva);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        /// Atualiza o número da reserva
+        public async Task<bool?> AtualizarNumeroReservaAsync(int reservaId, int numeroReserva)
+        {
+            var reserva = await _context.Reservas.FindAsync(reservaId);
+            if (reserva == null) return null;
+            reserva.NumeroReserva = numeroReserva;
             _context.Reservas.Update(reserva);
             return await _context.SaveChangesAsync() > 0;
         }

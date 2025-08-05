@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import useToast from '../../hooks/useToast';
+import ToastContainer from '../common/ToastContainer';
 
 const ReviewManagement = () => {
   const [pendingReviews, setPendingReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState({
+    aprovadas: 0,
+    rejeitadas: 0,
+    sessaoIniciada: new Date().toLocaleString('pt-BR')
+  });
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
   const fetchPendingReviews = async () => {
     try {
@@ -37,6 +45,21 @@ const ReviewManagement = () => {
     try {
       const token = localStorage.getItem('token');
       
+      // Encontrar a avaliação antes de aprovar para mostrar os detalhes
+      const review = pendingReviews.find(r => r.id === reviewId);
+      const nomeUsuario = review?.usuario?.nome || 'Usuário não informado';
+      
+      // Confirmação antes de aprovar
+      const confirmar = window.confirm(
+        `Tem certeza que deseja APROVAR esta avaliação?\n\n` +
+        `Usuário: ${nomeUsuario}\n` +
+        `Nota: ${review?.nota}/5\n` +
+        `Comentário: "${review?.comentario}"\n\n` +
+        `A avaliação ficará visível publicamente.`
+      );
+      
+      if (!confirmar) return;
+      
       const response = await fetch(`https://localhost:5295/api/Avaliacao/aprovar/${reviewId}`, {
         method: 'PUT',
         headers: {
@@ -48,19 +71,48 @@ const ReviewManagement = () => {
       if (response.ok) {
         // Remove a avaliação da lista de pendentes
         setPendingReviews(prev => prev.filter(review => review.id !== reviewId));
-        alert('Avaliação aprovada com sucesso!');
+        
+        // Atualizar estatísticas
+        setStats(prev => ({ ...prev, aprovadas: prev.aprovadas + 1 }));
+        
+        // Mostrar detalhes da aprovação
+        const mensagem = `AVALIAÇÃO APROVADA COM SUCESSO! Usuario: ${nomeUsuario} - Nota: ${review?.nota}/5 - A avaliação agora está visível publicamente!`;
+        
+        showSuccess(mensagem, 5000);
+        console.log('Avaliação aprovada:', { 
+          id: reviewId,
+          nomeUsuario, 
+          nota: review?.nota, 
+          comentario: review?.comentario,
+          timestamp: new Date().toISOString()
+        });
       } else {
         throw new Error('Erro ao aprovar avaliação');
       }
     } catch (err) {
       console.error('Erro ao aprovar:', err);
-      alert('Erro ao aprovar avaliação');
+      showError('Erro ao aprovar avaliação. Tente novamente.');
     }
   };
 
   const handleReject = async (reviewId) => {
     try {
       const token = localStorage.getItem('token');
+      
+      // Encontrar a avaliação antes de rejeitar para mostrar os detalhes
+      const review = pendingReviews.find(r => r.id === reviewId);
+      const nomeUsuario = review?.usuario?.nome || 'Usuário não informado';
+      
+      // Confirmação antes de rejeitar
+      const confirmar = window.confirm(
+        `Tem certeza que deseja REJEITAR esta avaliação?\n\n` +
+        `Usuário: ${nomeUsuario}\n` +
+        `Nota: ${review?.nota}/5\n` +
+        `Comentário: "${review?.comentario}"\n\n` +
+        `A avaliação será permanentemente rejeitada e não ficará visível.`
+      );
+      
+      if (!confirmar) return;
       
       const response = await fetch(`https://localhost:5295/api/Avaliacao/rejeitar/${reviewId}`, {
         method: 'PUT',
@@ -73,13 +125,28 @@ const ReviewManagement = () => {
       if (response.ok) {
         // Remove a avaliação da lista de pendentes
         setPendingReviews(prev => prev.filter(review => review.id !== reviewId));
-        alert('Avaliação rejeitada com sucesso!');
+        
+        // Atualizar estatísticas
+        setStats(prev => ({ ...prev, rejeitadas: prev.rejeitadas + 1 }));
+        
+        // Mostrar detalhes da rejeição
+        const mensagem = `AVALIAÇÃO REJEITADA! Usuario: ${nomeUsuario} - Nota: ${review?.nota}/5 - A avaliação foi rejeitada e não será exibida publicamente.`;
+        
+        showError(mensagem, 5000);
+        console.log('Avaliação rejeitada:', { 
+          id: reviewId,
+          nomeUsuario, 
+          nota: review?.nota, 
+          comentario: review?.comentario,
+          motivo: 'Rejeitada pelo administrador',
+          timestamp: new Date().toISOString()
+        });
       } else {
         throw new Error('Erro ao rejeitar avaliação');
       }
     } catch (err) {
       console.error('Erro ao rejeitar:', err);
-      alert('Erro ao rejeitar avaliação');
+      showError('Erro ao rejeitar avaliação. Tente novamente.');
     }
   };
 
@@ -120,6 +187,26 @@ const ReviewManagement = () => {
         </button>
       </div>
 
+      {/* Painel de Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-blue-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-blue-800">Pendentes</h3>
+          <p className="text-2xl font-bold text-blue-900">{pendingReviews.length}</p>
+        </div>
+        <div className="bg-green-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-green-800">Aprovadas Hoje</h3>
+          <p className="text-2xl font-bold text-green-900">{stats.aprovadas}</p>
+        </div>
+        <div className="bg-red-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-red-800">Rejeitadas Hoje</h3>
+          <p className="text-2xl font-bold text-red-900">{stats.rejeitadas}</p>
+        </div>
+        <div className="bg-gray-100 p-4 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-800">Sessão Iniciada</h3>
+          <p className="text-xs text-gray-600">{stats.sessaoIniciada}</p>
+        </div>
+      </div>
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
@@ -137,11 +224,11 @@ const ReviewManagement = () => {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                    {review.pacote?.titulo || 'Pacote não informado'}
+                    Avaliação #{review.id}
                   </h3>
                   <div className="flex items-center mb-2">
                     <span className="text-sm text-gray-600 mr-4">
-                      Avaliado por: {review.usuario?.nome || 'Usuário não informado'}
+                      Avaliado por: {review.nomeUsuario || 'Usuário'}
                     </span>
                     <span className="text-sm text-gray-600">
                       Email: {review.usuario?.email || 'Email não informado'}
@@ -189,6 +276,9 @@ const ReviewManagement = () => {
           ))}
         </div>
       )}
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

@@ -112,7 +112,7 @@ const ReservaCard = ({ reserva, index }) => {
                 {reserva.pacote}
               </h3>
               <div className="flex items-center gap-1 sm:gap-2 text-gray-600 text-sm sm:text-base lg:text-lg mb-2">
-                <span>📍 {reserva.destino}</span>
+                <span> {reserva.destino}</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500">
                 Código:{" "}
@@ -196,17 +196,7 @@ const ReservaCard = ({ reserva, index }) => {
                 </span>
               </span>
             </div>
-            {reserva.categoria && (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Package className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
-                <span className="text-gray-600">
-                  Categoria:{" "}
-                  <span className="font-medium capitalize">
-                    {reserva.categoria}
-                  </span>
-                </span>
-              </div>
-            )}
+           
           </div>
         </div>
 
@@ -233,13 +223,7 @@ const ReservaCard = ({ reserva, index }) => {
             <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
             Ver Detalhes
           </button>
-          {reserva.status === "confirmada" && (
-            <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer">
-              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Gerenciar</span>
-              <span className="sm:hidden">Gerenciar</span>
-            </button>
-          )}
+
         </div>
       </div>
     </div>

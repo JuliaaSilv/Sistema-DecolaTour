@@ -80,7 +80,9 @@ namespace agencia.Repository
         {
             return await _context.Set<Avaliacao>()
                 .Include(a => a.Reserva)
-                .ThenInclude(r => r.Pacote)
+                    .ThenInclude(r => r.Usuario)
+                .Include(a => a.Reserva)
+                    .ThenInclude(r => r.Pacote)
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 

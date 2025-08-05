@@ -58,11 +58,19 @@ namespace agencia.Service
                 return new ApiResponse(new { }, new ErrorResponse("Dados da reserva não informados!"), 400);
 
             var reserva = _mapper.Map<Reserva>(reservaDTO);
-            reserva.NumeroReserva = new Random().Next(100000, 999999);
+            // Primeiro criamos a reserva para obter o ID, depois atualizamos o número
+            reserva.NumeroReserva = 0; // Temporário
             reserva.DataReserva = DateTime.UtcNow;
             reserva.Status = StatusReseva.Pendente.ToString();
 
             var reservaCriada = await _reservaRepository.CriarReservaAsync(reserva);
+            
+            // Agora geramos um número de reserva baseado no ID para garantir unicidade
+            if (reservaCriada != null)
+            {
+                reservaCriada.NumeroReserva = reservaCriada.Id + 100000; // Exemplo: ID 1 = 100001, ID 2 = 100002
+                await _reservaRepository.AtualizarNumeroReservaAsync(reservaCriada.Id, reservaCriada.NumeroReserva);
+            }
             var reservaCriadaDTO = _mapper.Map<ReservaDTO>(reservaCriada);
             reservaCriadaDTO.QuantidadeViajantes = reservaCriada?.Viajantes != null ? reservaCriada.Viajantes.Count : 0;
 

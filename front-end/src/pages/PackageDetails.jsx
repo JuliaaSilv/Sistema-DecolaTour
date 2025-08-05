@@ -7,6 +7,7 @@ import { estaLogado, obterTipoUsuario } from "../api/auth";
 // Imports para toast estilizado
 import ToastContainer from "../components/ui/ToastContainer";
 import useToast from "../hooks/useToast";
+
 // Componentes de package-details
 import PackageHero from "../components/package-details/PackageHero";
 import HotelInfoCard from "../components/package-details/HotelInfoCard";
@@ -136,24 +137,12 @@ export default function PackageDetails() {
     // Verifica se é um cliente (tipo 3)
     const tipoUsuario = obterTipoUsuario();
     if (tipoUsuario !== '3') {
-      console.log('🚫 Usuário não é cliente, tipo:', tipoUsuario);
-      
-      // Mostra toast estilizado
-      showWarning('Apenas clientes podem fazer reservas. Redirecionando para login...', 0);
-      
-      // Salva a URL de destino para redirecionar após o login
-      const bookingUrl = `/booking-form/${pacote.id}`;
-      localStorage.setItem('redirectAfterLogin', bookingUrl);
-      
-      // Redireciona para login após 2.5 segundos
-      setTimeout(() => {
-        navigate('/login');
-      }, 2500);
-      
+      console.log('Usuário não é cliente, tipo:', tipoUsuario);
+      showWarning('Apenas clientes podem fazer reservas. Faça login com uma conta de cliente.');
       return;
     }
 
-    console.log('✅ Usuário logado como cliente, redirecionando para booking form');
+    console.log('Usuário logado como cliente, redirecionando para booking form');
     // Redireciona para a página BookingForm usando o id do pacote
     navigate(`/booking-form/${pacote.id}`);
   };
@@ -235,6 +224,7 @@ export default function PackageDetails() {
       <div className="mt-16">
         <ReviewsSection pacoteId={pacote?.id} />
       </div>
+      {/* ToastContainer extra removido, já está no topo do componente */}
     </main>
   );
 }

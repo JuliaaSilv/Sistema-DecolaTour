@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { fetchEnderecos, createEndereco, updateEndereco, deleteEndereco } from '../api/enderecos';
+import useToast from '../hooks/useToast';
+import ToastContainer from './ui/ToastContainer';
 
 export default function EnderecoManager() {
+  const { showSuccess, showError } = useToast();
   const [enderecos, setEnderecos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -58,9 +61,10 @@ export default function EnderecoManager() {
         apelido: ''
       });
       loadEnderecos();
+      showSuccess('Endereço salvo com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar endereço:', error);
-      alert('Erro ao salvar endereço: ' + error.message);
+      showError('Erro ao salvar endereço: ' + error.message);
     }
   };
 
@@ -85,9 +89,10 @@ export default function EnderecoManager() {
       try {
         await deleteEndereco(enderecoId);
         loadEnderecos();
+        showSuccess('Endereço removido com sucesso!');
       } catch (error) {
         console.error('Erro ao remover endereço:', error);
-        alert('Erro ao remover endereço: ' + error.message);
+        showError('Erro ao remover endereço: ' + error.message);
       }
     }
   };
@@ -350,6 +355,7 @@ export default function EnderecoManager() {
           </div>
         </div>
       )}
+      <ToastContainer toasts={[]} onRemoveToast={() => {}} />
     </div>
   );
 }

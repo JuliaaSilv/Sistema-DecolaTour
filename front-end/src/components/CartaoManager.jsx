@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FaCreditCard, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { fetchCartoes, createCartao, updateCartao, deleteCartao } from '../api/cartoes';
+import useToast from '../hooks/useToast';
+import ToastContainer from './ui/ToastContainer';
 
 export default function CartaoManager() {
+  const { showSuccess, showError } = useToast();
   const [cartoes, setCartoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -52,9 +55,10 @@ export default function CartaoManager() {
         apelido: ''
       });
       loadCartoes();
+      showSuccess('Cartão salvo com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar cartão:', error);
-      alert('Erro ao salvar cartão: ' + error.message);
+      showError('Erro ao salvar cartão: ' + error.message);
     }
   };
 
@@ -76,9 +80,10 @@ export default function CartaoManager() {
       try {
         await deleteCartao(cartaoId);
         loadCartoes();
+        showSuccess('Cartão removido com sucesso!');
       } catch (error) {
         console.error('Erro ao remover cartão:', error);
-        alert('Erro ao remover cartão: ' + error.message);
+        showError('Erro ao remover cartão: ' + error.message);
       }
     }
   };
@@ -299,6 +304,7 @@ export default function CartaoManager() {
           </div>
         </div>
       )}
+      <ToastContainer toasts={[]} onRemoveToast={() => {}} />
     </div>
   );
 }

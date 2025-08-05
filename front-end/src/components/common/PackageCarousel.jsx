@@ -77,6 +77,7 @@ const PackageCarousel = ({ packages}) => {
                 categoria={pkg.categoria}
                 inclusions={pkg.inclusions}
                 estrelas={pkg.estrelas}
+                totalAvaliacoes={pkg.totalAvaliacoes}
               />
             </div>
           ))}
