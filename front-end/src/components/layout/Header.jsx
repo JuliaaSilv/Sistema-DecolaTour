@@ -117,6 +117,8 @@ export default function Header() {
                       Ver Perfil
                     </button>
 
+                    {/* Área de Minhas reservas não deve ser exibido para Funcionário!.  */}
+                    {!["3"].includes(tipoUsuario)  && (
                     <button
                       className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                       onClick={() => {
@@ -127,9 +129,10 @@ export default function Header() {
                       <FaCalendarAlt className="mr-2" size={14} />
                       Minhas Reservas
                     </button>
+                    )}
 
                     {/* Visível apenas para tipoUsuario === "1" */}
-                    {["1", "2"].includes(tipoUsuario)  && (
+                    {["1"].includes(tipoUsuario)  && (
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                         onClick={() => {
@@ -139,6 +142,19 @@ export default function Header() {
                       >
                         <FaUserTie className="mr-2" size={14} />
                         Área Administrativa
+                      </button>
+                    )}
+
+                    {["3"].includes(tipoUsuario)  && (
+                      <button
+                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                        onClick={() => {
+                          navigate("/atendente");
+                          setShowProfileMenu(false);
+                        }}
+                      >
+                        <FaUserTie className="mr-2" size={14} />
+                        Área do Atendente
                       </button>
                     )}
 

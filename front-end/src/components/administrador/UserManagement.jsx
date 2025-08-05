@@ -97,6 +97,10 @@ const UserManagement = () => {
       const data = await fetchUsers();
       const normalizedUsers = data.map(normalizeUserData);
       setUsers(normalizedUsers);
+
+      if (tipoUsuario === 3) { // Se sou um atendente só posso visualizar clientes e não outros atendentes ou adminitrador.
+        setFilterType('cliente');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -258,11 +262,26 @@ const UserManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
+           {(tipoUsuario === 1) && (
           <h1 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
             <Users className="w-6 h-6" />
             Gerenciamento de Usuários
           </h1>
-          <p className="text-blue-700 mt-1">Gerencie clientes e administradores</p>
+           )}
+
+           {(tipoUsuario === 3) && (
+          <h1 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+            <Users className="w-6 h-6" />
+            Gerenciamento de Clientes
+          </h1> 
+           )}           
+          {(tipoUsuario === 1) && (
+            <p className="text-blue-700 mt-1">Gerencie seus clientes, atendentes e administradores</p>
+           )}
+          {(tipoUsuario === 3) && (
+            <p className="text-blue-700 mt-1">Gerencie seus clientes</p>
+          )}
+
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Button
@@ -301,17 +320,19 @@ const UserManagement = () => {
                 />
               </div>
             </div>
+            {tipoUsuario !== 3 && (
             <div className="sm:w-48">
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-              >
+              >                
                 <option value="todos">Todos os Tipos</option>
                 <option value="cliente">Cliente</option>
                 <option value="administrador">Administrador</option>
               </select>
             </div>
+            )}
             <div className="sm:w-48">
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -333,7 +354,7 @@ const UserManagement = () => {
         {!isLoading && filteredUsers.length > 0 && (
           <div className="flex justify-between items-center text-sm text-gray-600">
             <span>
-              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredUsers.length)} de {filteredUsers.length} usuários
+              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredUsers.length)} de {filteredUsers.length} {tipoUsuario === 3 ? 'clientes' : 'usuários'}
             </span>
             <span>Página {currentPage} de {totalPages}</span>
           </div>
@@ -676,7 +697,7 @@ const UserFormModal = ({ isOpen, onClose, user, onSave, tipoUsuario }) => {
     cpf: '',
     senha: '',
     dataNascimento: '',
-    tipoUsuarioId: 3, // Cliente por padrão
+    tipoUsuarioId: 1, // Cliente por padrão
     ativo: true
   });
 

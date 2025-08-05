@@ -56,12 +56,12 @@ namespace agencia.Controller
         // Adicionado para tela de administrador.
         // Lista todas as reservas juntamente com alguns dados associados como pagamento, cliente (apenas para administradores e atendentes).
         [HttpGet("/api/Reserva/lista-completa")]
-        [Authorize(Roles = "1,2")]
+        [Authorize(Roles = "1,2,3")]
         public async Task<ActionResult> ListarCompletaDeReservas()
         {
             var reservas = await ReservaService.ListaCompletaDeReservasAsync();
             if (reservas == null || !reservas.Any())
-                return NotFound(new ApiResponse(null, new ErrorResponse("Nenhuma reserva encontrada."), 404));
+               return Ok(new ApiResponse(reservas, null, 200)); // Por favor não mexer nessa linha reslmente não é para retornar ERRO e sim uma lista vazia. Por favor!.
 
             return Ok(new ApiResponse(reservas, null, 200));
         }

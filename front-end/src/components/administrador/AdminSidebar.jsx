@@ -35,11 +35,13 @@ export default function AdminSidebar({ activeTab, onTabChange }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, rolesPermitidas: [1] },
     { id: "packages", label: "Pacotes", icon: Package, rolesPermitidas: [1, 2] },
-    { id: "reservations", label: "Reservas", icon: Calendar, rolesPermitidas: [1, 2] },
+    { id: "reservations", label: "Reservas", icon: Calendar, rolesPermitidas: [1, 2, 3] },
     { id: "users", label: "Usuários", icon: Users, rolesPermitidas: [1, 2] },
     { id: "promotions", label: "Promoções", icon: Gift, rolesPermitidas: [1] },
+    { id: "users", label: "Clientes", icon: Users, rolesPermitidas: [3] }, 
   ];
 
+  
   return (
     <>
       {/* Mobile Menu Button */}

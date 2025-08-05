@@ -43,7 +43,7 @@ namespace agencia.Models
         [Column("ATUALIZADO_EM")]
         public DateTime? AtualizadoEm { get; set; } = DateTime.Now;
         [Required]
-        [Column("VERSÃO")]
+        [Column("VERSAO")]
         public int VERSAO { get; set; } = 1;
         [Column("CATEGORIAS")]
         public string Categorias { get; set; } = string.Empty;
