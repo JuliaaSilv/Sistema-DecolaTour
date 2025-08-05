@@ -38,6 +38,12 @@ export default function Header() {
     return () => clearInterval(interval);
   }, []);
 
+  // Função para navegação inteligente baseada no tipo de usuário
+  const navigateToHome = () => {
+    // Todos os usuários vão para home, independente do tipo
+    navigate("/home");
+  };
+
   const handleLogout = () => {
     fazerLogout();
     setShowProfileMenu(false);
@@ -67,7 +73,7 @@ export default function Header() {
         <div className="flex flex-col md:flex-row items-center justify-between h-auto md:h-16 gap-2 md:gap-0">
           <div
             className="flex items-center gap-2 sm:gap-3 cursor-pointer mb-2 md:mb-0"
-            onClick={() => navigate("/home")}
+            onClick={navigateToHome}
           >
             <img src={logo} alt="Logo" className="h-10 sm:h-12 w-auto" />
             <h1 className="text-white text-lg sm:text-2xl font-bold font-standard tracking-wide">
@@ -78,7 +84,7 @@ export default function Header() {
           <div className="flex items-center justify-between gap-6 sm:gap-10 md:gap-16 w-full md:w-auto">
             <div
               className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => navigate("/home")}
+              onClick={navigateToHome}
             >
               <FaHome size={18} className="sm:w-5 sm:h-5" color="white" />
               <p className="text-xs sm:text-sm text-white mt-1">Início</p>
@@ -117,19 +123,22 @@ export default function Header() {
                       Ver Perfil
                     </button>
 
-                    <button
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
-                      onClick={() => {
-                        navigate("/minhas-reservas");
-                        setShowProfileMenu(false);
-                      }}
-                    >
-                      <FaCalendarAlt className="mr-2" size={14} />
-                      Minhas Reservas
-                    </button>
+                    {/* Minhas Reservas - apenas para usuários que não são administradores */}
+                    {!["1", "2"].includes(tipoUsuario) && (
+                      <button
+                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                        onClick={() => {
+                          navigate("/minhas-reservas");
+                          setShowProfileMenu(false);
+                        }}
+                      >
+                        <FaCalendarAlt className="mr-2" size={14} />
+                        Minhas Reservas
+                      </button>
+                    )}
 
                     {/* Visível apenas para tipoUsuario === "1" */}
-                    {["1", "2"].includes(tipoUsuario)  && (
+                    {["1"].includes(tipoUsuario)  && (
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                         onClick={() => {
@@ -139,6 +148,19 @@ export default function Header() {
                       >
                         <FaUserTie className="mr-2" size={14} />
                         Área Administrativa
+                      </button>
+                    )}
+
+                    {["3"].includes(tipoUsuario)  && (
+                      <button
+                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                        onClick={() => {
+                          navigate("/atendente");
+                          setShowProfileMenu(false);
+                        }}
+                      >
+                        <FaUserTie className="mr-2" size={14} />
+                        Área do Atendente
                       </button>
                     )}
 

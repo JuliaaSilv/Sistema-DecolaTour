@@ -10,6 +10,7 @@ import PackageDetails from "./pages/PackageDetails.jsx";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ConfirmacaoEmail from "./pages/ConfirmacaoEmail.jsx"
 import AdminPainel from "./pages/AdminPainel";
+import AtendentePainel from "./pages/AtendentePainel";
 import Pagamento from "./pages/Pagamento.jsx";
 import BookingForm from "./pages/BookingForm.jsx";
 import BookingConfirmation from "./pages/BookingConfirmation.jsx";
@@ -39,6 +40,7 @@ function App() {
         <Route path="/confirmar-email" element={<ConfirmacaoEmail />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin-painel" element={<AdminPainel />} />
+        <Route path="/atendente-painel" element={<AtendentePainel/>} />
         <Route path="/redefinir-senha" element={<RecuperarSenhaNovaSenha />} />
         
         {/* Páginas com header/footer */}
@@ -56,6 +58,7 @@ function App() {
                 <Route path="/pagamento" element={<Pagamento />} />
                 <Route path="/booking-confirmation" element={<BookingConfirmation />} />
                 <Route path="/admin" element={<AdminPainel />} />
+                <Route path="/atendente" element={<AtendentePainel />} />
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/minhas-reservas" element={<MinhasReservas />} />
                 <Route path="/reserva-detalhes/:id" element={<ReservaDetalhes />} />

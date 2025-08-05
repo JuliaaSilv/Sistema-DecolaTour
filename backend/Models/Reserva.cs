@@ -24,13 +24,13 @@ namespace agencia.Models
         public string Status { get; set; } = "PENDENTE";
 
         [Required]
-        [Column("VALOR_UNITARIO")]
+        [Column("VALOR_UNITARIO", TypeName = "decimal(18,2)")]
         public float ValorUnitario { get; set; }
 
         [Column("QUANTIDADE_VIAJANTES")]
         public int? QuantidadeViajantes { get; set; }
 
-        [Column("VALOR_TOTAL")]
+        [Column("VALOR_TOTAL", TypeName = "decimal(18,2)")]
         public decimal? ValorTotal { get; set; }
 
         [Required]

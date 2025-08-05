@@ -9,6 +9,7 @@ import PackageCarousel from "../components/common/PackageCarousel";
 import ModernPackageCard from "../components/common/ModernPackageCard";
 import SimplePackageCard from "../components/common/SimplePackageCard";
 import { Package } from "lucide-react";
+import { estaLogado, obterTipoUsuario } from "../api/auth";
 
 // Componente principal da página Home
 export default function Home() {
@@ -162,15 +163,14 @@ export default function Home() {
           </div>
         </section>
       ) : (
-        <section className="relative py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 bg-[#E6E6EB]">
+        <section className="relative py-2 sm:py-4 md:py-6 lg:py-8 px-3 sm:px-4 md:px-6 lg:px-8 bg-[#E6E6EB]">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6 sm:mb-8">
-              <h1 className="text-blue-900 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-center lg:text-left">
+              <h1 className="text-blue-900 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-center lg:text-left">
                 Destinos Populares
               </h1>
-              <p className="text-blue-700 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-                Explore os melhores destinos selecionados especialmente para
-                você
+              <p className="text-blue-700 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mt-2 sm:mt-3 text-center lg:text-left max-w-4xl mx-auto lg:mx-0 whitespace-nowrap">
+                Explore os melhores destinos selecionados especialmente para você
               </p>
             </div>
 
@@ -224,7 +224,7 @@ export default function Home() {
           <Button
             variant="primary"
             size="large"
-            className="px-4 sm:px-6 md:px-8 lg:px-12 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base lg:text-lg font-semibold rounded-md sm:rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
+            className="px-4 sm:px-6 md:px-8 lg:px-12 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base lg:text-lg font-semibold rounded-md sm:rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto cursor-pointer"
             onClick={() => navigate("/packages")}
           >
             Ver Todos os Destinos

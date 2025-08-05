@@ -17,7 +17,18 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  CreditCard,
+  User,
+  Calendar,
+  Lock,
+  DollarSign,
+  Smartphone,
+  Building2,
+  Receipt,
+  Check,
+  Coins,
+  Shield
 } from "lucide-react";
 import qrCodePix from "../assets/qrcodepix.png";
 import boletoFake from "../assets/boletofake.png";
@@ -28,6 +39,20 @@ const customStyles = {
     perspective: '1000px'
   }
 };
+
+// Componente de ícone personalizado para dois cartões sobrepostos
+const DoubleCardIcon = ({ size = 16, className = "" }) => (
+  <div className={`relative inline-block ${className}`} style={{ width: size, height: size }}>
+    <CreditCard 
+      size={size * 0.8} 
+      className="absolute top-0 left-0 text-[#F28C38] opacity-60" 
+    />
+    <CreditCard 
+      size={size * 0.8} 
+      className="absolute top-1 left-1 text-[#F28C38]" 
+    />
+  </div>
+);
 
 function getCardFlag(number) {
   if (!number) return null;
@@ -674,13 +699,15 @@ export default function Pagamento() {
                 onClick={() => setSelected("credito")}
               >
                 <div className="text-center">
-                  <div className="text-xl mb-1">💳</div>
+                  <div className="text-xl mb-1">
+                    <CreditCard className="w-6 h-6 mx-auto text-orange-500" />
+                  </div>
                   <div className="font-semibold text-sm">Cartão de Crédito</div>
                   <div className="text-xs opacity-75 mt-1">Até 12x sem juros</div>
                 </div>
                 {selected === "credito" && (
                   <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    ✓
+                    <Check className="w-3 h-3" />
                   </div>
                 )}
               </button>
@@ -694,13 +721,15 @@ export default function Pagamento() {
                 onClick={() => setSelected("debito")}
               >
                 <div className="text-center">
-                  <div className="text-xl mb-1">🏦</div>
+                  <div className="text-xl mb-1">
+                    <Building2 className="w-6 h-6 mx-auto text-orange-500" />
+                  </div>
                   <div className="font-semibold text-sm">Cartão de Débito</div>
                   <div className="text-xs opacity-75 mt-1">À vista</div>
                 </div>
                 {selected === "debito" && (
                   <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    ✓
+                    <Check className="w-3 h-3" />
                   </div>
                 )}
               </button>
@@ -714,13 +743,15 @@ export default function Pagamento() {
                 onClick={() => setSelected("pix")}
               >
                 <div className="text-center">
-                  <div className="text-xl mb-1">📱</div>
+                  <div className="text-xl mb-1">
+                    <Smartphone className="w-6 h-6 mx-auto text-orange-500" />
+                  </div>
                   <div className="font-semibold text-sm">Pix</div>
                   <div className="text-xs opacity-75 mt-1">Instantâneo</div>
                 </div>
                 {selected === "pix" && (
                   <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    ✓
+                    <Check className="w-3 h-3" />
                   </div>
                 )}
               </button>
@@ -734,13 +765,15 @@ export default function Pagamento() {
                 onClick={() => setSelected("boleto")}
               >
                 <div className="text-center">
-                  <div className="text-xl mb-1">🧾</div>
+                  <div className="text-xl mb-1">
+                    <Receipt className="w-6 h-6 mx-auto text-orange-500" />
+                  </div>
                   <div className="font-semibold text-sm">Boleto</div>
                   <div className="text-xs opacity-75 mt-1">Até 3 dias úteis</div>
                 </div>
                 {selected === "boleto" && (
                   <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    ✓
+                    <Check className="w-3 h-3" />
                   </div>
                 )}
               </button>
@@ -809,7 +842,8 @@ export default function Pagamento() {
                   <h4 className="text-lg font-semibold text-gray-800 mb-4">Dados do Cartão</h4>
                   <form className="space-y-3">
                     <div className="relative group">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <CreditCard className="w-4 h-4 text-orange-500" />
                         Número do cartão
                       </label>
                       <input
@@ -843,7 +877,8 @@ export default function Pagamento() {
                     </div>
                     
                     <div className="group">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <User className="w-4 h-4 text-orange-500" />
                         Nome do titular
                       </label>
                       <input
@@ -863,7 +898,8 @@ export default function Pagamento() {
                     
                     <div className="grid grid-cols-2 gap-3">
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                          <Calendar className="w-4 h-4 text-orange-500" />
                           Validade
                         </label>
                         <input
@@ -882,7 +918,8 @@ export default function Pagamento() {
                         />
                       </div>
                       <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                          <Lock className="w-4 h-4 text-orange-500" />
                           CVV
                         </label>
                         <input
@@ -1009,7 +1046,9 @@ export default function Pagamento() {
             {selected === "pix" && (
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <div className="text-center">
-                  <div className="text-5xl mb-3">📱</div>
+                  <div className="flex justify-center mb-3">
+                    <Smartphone className="w-16 h-16 text-orange-500" />
+                  </div>
                   <h4 className="text-xl font-bold text-[#F28C38] mb-4">Pagamento via Pix</h4>
                   
                   {/* QR Code de exemplo */}
@@ -1051,8 +1090,9 @@ export default function Pagamento() {
                   
                   <div className="space-y-2">
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
-                      <p className="text-sm text-green-700 font-medium">
-                        💰 Desconto de 5% aplicado no pagamento via PIX
+                      <p className="text-sm text-green-700 font-medium flex items-center gap-2">
+                        <Coins className="w-4 h-4 text-orange-500" />
+                        Desconto de 5% aplicado no pagamento via PIX
                       </p>
                     </div>
                   </div>
@@ -1063,7 +1103,9 @@ export default function Pagamento() {
             {selected === "boleto" && (
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <div className="text-center">
-                  <div className="text-5xl mb-3">🧾</div>
+                  <div className="flex justify-center mb-3">
+                    <Receipt className="w-16 h-16 text-orange-500" />
+                  </div>
                   <h4 className="text-xl font-bold text-[#F28C38] mb-3">Pagamento via Boleto</h4>
                   <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
                     <p className="text-gray-700">
@@ -1158,7 +1200,7 @@ export default function Pagamento() {
                 </>
               ) : (
                 <>
-                  <span>🔒</span>
+                  <Lock className="w-5 h-5" />
                   <span>Confirmar Pagamento Seguro</span>
                   <span className="text-sm opacity-90">- {getPaymentButtonText()}</span>
                 </>
@@ -1171,15 +1213,15 @@ export default function Pagamento() {
         <div className="mt-5 text-center">
           <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
-              <span>🔒</span>
+              <Lock className="w-4 h-4 text-orange-500" />
               <span>SSL Seguro</span>
             </div>
             <div className="flex items-center gap-1">
-              <span>🛡️</span>
+              <Shield className="w-4 h-4 text-orange-500" />
               <span>Dados Protegidos</span>
             </div>
             <div className="flex items-center gap-1">
-              <span>✅</span>
+              <CheckCircle className="w-4 h-4 text-orange-500" />
               <span>Site Verificado</span>
             </div>
           </div>

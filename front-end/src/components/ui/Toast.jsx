@@ -18,9 +18,9 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
     switch (type) {
       case 'success':
         return {
-          bgColor: 'bg-green-50 border-green-200',
-          textColor: 'text-green-800',
-          iconColor: 'text-green-600',
+          bgColor: 'bg-gradient-to-r from-green-400 to-emerald-500 border-green-300 shadow-lg',
+          textColor: 'text-white font-semibold',
+          iconColor: 'text-white',
           icon: CheckCircle
         };
       case 'error':
@@ -68,7 +68,7 @@ const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 
           </div>
           <button
             onClick={onClose}
-            className={`${textColor} hover:opacity-70 transition-opacity flex-shrink-0`}
+            className={`${textColor} hover:opacity-70 transition-all duration-200 flex-shrink-0 hover:bg-white/20 rounded-full p-1`}
           >
             <X className="w-4 h-4" />
           </button>

@@ -4,6 +4,9 @@ import fundo from "../assets/fundoHome.jpg";
 import Button from "../components/common/Button";
 import HotelServices from "../components/common/HotelServices";
 import { estaLogado, obterTipoUsuario } from "../api/auth";
+// Imports para toast estilizado
+import ToastContainer from "../components/ui/ToastContainer";
+import useToast from "../hooks/useToast";
 // Componentes de package-details
 import PackageHero from "../components/package-details/PackageHero";
 import HotelInfoCard from "../components/package-details/HotelInfoCard";
@@ -24,6 +27,8 @@ export default function PackageDetails() {
   
   const { id } = useParams();
   const navigate = useNavigate();
+  // Hook do toast
+  const { toasts, showWarning, removeToast } = useToast();
   // Decodifica o parâmetro caso seja um nome com caracteres especiais
   const identifier = decodeURIComponent(id);
 
@@ -96,8 +101,14 @@ export default function PackageDetails() {
   // Verificar se há vídeos
   const videosGaleria = pacote?.videos?.map(vid => `http://localhost:5295${vid.url}`) ?? [];
   
+  // Obter imagem para o hero - primeira imagem do pacote ou fallback para o fundo padrão
+  const heroBackgroundImage = imagensGaleria && imagensGaleria.length > 0 
+    ? imagensGaleria[0] 
+    : fundo;
+  
   console.log('🎬 Vídeos encontrados:', videosGaleria);
   console.log('📸 Imagens encontradas:', imagensGaleria);
+  console.log('🖼️ Imagem do hero:', heroBackgroundImage);
   console.log('📦 Pacote completo:', pacote);
 
   
@@ -106,11 +117,19 @@ export default function PackageDetails() {
     // Verifica se o usuário está logado
     if (!estaLogado()) {
       console.log('🚫 Usuário não está logado, redirecionando para login');
+      
+      // Mostra toast estilizado
+      showWarning('Você precisa estar logado para fazer reservas. Redirecionando para login...', 0);
+      
       // Salva a URL de destino para redirecionar após o login
       const bookingUrl = `/booking-form/${pacote.id}`;
       localStorage.setItem('redirectAfterLogin', bookingUrl);
-      // Redireciona para login
-      navigate('/login');
+      
+      // Redireciona para login após 2.5 segundos
+      setTimeout(() => {
+        navigate('/login');
+      }, 2500);
+      
       return;
     }
 
@@ -118,7 +137,19 @@ export default function PackageDetails() {
     const tipoUsuario = obterTipoUsuario();
     if (tipoUsuario !== '3') {
       console.log('🚫 Usuário não é cliente, tipo:', tipoUsuario);
-      alert('Apenas clientes podem fazer reservas. Faça login com uma conta de cliente.');
+      
+      // Mostra toast estilizado
+      showWarning('Apenas clientes podem fazer reservas. Redirecionando para login...', 0);
+      
+      // Salva a URL de destino para redirecionar após o login
+      const bookingUrl = `/booking-form/${pacote.id}`;
+      localStorage.setItem('redirectAfterLogin', bookingUrl);
+      
+      // Redireciona para login após 2.5 segundos
+      setTimeout(() => {
+        navigate('/login');
+      }, 2500);
+      
       return;
     }
 
@@ -148,9 +179,11 @@ export default function PackageDetails() {
 
   return (
     <main className="min-h-screen min-w-screen bg-white">
+      {/* ToastContainer para exibir mensagens estilizadas */}
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
       {/* Hero banner componentizado */}
       <PackageHero 
-        backgroundImage={fundo}
+        backgroundImage={heroBackgroundImage}
         title={pacote.titulo}
         subtitle={pacote.destino}
       />

@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { fazerCadastro } from "../api/auth";
 import { FaArrowLeft } from 'react-icons/fa';
+import ToastContainer from "../components/ui/ToastContainer";
+import useToast from "../hooks/useToast";
 
 export default function Cadastro() {
   const navigate = useNavigate();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   
   // Estados simples para os campos
   const [nome, setNome] = useState('');
@@ -15,8 +18,6 @@ export default function Cadastro() {
   const [cpf, setCpf] = useState('');
   const [telefone, setTelefone] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
-  const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   // Funções para formatar CPF e telefone
@@ -50,48 +51,46 @@ export default function Cadastro() {
   // Função para enviar o formulário
   const enviarFormulario = async (e) => {
     e.preventDefault(); // Impede o reload da página
-    setErro(''); // Limpa erros anteriores
-    setSucesso(''); // Limpa mensagem de sucesso anterior
     setCarregando(true); // Mostra loading
 
     // Validações simples
     if (!nome) {
-      setErro('Nome é obrigatório');
+      showError('Nome é obrigatório');
       setCarregando(false);
       return;
     }
     if (!email) {
-      setErro('Email é obrigatório');
+      showError('Email é obrigatório');
       setCarregando(false);
       return;
     }
     if (!cpf) {
-      setErro('CPF é obrigatório');
+      showError('CPF é obrigatório');
       setCarregando(false);
       return;
     }
     if (!telefone) {
-      setErro('Telefone é obrigatório');
+      showError('Telefone é obrigatório');
       setCarregando(false);
       return;
     }
     if (!dataNascimento) {
-      setErro('Data de nascimento é obrigatória');
+      showError('Data de nascimento é obrigatória');
       setCarregando(false);
       return;
     }
     if (!senha) {
-      setErro('Senha é obrigatória');
+      showError('Senha é obrigatória');
       setCarregando(false);
       return;
     }
     if (senha.length < 6) {
-      setErro('Senha deve ter no mínimo 6 caracteres');
+      showError('Senha deve ter no mínimo 6 caracteres');
       setCarregando(false);
       return;
     }
     if (senha !== confirmarSenha) {
-      setErro('Senhas não conferem');
+      showError('Senhas não conferem');
       setCarregando(false);
       return;
     }
@@ -100,22 +99,24 @@ export default function Cadastro() {
     const resultado = await fazerCadastro(nome, email, senha, cpf, telefone, dataNascimento);
 
     if (resultado.sucesso) {
-      // Mostra mensagem de sucesso
-      setSucesso('Cadastro realizado com sucesso! 🎉');
+      // Mostra toast de sucesso
+      showSuccess('Cadastro realizado com sucesso! 🎉', 0);
       // Aguarda um pouco para mostrar a mensagem antes de navegar
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 1200);
     } else {
-      // Deu erro, mostra a mensagem
-      setErro(resultado.erro);
+      // Deu erro, mostra toast de erro
+      showError(resultado.erro);
     }
     
     setCarregando(false);
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 flex items-center justify-center p-4">
+    <>
+      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      <section className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 flex items-center justify-center p-4">
       
       {/* Botão Voltar */}
       <div className="absolute top-6 left-6 z-10">
@@ -146,20 +147,6 @@ export default function Cadastro() {
 
             {/* Formulário */}
             <form onSubmit={enviarFormulario} className="space-y-6">
-              {/* Erro */}
-              {erro && (
-                <div className="bg-red-500/20 border border-red-400/50 text-red-100 px-4 py-3 rounded-lg backdrop-blur-sm">
-                  {erro}
-                </div>
-              )}
-
-              {/* Sucesso */}
-              {sucesso && (
-                <div className="bg-green-500/20 border border-green-400/50 text-green-100 px-4 py-3 rounded-lg backdrop-blur-sm">
-                  {sucesso}
-                </div>
-              )}
-
               {/* Grid de Campos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nome Completo */}
@@ -274,5 +261,6 @@ export default function Cadastro() {
         </div>
       </div>
     </section>
+    </>
   );
 }

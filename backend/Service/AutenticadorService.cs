@@ -47,6 +47,7 @@ namespace agencia.Service
         public async Task<Usuario> GetUserByEmail(string email)
         {
             return await _context.Usuarios
+                .Include(u => u.TipoUsuario) 
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }

@@ -131,7 +131,7 @@ const MinhasReservas = () => {
                 {reservas.length === 0 && (
                   <button 
                     onClick={() => navigate('/')}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer"
                   >
                     Descobrir Pacotes
                   </button>
