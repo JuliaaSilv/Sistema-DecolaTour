@@ -123,20 +123,6 @@ export default function Header() {
                       Ver Perfil
                     </button>
 
-<<<<<<< Updated upstream
-                    {/* Área de Minhas reservas não deve ser exibido para Funcionário!.  */}
-                    {!["3"].includes(tipoUsuario)  && (
-                    <button
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
-                      onClick={() => {
-                        navigate("/minhas-reservas");
-                        setShowProfileMenu(false);
-                      }}
-                    >
-                      <FaCalendarAlt className="mr-2" size={14} />
-                      Minhas Reservas
-                    </button>
-=======
                     {/* Minhas Reservas - apenas para usuários que não são administradores */}
                     {!["1", "2"].includes(tipoUsuario) && (
                       <button
@@ -149,7 +135,6 @@ export default function Header() {
                         <FaCalendarAlt className="mr-2" size={14} />
                         Minhas Reservas
                       </button>
->>>>>>> Stashed changes
                     )}
 
                     {/* Visível apenas para tipoUsuario === "1" */}
