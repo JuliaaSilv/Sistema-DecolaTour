@@ -142,9 +142,16 @@ export default function Pagamento() {
     return basePrice + installmentFee;
   };
 
+  const getBaseTotal = () => {
+    return (pacote?.preco || 0) * (travelerData?.numeroViajantes || 1);
+  };
+
   const calculateDiscount = () => {
     if (selected === 'pix') {
-      return calculateTotal() * 0.05;
+      // Calcula desconto sobre o valor com taxa se houver parcelamento
+      const baseTotal = getBaseTotal();
+      const totalWithFee = (selected === 'credito' && parcelas > 1) ? baseTotal * 1.02 : baseTotal;
+      return totalWithFee * 0.05;
     }
     return 0;
   };
@@ -171,11 +178,19 @@ export default function Pagamento() {
       quantidadeViajantes = 1;
     }
     
-    const valorTotal = basePrice * quantidadeViajantes;
+    const valorBase = basePrice * quantidadeViajantes;
     
-    console.log(`Cálculo valor total: R$ ${basePrice} × ${quantidadeViajantes} viajantes = R$ ${valorTotal}`);
+    // Aplicar taxa de parcelamento se for cartão de crédito e mais de 1 parcela
+    const totalComTaxa = (selected === 'credito' && parcelas > 1) ? valorBase * 1.02 : valorBase;
     
-    return valorTotal;
+    // Aplicar desconto PIX se aplicável
+    const desconto = selected === 'pix' ? totalComTaxa * 0.05 : 0;
+    const totalFinal = totalComTaxa - desconto;
+    
+    console.log(`Cálculo valor total: R$ ${basePrice} × ${quantidadeViajantes} viajantes = R$ ${valorBase}`);
+    console.log(`Com taxa/desconto: R$ ${totalFinal}`);
+    
+    return totalFinal;
   };
 
   const getOldTotal = () => {
@@ -184,10 +199,7 @@ export default function Pagamento() {
   };
 
   const getInstallmentValue = (installments) => {
-    const baseTotal = getFinalTotal();
-    const totalWithFee = installments > 1 ? baseTotal * 1.02 : baseTotal;
-    const discount = selected === 'pix' ? totalWithFee * 0.05 : 0;
-    const finalTotal = totalWithFee - discount;
+    const finalTotal = getFinalTotal();
     return finalTotal / installments;
   };
 
@@ -658,13 +670,13 @@ export default function Pagamento() {
             
             <div className="border-t pt-4">
               <div className="flex justify-between text-sm mb-2">
-                <span>Pacote ({travelerData.numeroViajantes}x)</span>
-                <span>R$ {(pacote.preco * travelerData.numeroViajantes).toLocaleString('pt-BR')}</span>
+                <span>Pacote ({travelerData.numeroViajantes} {travelerData.numeroViajantes === 1 ? 'pessoa' : 'pessoas'})</span>
+                <span>R$ {getBaseTotal().toLocaleString('pt-BR')}</span>
               </div>
               {parcelas > 1 && (
                 <div className="flex justify-between text-sm mb-2 text-orange-600">
                   <span>Taxa de parcelamento (2%)</span>
-                  <span>R$ {(pacote.preco * travelerData.numeroViajantes * 0.02).toLocaleString('pt-BR')}</span>
+                  <span>R$ {(getBaseTotal() * 0.02).toLocaleString('pt-BR')}</span>
                 </div>
               )}
               {selected === 'pix' && (

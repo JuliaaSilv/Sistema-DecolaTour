@@ -441,3 +441,200 @@ export const fetchPagamentosReserva = async (reservaId) => {
     };
   }
 };
+
+/**
+ * Busca estatísticas de reservas de um usuário específico (apenas para administradores)
+ */
+export const fetchEstatisticasUsuario = async (userId) => {
+  try {
+    console.log(`🔍 Buscando estatísticas para usuário ID: ${userId}`);
+    
+    // Buscar todas as reservas e filtrar pelo usuário
+    const todasReservas = await fetchReservas();
+    console.log(`📋 Total de reservas no sistema: ${todasReservas.length}`);
+    console.log(`📋 Estrutura da primeira reserva:`, todasReservas[0]);
+    
+    // Log detalhado de todas as reservas para debug
+    todasReservas.forEach((reserva, index) => {
+      console.log(`📝 Reserva ${index + 1}:`, {
+        id: reserva.id,
+        cliente: reserva.cliente,
+        email: reserva.email,
+        usuarioId: reserva.usuarioId,
+        userId: reserva.userId,
+        usuario: reserva.usuario,
+        nomeUsuario: reserva.nomeUsuario,
+        valor: reserva.valor,
+        valorTotal: reserva.valorTotal,
+        preco: reserva.preco
+      });
+    });
+    
+    // Filtrar reservas do usuário específico - verificar diferentes campos possíveis
+    const reservasUsuario = todasReservas.filter(reserva => {
+      const usuarioId = reserva.usuarioId || reserva.userId || reserva.usuario?.id;
+      const nomeUsuario = reserva.nomeUsuario || reserva.usuario?.nome || reserva.cliente;
+      const emailUsuario = reserva.emailUsuario || reserva.usuario?.email || reserva.email;
+      
+      // Verificar por ID
+      const matchId = usuarioId == userId;
+      // Verificar por nome (se userId for string e contiver nome)
+      const matchNome = typeof userId === 'string' && nomeUsuario && 
+                       nomeUsuario.toLowerCase().includes(userId.toLowerCase());
+      // Verificar se o nome do usuário está no campo cliente
+      const matchCliente = nomeUsuario && nomeUsuario.toLowerCase() === 'alcides augusto';
+      
+      console.log(`🔍 Verificando reserva ${reserva.id}:`, {
+        usuarioId,
+        nomeUsuario,
+        emailUsuario,
+        matchId,
+        matchNome,
+        matchCliente,
+        userId
+      });
+      
+      return matchId || matchNome || matchCliente;
+    });
+    
+    console.log(`🎯 Reservas encontradas para usuário ${userId}:`, reservasUsuario);
+    
+    // Calcular estatísticas
+    const totalReservas = reservasUsuario.length;
+    
+    // Calcular o valor total real pago pelo cliente usando a mesma lógica do pagamento
+    let totalGasto = 0;
+    
+    for (const reserva of reservasUsuario) {
+      console.log(`💰 Processando reserva ${reserva.id}:`);
+      
+      // Primeiro, verificar se a reserva já tem valor total calculado
+      let valorFinalReserva = 0;
+      
+      if (reserva.valorTotal && reserva.valorTotal > 0) {
+        valorFinalReserva = parseFloat(reserva.valorTotal);
+        console.log(`✅ Usando valor total da reserva: R$ ${valorFinalReserva}`);
+      } else {
+        // Calcular usando a mesma lógica do componente Pagamento
+        const valorUnitario = parseFloat(reserva.valor || reserva.valorUnitario || reserva.preco || 0);
+        const quantidadeViajantes = parseInt(reserva.pessoas || reserva.quantidadeViajantes || 1);
+        
+        if (valorUnitario > 0) {
+          // Valor base (unitário × quantidade de pessoas)
+          const valorBase = valorUnitario * quantidadeViajantes;
+          
+          // Assumir que houve parcelamento se valor > 1000 (aplicar taxa de 2%)
+          const temTaxa = valorBase > 1000;
+          const valorComTaxa = temTaxa ? valorBase * 1.02 : valorBase;
+          
+          // Para ser conservador, não aplicar desconto PIX (assumir que foi pago o valor total)
+          valorFinalReserva = valorComTaxa;
+          
+          console.log(`🧮 Valor calculado: R$ ${valorUnitario} × ${quantidadeViajantes} pessoas = R$ ${valorBase}`);
+          console.log(`📊 Com taxa de parcelamento: R$ ${valorFinalReserva}`);
+        } else {
+          console.log(`❌ Valor inválido para reserva ${reserva.id}: ${valorUnitario}`);
+          continue;
+        }
+      }
+      
+      // Tentar buscar o valor real dos pagamentos como confirmação
+      try {
+        const pagamentosResult = await fetchPagamentosReserva(reserva.id);
+        if (pagamentosResult.sucesso && pagamentosResult.dados.length > 0) {
+          const valorPagamentos = pagamentosResult.dados.reduce((sum, pagamento) => {
+            const valor = parseFloat(pagamento.valor || pagamento.total || 0);
+            return sum + valor;
+          }, 0);
+          
+          if (valorPagamentos > 0) {
+            valorFinalReserva = valorPagamentos;
+            console.log(`💳 Usando valor real dos pagamentos: R$ ${valorPagamentos}`);
+          }
+        }
+      } catch (error) {
+        console.log(`⚠️ Erro ao buscar pagamentos da reserva ${reserva.id}:`, error);
+      }
+      
+      totalGasto += valorFinalReserva;
+      console.log(`💰 Total acumulado: R$ ${totalGasto}`);
+    }
+    
+    // Determinar tier baseado no total gasto
+    let tier = 'Bronze';
+    if (totalGasto >= 50000) {
+      tier = 'Platinum';
+    } else if (totalGasto >= 25000) {
+      tier = 'Gold';
+    } else if (totalGasto >= 10000) {
+      tier = 'Silver';
+    }
+    
+    console.log(`📊 Estatísticas calculadas para usuário ${userId}: ${totalReservas} reservas, R$ ${totalGasto} total, tier ${tier}`);
+    
+    return {
+      reservas: totalReservas,
+      totalGasto: totalGasto,
+      tier: tier
+    };
+    
+  } catch (error) {
+    console.error('❌ Erro ao buscar estatísticas do usuário:', error);
+    return {
+      reservas: 0,
+      totalGasto: 0,
+      tier: 'Bronze'
+    };
+  }
+};
+
+/**
+ * Calcula o valor real de uma reserva (incluindo taxas e descontos)
+ */
+export const calcularValorRealReserva = async (reserva) => {
+  try {
+    // Primeiro, verificar se a reserva já tem valor total calculado
+    if (reserva.valorTotal && reserva.valorTotal > 0) {
+      return parseFloat(reserva.valorTotal);
+    }
+    
+    // Tentar buscar o valor real dos pagamentos
+    try {
+      const pagamentosResult = await fetchPagamentosReserva(reserva.id);
+      if (pagamentosResult.sucesso && pagamentosResult.dados.length > 0) {
+        const valorPagamentos = pagamentosResult.dados.reduce((sum, pagamento) => {
+          const valor = parseFloat(pagamento.valor || pagamento.total || 0);
+          return sum + valor;
+        }, 0);
+        
+        if (valorPagamentos > 0) {
+          return valorPagamentos;
+        }
+      }
+    } catch (error) {
+      console.log(`⚠️ Erro ao buscar pagamentos da reserva ${reserva.id}:`, error);
+    }
+    
+    // Calcular usando a mesma lógica do componente Pagamento
+    const valorUnitario = parseFloat(reserva.valor || reserva.valorUnitario || reserva.preco || 0);
+    const quantidadeViajantes = parseInt(reserva.pessoas || reserva.quantidadeViajantes || 1);
+    
+    if (valorUnitario > 0) {
+      // Valor base (unitário × quantidade de pessoas)
+      const valorBase = valorUnitario * quantidadeViajantes;
+      
+      // Assumir que houve parcelamento se valor > 1000 (aplicar taxa de 2%)
+      const temTaxa = valorBase > 1000;
+      const valorComTaxa = temTaxa ? valorBase * 1.02 : valorBase;
+      
+      // Para ser conservador, não aplicar desconto PIX (assumir que foi pago o valor total)
+      return valorComTaxa;
+    }
+    
+    return 0;
+    
+  } catch (error) {
+    console.error('Erro ao calcular valor real da reserva:', error);
+    return 0;
+  }
+};

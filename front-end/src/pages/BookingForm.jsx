@@ -97,19 +97,33 @@ const BookingForm = () => {
         };
 
         // Preencher dados do formulário com dados do usuário
-        setFormData(prev => ({
-          ...prev,
-          nome: userProfile.nome || '',
-          email: userProfile.email || '',
-          telefone: formatarTelefone(userProfile.telefone) || '',
-          cpf: formatarCPF(userProfile.cpf) || '',
-          endereco: enderecoUsuario?.logradouro || '',
-          cidade: enderecoUsuario?.cidade || '',
-          estado: enderecoUsuario?.estado || '',
-          cep: enderecoUsuario?.cep || enderecoUsuario?.CEP || ''
-        }));
+        setFormData(prev => {
+          // Criar uma cópia dos viajantes existentes
+          const viajantesAtualizados = [...prev.viajantes];
+          
+          // Preencher o viajante 1 (índice 0) com os dados do usuário
+          viajantesAtualizados[0] = {
+            nome: userProfile.nome || '',
+            email: userProfile.email || '',
+            telefone: formatarTelefone(userProfile.telefone) || ''
+          };
+          
+          return {
+            ...prev,
+            nome: userProfile.nome || '',
+            email: userProfile.email || '',
+            telefone: formatarTelefone(userProfile.telefone) || '',
+            cpf: formatarCPF(userProfile.cpf) || '',
+            endereco: enderecoUsuario?.logradouro || '',
+            cidade: enderecoUsuario?.cidade || '',
+            estado: enderecoUsuario?.estado || '',
+            cep: enderecoUsuario?.cep || enderecoUsuario?.CEP || '',
+            viajantes: viajantesAtualizados
+          };
+        });
 
         console.log('Dados do usuário carregados e preenchidos automaticamente:', userProfile);
+        console.log('Viajante 1 preenchido automaticamente com dados do usuário');
         
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -174,13 +188,43 @@ const BookingForm = () => {
     // Se for número de viajantes, ajusta o array de viajantes
     if (name === 'numeroViajantes') {
       const num = parseInt(formattedValue, 10);
-      setFormData(prev => ({
-        ...prev,
-        numeroViajantes: num,
-        viajantes: Array.from({ length: num }, (_, i) => prev.viajantes[i] || { nome: '', email: '', telefone: '' })
-      }));
+      setFormData(prev => {
+        // Criar novo array de viajantes
+        const novosViajantes = Array.from({ length: num }, (_, i) => {
+          // Se é o viajante 1 (índice 0), preservar dados do usuário se já existirem
+          if (i === 0 && prev.viajantes[0] && (prev.viajantes[0].nome === prev.nome)) {
+            return {
+              nome: prev.nome || '',
+              email: prev.email || '',
+              telefone: prev.telefone || ''
+            };
+          }
+          // Para outros viajantes, manter dados existentes ou criar vazio
+          return prev.viajantes[i] || { nome: '', email: '', telefone: '' };
+        });
+        
+        return {
+          ...prev,
+          numeroViajantes: num,
+          viajantes: novosViajantes
+        };
+      });
     } else {
-      setFormData(prev => ({ ...prev, [name]: formattedValue }));
+      setFormData(prev => {
+        const updatedData = { ...prev, [name]: formattedValue };
+        
+        // Se alterou dados do usuário que devem ser sincronizados com viajante 1
+        if ((name === 'nome' || name === 'email' || name === 'telefone') && prev.viajantes[0]) {
+          const viajantesAtualizados = [...prev.viajantes];
+          viajantesAtualizados[0] = {
+            ...viajantesAtualizados[0],
+            [name]: formattedValue
+          };
+          updatedData.viajantes = viajantesAtualizados;
+        }
+        
+        return updatedData;
+      });
     }
     // Limpar erro quando o usuário começar a digitar
     if (errors[name]) {
@@ -591,9 +635,16 @@ const BookingForm = () => {
                 <h4 className="text-lg font-semibold text-gray-800 mb-4">Dados dos Viajantes</h4>
                 {formData.viajantes.map((viajante, idx) => (
                   <div key={idx} className="mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50">
-                    <div className="font-medium text-[#F28C38] mb-2">Viajante {idx + 1}</div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-medium text-[#F28C38]">Viajante {idx + 1}</div>
+                      {idx === 0 && (
+                        <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                          ✓ Preenchido automaticamente
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <User className="text-[#F28C38]" size={14} />
                           Nome *
@@ -609,7 +660,7 @@ const BookingForm = () => {
                         />
                         {errors[`viajante_${idx}_nome`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_nome`]}</p>}
                       </div>
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <Mail className="text-[#F28C38]" size={14} />
                           Email *
@@ -625,7 +676,7 @@ const BookingForm = () => {
                         />
                         {errors[`viajante_${idx}_email`] && <p className="text-red-500 text-sm mt-1">{errors[`viajante_${idx}_email`]}</p>}
                       </div>
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                           <Phone className="text-[#F28C38]" size={14} />
                           Telefone *

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
 import { cn } from "../../lib/utils";
-import { fetchMetricasGerais } from "../../api/dashboard";
+import { fetchMetricasGerais, fetchMetricasComValoresReais } from "../../api/dashboard";
 
 export default function DashboardMetrics() {
   const [metrics, setMetrics] = useState(null);
@@ -14,7 +14,7 @@ export default function DashboardMetrics() {
     const loadMetrics = async () => {
       try {
         setLoading(true);
-        const data = await fetchMetricasGerais();
+        const data = await fetchMetricasComValoresReais();
         
         // Formatação dos dados para o componente
         const formattedMetrics = [

@@ -5,7 +5,7 @@ import CardContent from './ui/CardContent';
 import Button from './ui/Button';
 import Badge from './ui/Badge';
 import { obterTipoUsuario } from '../../api/auth';
-import { fetchReservas, normalizeReservaData } from '../../api/reservas';
+import { fetchReservas, normalizeReservaData, calcularValorRealReserva } from '../../api/reservas';
 
 const ReservationManagement = () => {
   const [reservations, setReservations] = useState([]);
@@ -15,6 +15,7 @@ const ReservationManagement = () => {
   const [editingReservation, setEditingReservation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [valoresReais, setValoresReais] = useState({});
   
   // Estados para paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,7 +30,17 @@ const ReservationManagement = () => {
         const data = await fetchReservas();
         console.log(normalizeReservaData);
         
-        setReservations(data.map(normalizeReservaData));
+        const reservasNormalizadas = data.map(normalizeReservaData);
+        setReservations(reservasNormalizadas);
+        
+        // Calcular valores reais para cada reserva
+        const valoresCalculados = {};
+        for (const reserva of reservasNormalizadas) {
+          const valorReal = await calcularValorRealReserva(reserva);
+          valoresCalculados[reserva.id] = valorReal;
+        }
+        setValoresReais(valoresCalculados);
+        
         //setReservations(mockReservations) // Caso eu quiser usar os dados mockados.
       } catch (err) {
         setError(err.message);
@@ -220,7 +231,10 @@ const ReservationManagement = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-green-600">
-                        R$ {reservation.valor.toLocaleString()}
+                        R$ {(valoresReais[reservation.id] || reservation.valor).toLocaleString('pt-BR', { 
+                          minimumFractionDigits: 2, 
+                          maximumFractionDigits: 2 
+                        })}
                       </p>
                       <p className="text-sm text-gray-600">{reservation.pessoas} pessoa(s)</p>
                     </div>

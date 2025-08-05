@@ -6,7 +6,7 @@ import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import Badge from "./ui/Badge";
 import { cn } from "../../lib/utils";
-import { fetchClientesFrequentes } from "../../api/dashboard";
+import { fetchClientesFrequentes, fetchClientesFrequentesComValoresReais } from "../../api/dashboard";
 
 const getTierIcon = (tier) => {
 	switch (tier) {
@@ -45,16 +45,16 @@ export default function FrequentClients() {
 		const loadClients = async () => {
 			try {
 				setLoading(true);
-				const response = await fetchClientesFrequentes();
+				const response = await fetchClientesFrequentesComValoresReais();
 				
-				// Formatar dados e calcular tier
+				// Formatar dados - agora já vem com valores reais calculados
 				const formattedClients = response.map(client => ({
 					id: client.email,
 					name: client.nome || "Cliente não informado",
 					email: client.email || "Email não informado",
 					reservations: client.reservas || 0,
-					totalSpent: 0, // Não temos essa informação na API atual
-					tier: getTierByReservations(client.reservas || 0),
+					totalSpent: client.totalSpent || 0,
+					tier: client.tier || getTierByReservations(client.reservas || 0),
 					lastBooking: "N/A" // Não temos essa informação na API atual
 				}));
 				

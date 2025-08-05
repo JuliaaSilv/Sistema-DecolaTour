@@ -263,7 +263,8 @@ export const normalizeUserData = (user) => {
     cpf: user.cpf || '',
     tipo: getTipoNome(user.tipoUsuarioId),
     tipoId: user.tipoUsuarioId,
-    status: user.ativo ? 'ativo' : 'inativo',
+    // Se o usuário tem reservas ou gastos, deve estar ativo
+    status: (user.ativo || user.totalReservas > 0 || user.totalGasto > 0) ? 'ativo' : 'inativo',
     dataRegistro: user.dataCadastro ? new Date(user.dataCadastro).toLocaleDateString('pt-BR') : '',
     ultimoLogin: user.ultimoLogin ? new Date(user.ultimoLogin).toLocaleDateString('pt-BR') : 'Nunca',
     reservas: user.totalReservas || 0,

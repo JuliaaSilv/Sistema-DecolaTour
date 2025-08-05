@@ -8,6 +8,7 @@ import ToastContainer from '../ui/ToastContainer';
 import useToast from '../../hooks/useToast';
 import { obterTipoUsuario } from '../../api/auth';
 import { fetchUsers, createUser, updateUser, deleteUser, normalizeUserData } from '../../api/users'; 
+import { fetchEstatisticasUsuario } from '../../api/reservas'; 
 
 // Dados mockados - substituir por dados reais da API
 const mockUsers = [
@@ -74,6 +75,7 @@ const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [error, setError] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingUser, setViewingUser] = useState(null);
@@ -96,15 +98,55 @@ const UserManagement = () => {
       setError(null);
       const data = await fetchUsers();
       const normalizedUsers = data.map(normalizeUserData);
+      
+      // Primeiro, setar os usuários básicos
       setUsers(normalizedUsers);
+      setIsLoading(false);
+      
+      // Depois, carregar estatísticas para clientes em background
+      setIsLoadingStats(true);
+      const usersWithStats = await Promise.all(
+        normalizedUsers.map(async (user) => {
+          try {
+            // Buscar estatísticas apenas para clientes
+            if (user.tipo && user.tipo.toLowerCase().includes('cliente')) {
+              console.log(`🔍 Carregando estatísticas para ${user.nome} (ID: ${user.id})`);
+              // Tentar primeiro por ID, depois por nome
+              let stats = await fetchEstatisticasUsuario(user.id);
+              
+              // Se não encontrou por ID, tentar por nome
+              if (stats.reservas === 0 && user.nome) {
+                console.log(`🔄 Tentando buscar por nome: ${user.nome}`);
+                stats = await fetchEstatisticasUsuario(user.nome);
+              }
+              
+              return {
+                ...user,
+                reservas: stats.reservas,
+                totalGasto: stats.totalGasto,
+                tier: stats.tier,
+                // Se o cliente tem reservas, definir status como ativo
+                status: stats.reservas > 0 ? 'ativo' : (user.status || 'inativo')
+              };
+            }
+            return user;
+          } catch (error) {
+            console.error(`❌ Erro ao buscar estatísticas para usuário ${user.id}:`, error);
+            return user;
+          }
+        })
+      );
+      
+      setUsers(usersWithStats);
+      setIsLoadingStats(false);
 
       if (tipoUsuario === 3) { // Se sou um atendente só posso visualizar clientes e não outros atendentes ou adminitrador.
         setFilterType('cliente');
       }
     } catch (err) {
       setError(err.message);
-    } finally {
       setIsLoading(false);
+      setIsLoadingStats(false);
     }
   };
 
@@ -411,14 +453,32 @@ const UserManagement = () => {
                 {/* {user.tipo === 'Cliente' && (
                   <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">{user.reservas}</p>
-                      <p className="text-xs text-gray-600">Reservas</p>
+                      {isLoadingStats ? (
+                        <div className="text-center">
+                          <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+                          <p className="text-xs text-gray-600 mt-1">Carregando...</p>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-2xl font-bold text-blue-600">{user.reservas || 0}</p>
+                          <p className="text-xs text-gray-600">Reservas</p>
+                        </>
+                      )}
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
-                        R$ {user.totalGasto.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-gray-600">Total Gasto</p>
+                      {isLoadingStats ? (
+                        <div className="text-center">
+                          <div className="animate-spin h-6 w-6 border-2 border-green-600 border-t-transparent rounded-full mx-auto"></div>
+                          <p className="text-xs text-gray-600 mt-1">Carregando...</p>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-2xl font-bold text-green-600">
+                            R$ {(user.totalGasto || 0).toLocaleString('pt-BR')}
+                          </p>
+                          <p className="text-xs text-gray-600">Total Gasto</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 )} */}
@@ -648,12 +708,12 @@ const UserViewModal = ({ isOpen, onClose, user }) => {
             <>
               <div>
                 <label className="text-sm font-medium text-gray-600">Total de Reservas</label>
-                <p className="text-gray-800">{user.reservas}</p>
+                <p className="text-gray-800">{user.reservas || 0}</p>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-gray-600">Total Gasto</label>
-                <p className="text-gray-800">R$ {user.totalGasto.toLocaleString()}</p>
+                <p className="text-gray-800">R$ {(user.totalGasto || 0).toLocaleString('pt-BR')}</p>
               </div>
 
               {user.tier && (

@@ -5,7 +5,7 @@ import CardContent from "./ui/CardContent";
 import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import { TrendingUp, AlertTriangle, BarChart3 } from "lucide-react";
-import { fetchFaturamentoMensal } from "../../api/dashboard";
+import { fetchFaturamentoMensal, fetchFaturamentoMensalComValoresReais } from "../../api/dashboard";
 
 export default function RevenueChart() {
 	const [data, setData] = useState([]);
@@ -16,7 +16,7 @@ export default function RevenueChart() {
 		const loadRevenueData = async () => {
 			try {
 				setLoading(true);
-				const response = await fetchFaturamentoMensal();
+				const response = await fetchFaturamentoMensalComValoresReais();
 				
 				const formattedData = response.map(item => ({
 					month: item.mes,
