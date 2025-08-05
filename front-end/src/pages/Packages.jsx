@@ -232,7 +232,7 @@ export default function Packages() {
           <div className="mb-4">
             <h1 className="text-white text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
               Descubra o mundo
-              <span className="block text-yellow-300 text-2xl sm:text-4xl md:text-5xl mt-2">
+              <span className="block text-orange-400 text-2xl sm:text-4xl md:text-5xl mt-2">
                 Com nossos pacotes
               </span>
             </h1>
@@ -244,7 +244,7 @@ export default function Packages() {
           <div className="flex flex-col sm:flex-row gap-4 mt-6 px-4 sm:px-0">
             <button 
               onClick={() => document.getElementById('pacotes-nacionais')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base cursor-pointer"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base cursor-pointer"
             >
               Ver Pacotes Nacionais
             </button>
