@@ -38,7 +38,7 @@ export default function Login() {
     if (resultado.sucesso) {
 
       // Mostra mensagem de sucesso
-      setSucesso('Login realizado com sucesso!');
+      showSuccess('Login realizado com sucesso!');
       
       // Verifica se há uma URL de redirecionamento salva
       const redirectUrl = localStorage.getItem('redirectAfterLogin');
