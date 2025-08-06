@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AdminSidebar from "../components/administrador/AdminSidebar";
 import DashboardMetrics from "../components/administrador/DashboardMetrics";
 import RevenueChart from "../components/administrador/RevenueChart";
@@ -12,19 +12,21 @@ import UserManagement from "../components/administrador/UserManagement";
 import { obterTipoUsuario, estaLogado } from "../api/auth"; 
 
 export default function AtendentePainel() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "packages");
   const navigate = useNavigate();
   const tipoUsuario = parseInt(obterTipoUsuario());
 
   // Verificar acesso ao painel de funcionário
   useEffect(() => {
     if (!estaLogado()) {
-      navigate('/atendente-login');
+      navigate('/login');
       return;
     }
 
-    if (tipoUsuario !== 3) {
-      // Se não for atendente (3), redirecionar para home
+    if (tipoUsuario !== 2) {
+      // Se não for atendente (2), redirecionar para home
       navigate('/');
       return;
     }
@@ -37,8 +39,8 @@ export default function AtendentePainel() {
 
         <main className="flex-1 min-h-screen lg:ml-0">
           <div className="p-3 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden pt-16 lg:pt-3">
-{/* 
-            {activeTab === "dashboard" && (tipoUsuario === 3) && (
+
+            {activeTab === "dashboard" && (tipoUsuario === 2) && (
               <>
                 <ExportButtons />
                 <DashboardMetrics />
@@ -49,7 +51,7 @@ export default function AtendentePainel() {
                   <FrequentClients />
                 </div>
               </>
-            )} */}
+            )}
 
             {activeTab !== "dashboard" && (
               <>

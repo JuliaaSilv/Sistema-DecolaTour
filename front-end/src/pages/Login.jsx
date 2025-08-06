@@ -58,12 +58,16 @@ export default function Login() {
           console.log('🔄 Redirecionando para:', redirectUrl);
           // Redireciona para a URL salva
           navigate(redirectUrl);
-        } else if (userRole === "1" || userRole === "2") {
-          // Se for administrador (1) ou atendente (2), redireciona para admin
+        } else if (userRole === "1") {
+          // Se for administrador (1), redireciona para admin
           console.log('🔄 Administrador detectado, redirecionando para admin');
           navigate('/admin');
+        } else if (userRole === "2") {
+          // Se for atendente (2), redireciona para atendente
+          console.log('🔄 Atendente detectado, redirecionando para atendente');
+          navigate('/atendente?tab=packages');
         } else {
-          // Redireciona para home se não há URL salva e não é admin
+          // Redireciona para home se não há URL salva e não é admin nem atendente
           navigate('/home');
         }
       }, 1200); // Reduzido de 2000ms para 1200ms para redirecionamento mais rápido

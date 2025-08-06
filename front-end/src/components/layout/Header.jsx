@@ -123,8 +123,8 @@ export default function Header() {
                       Ver Perfil
                     </button>
 
-                    {/* Minhas Reservas - apenas para usuários que não são administradores */}
-                    {!["1", "2"].includes(tipoUsuario) && (
+                    {/* Minhas Reservas - apenas para clientes */}
+                    {["3"].includes(tipoUsuario) && (
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                         onClick={() => {
@@ -151,7 +151,7 @@ export default function Header() {
                       </button>
                     )}
 
-                    {["3"].includes(tipoUsuario)  && (
+                    {["2"].includes(tipoUsuario)  && (
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
                         onClick={() => {

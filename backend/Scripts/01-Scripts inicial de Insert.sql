@@ -86,7 +86,7 @@ VALUES (
     NULL,
     NULL,
     '$2b$12$D5ARIB.W7jXi5aOtGVSc8ecbLyv4ckX8/OhHx.JVWKVTMCZoAW0xm',
-    3
+    2
 );
 
 

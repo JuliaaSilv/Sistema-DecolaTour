@@ -334,7 +334,7 @@ const UserManagement = () => {
             <Download className="w-4 h-4 mr-2" />
             <span>Exportar</span>
           </Button>
-          {(tipoUsuario === 1 || tipoUsuario === 2) && (
+          {(tipoUsuario === 1) && (
             <Button
               onClick={handleCreate}
               className="bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center"
@@ -500,7 +500,7 @@ const UserManagement = () => {
                     <Eye className="w-4 h-4 mr-1" />
                     <span>Ver</span>
                   </Button>
-                  {(tipoUsuario === 1 || tipoUsuario === 2) && (
+                  {(tipoUsuario === 1) && (
                     <>
                       <Button
                         size="sm"
@@ -601,7 +601,7 @@ const UserManagement = () => {
       )}
 
       {/* Modal de Cadastro/Edição */}
-      {(tipoUsuario === 1 || tipoUsuario === 2) && isModalOpen && (
+      {(tipoUsuario === 1) && isModalOpen && (
         <UserFormModal
           isOpen={isModalOpen}
           onClose={() => {

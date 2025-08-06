@@ -12,10 +12,12 @@ export default function ConfirmacaoEmail() {
   const token = searchParams.get("token");
 
   const [status, setStatus] = useState("carregando");
+  const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
     if (!token) {
       setStatus("erro");
+      setMensagem("Token não encontrado na URL.");
       showError("Token não encontrado na URL.");
       return;
     }
@@ -27,6 +29,7 @@ export default function ConfirmacaoEmail() {
 
         if (resposta.ok || dados.mensagem === "E-mail já confirmado.") {
           setStatus("sucesso");
+          setMensagem(dados.mensagem || "E-mail confirmado com sucesso!");
           showSuccess(dados.mensagem, 0);
 
           setTimeout(() => {
@@ -34,10 +37,12 @@ export default function ConfirmacaoEmail() {
           }, 3000);
         } else {
           setStatus("erro");
+          setMensagem(dados.mensagem || "Erro ao confirmar o e-mail.");
           showError(dados.mensagem || "Erro ao confirmar o e-mail.");
         }
       } catch (erro) {
         setStatus("erro");
+        setMensagem("Erro na conexão com o servidor.");
         showError("Erro na conexão com o servidor.");
       }
     };
