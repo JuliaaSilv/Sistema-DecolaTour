@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Search, Edit, Trash2, Eye, Download, User, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Plus, Search, Edit, Trash2, Eye, User, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from './ui/Card';
 import CardContent from './ui/CardContent';
 import Button from './ui/Button';
@@ -23,6 +23,138 @@ const ReservationManagement = () => {
 
   const tipoUsuario = parseInt(obterTipoUsuario());
 
+  // Dados mock para demonstração - ORDENADOS POR CÓDIGO DECRESCENTE
+  const mockReservations = [
+    {
+      id: 1008,
+      codigo: '#100010',
+      cliente: 'Paulo Henrique Costa',
+      email: 'paulo.henrique@email.com',
+      pacote: 'Pantanal Aventura - 8 dias',
+      destino: 'Pantanal, Mato Grosso do Sul',
+      dataViagem: '2025-07-12',
+      dataReserva: '2025-02-05',
+      valor: 3200.00,
+      valorTotal: 3200.00,
+      status: 'confirmada',
+      pessoas: 1,
+      pagamento: 'pago',
+      categoria: 'nacional'
+    },
+    {
+      id: 1007,
+      codigo: '#100009',
+      cliente: 'Juliana Martins Souza',
+      email: 'juliana.martins@email.com',
+      pacote: 'Patagônia Argentina - 18 dias',
+      destino: 'Buenos Aires, Argentina',
+      dataViagem: '2025-04-25',
+      dataReserva: '2025-02-03',
+      valor: 9750.00,
+      valorTotal: 9750.00,
+      status: 'confirmada',
+      pessoas: 2,
+      pagamento: 'pago',
+      categoria: 'internacional'
+    },
+    {
+      id: 1006,
+      codigo: '#100008',
+      cliente: 'Roberto Santos Almeida',
+      email: 'roberto.santos@email.com',
+      pacote: 'Foz do Iguaçu Completo - 5 dias',
+      destino: 'Foz do Iguaçu, Paraná',
+      dataViagem: '2025-03-08',
+      dataReserva: '2025-02-01',
+      valor: 1890.00,
+      valorTotal: 1890.00,
+      status: 'confirmada',
+      pessoas: 1,
+      pagamento: 'pago',
+      categoria: 'nacional'
+    },
+    {
+      id: 1005,
+      codigo: '#100007',
+      cliente: 'Fernanda Costa Ribeiro',
+      email: 'fernanda.costa@email.com',
+      pacote: 'Tour Japão Cultural - 14 dias',
+      destino: 'Tóquio, Japão',
+      dataViagem: '2025-06-20',
+      dataReserva: '2025-01-30',
+      valor: 15800.00,
+      valorTotal: 15800.00,
+      status: 'confirmada',
+      pessoas: 2,
+      pagamento: 'pago',
+      categoria: 'internacional'
+    },
+    {
+      id: 1004,
+      codigo: '#100006',
+      cliente: 'Carlos Eduardo Lima',
+      email: 'carlos.eduardo@email.com',
+      pacote: 'Roteiro Amazônia Selvagem - 12 dias',
+      destino: 'Manaus, Amazonas',
+      dataViagem: '2025-05-05',
+      dataReserva: '2025-01-25',
+      valor: 4200.00,
+      valorTotal: 4200.00,
+      status: 'confirmada',
+      pessoas: 2,
+      pagamento: 'pago',
+      categoria: 'nacional'
+    },
+    {
+      id: 1003,
+      codigo: '#100005',
+      cliente: 'Ana Carolina Ferreira',
+      email: 'ana.carolina@email.com',
+      pacote: 'Cruzeiro pelo Caribe - 10 dias',
+      destino: 'Cancún, México',
+      dataViagem: '2025-04-10',
+      dataReserva: '2025-01-22',
+      valor: 12000.00,
+      valorTotal: 12000.00,
+      status: 'pendente',
+      pessoas: 3,
+      pagamento: 'pendente',
+      categoria: 'internacional'
+    },
+    {
+      id: 1002,
+      codigo: '#100004',
+      cliente: 'João Pedro Oliveira',
+      email: 'joao.pedro@email.com',
+      pacote: 'Aventura na Chapada Diamantina - 7 dias',
+      destino: 'Lençóis, Bahia',
+      dataViagem: '2025-02-28',
+      dataReserva: '2025-01-18',
+      valor: 2350.00,
+      valorTotal: 2350.00,
+      status: 'rejeitado',
+      pessoas: 1,
+      pagamento: 'rejeitado',
+      categoria: 'nacional'
+    },
+    {
+      id: 1001,
+      codigo: '#100003',
+      cliente: 'Maria Silva Santos',
+      email: 'maria.silva@email.com',
+      pacote: 'Pacote Europa Clássica - 15 dias',
+      destino: 'Paris, França',
+      dataViagem: '2025-03-15',
+      dataReserva: '2025-01-20',
+      valor: 8500.00,
+      valorTotal: 8500.00,
+      status: 'pendente',
+      pessoas: 2,
+      pagamento: 'pendente',
+      categoria: 'internacional'
+    }
+  ];
+
   useEffect(() => {
     const loadReservations = async () => {
       try {
@@ -31,11 +163,14 @@ const ReservationManagement = () => {
         console.log(normalizeReservaData);
         
         const reservasNormalizadas = data.map(normalizeReservaData);
-        setReservations(reservasNormalizadas);
+        
+        // Combinar dados da API com dados mock
+        const todasReservas = [...reservasNormalizadas, ...mockReservations];
+        setReservations(todasReservas);
         
         // Calcular valores reais para cada reserva
         const valoresCalculados = {};
-        for (const reserva of reservasNormalizadas) {
+        for (const reserva of todasReservas) {
           const valorReal = await calcularValorRealReserva(reserva);
           valoresCalculados[reserva.id] = valorReal;
         }
@@ -44,6 +179,13 @@ const ReservationManagement = () => {
         //setReservations(mockReservations) // Caso eu quiser usar os dados mockados.
       } catch (err) {
         setError(err.message);
+        // Em caso de erro na API, usar apenas os dados mock
+        setReservations(mockReservations);
+        const valoresMock = {};
+        mockReservations.forEach(reserva => {
+          valoresMock[reserva.id] = reserva.valor;
+        });
+        setValoresReais(valoresMock);
       } finally {
         setIsLoading(false);
       }
@@ -82,6 +224,7 @@ const ReservationManagement = () => {
       case 'confirmada': return 'bg-green-100 text-green-800';
       case 'pendente': return 'bg-yellow-100 text-yellow-800';
       case 'cancelada': return 'bg-red-100 text-red-800';
+      case 'rejeitado': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -91,6 +234,7 @@ const ReservationManagement = () => {
       case 'pago': return 'bg-green-100 text-green-800';
       case 'pendente': return 'bg-yellow-100 text-yellow-800';
       case 'reembolsado': return 'bg-blue-100 text-blue-800';
+      case 'rejeitado': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -136,14 +280,6 @@ const ReservationManagement = () => {
           <p className="text-blue-700 mt-1">Gerencie todas as reservas de viagem</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button
-            onClick={() => {}} 
-            variant="outline"
-            className="border-blue-300 text-blue-700 hover:bg-blue-50 flex items-center justify-center"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            <span>Exportar</span>
-          </Button>
           {/* {(tipoUsuario === 1 || tipoUsuario === 2) && (
             <Button
               onClick={handleCreate}
@@ -182,6 +318,7 @@ const ReservationManagement = () => {
                 <option value="confirmada">Confirmada</option>
                 <option value="pendente">Pendente</option>
                 <option value="cancelada">Cancelada</option>
+                <option value="rejeitado">Rejeitado</option>
               </select>
             </div>
           </div>
@@ -223,9 +360,6 @@ const ReservationManagement = () => {
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={getStatusColor(reservation.status)}>
                           {reservation.status}
-                        </Badge>
-                        <Badge className={getPaymentColor(reservation.pagamento)}>
-                          {reservation.pagamento}
                         </Badge>
                       </div>
                     </div>

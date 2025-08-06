@@ -6,7 +6,7 @@ import CardHeader from "./ui/CardHeader";
 import CardTitle from "./ui/CardTitle";
 import { MapPin, AlertTriangle, Globe } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { fetchDestinosPopulares } from "../../api/dashboard";
+import { fetchDestinosPopulares, fetchDestinosPopularesComMocks } from "../../api/dashboard";
 
 const COLORS = ["#FF6B35", "#4A90E2", "#7ED321", "#F5A623", "#BD10E0"];
 
@@ -19,7 +19,7 @@ export default function PopularDestinations() {
     const loadDestinations = async () => {
       try {
         setLoading(true);
-        const response = await fetchDestinosPopulares();
+        const response = await fetchDestinosPopularesComMocks();
         
         // Calcular percentuais
         const totalReservas = response.reduce((sum, item) => sum + item.reservas, 0);

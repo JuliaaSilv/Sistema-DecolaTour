@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import fundo from "../assets/fundoHome.jpg";
 import SimplePackageCard from "../components/common/SimplePackageCard";
 import Button from "../components/common/Button";
@@ -13,6 +13,10 @@ export default function Packages() {
   const [currentPageNacional, setCurrentPageNacional] = useState(1);
   const [currentPageInternacional, setCurrentPageInternacional] = useState(1);
   const packagesPerPage = 9;
+
+  // Estados para ordenação
+  const [sortNacional, setSortNacional] = useState({ field: null, direction: null });
+  const [sortInternacional, setSortInternacional] = useState({ field: null, direction: null });
 
   useEffect(() => {
     fetchPackages();
@@ -132,17 +136,64 @@ export default function Packages() {
   console.log("Pacotes nacionais:", nacionais.length, nacionais);
   console.log("Pacotes internacionais:", internacionais.length, internacionais);
 
+  // Funções de ordenação
+  const sortPackages = (packages, sortConfig) => {
+    if (!sortConfig.field) return packages;
+
+    return [...packages].sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortConfig.field === 'nome') {
+        aValue = a.titulo.toLowerCase();
+        bValue = b.titulo.toLowerCase();
+      } else if (sortConfig.field === 'preco') {
+        aValue = a.preco;
+        bValue = b.preco;
+      }
+
+      if (aValue < bValue) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  const handleSort = (field, type) => {
+    if (type === 'nacional') {
+      const newDirection = 
+        sortNacional.field === field && sortNacional.direction === 'asc' 
+          ? 'desc' 
+          : 'asc';
+      setSortNacional({ field, direction: newDirection });
+      setCurrentPageNacional(1); // Reset para primeira página
+    } else {
+      const newDirection = 
+        sortInternacional.field === field && sortInternacional.direction === 'asc' 
+          ? 'desc' 
+          : 'asc';
+      setSortInternacional({ field, direction: newDirection });
+      setCurrentPageInternacional(1); // Reset para primeira página
+    }
+  };
+
+  // Aplicar ordenação aos pacotes
+  const sortedNacionais = sortPackages(nacionais, sortNacional);
+  const sortedInternacionais = sortPackages(internacionais, sortInternacional);
+
   // Lógica de paginação para Nacionais
-  const totalPagesNacional = Math.ceil(nacionais.length / packagesPerPage);
+  const totalPagesNacional = Math.ceil(sortedNacionais.length / packagesPerPage);
   const startIndexNacional = (currentPageNacional - 1) * packagesPerPage;
   const endIndexNacional = startIndexNacional + packagesPerPage;
-  const currentNacionais = nacionais.slice(startIndexNacional, endIndexNacional);
+  const currentNacionais = sortedNacionais.slice(startIndexNacional, endIndexNacional);
 
   // Lógica de paginação para Internacionais
-  const totalPagesInternacional = Math.ceil(internacionais.length / packagesPerPage);
+  const totalPagesInternacional = Math.ceil(sortedInternacionais.length / packagesPerPage);
   const startIndexInternacional = (currentPageInternacional - 1) * packagesPerPage;
   const endIndexInternacional = startIndexInternacional + packagesPerPage;
-  const currentInternacionais = internacionais.slice(startIndexInternacional, endIndexInternacional);
+  const currentInternacionais = sortedInternacionais.slice(startIndexInternacional, endIndexInternacional);
 
   // Funções de navegação
   const handlePageChangeNacional = (newPage) => {
@@ -153,6 +204,42 @@ export default function Packages() {
   const handlePageChangeInternacional = (newPage) => {
     setCurrentPageInternacional(newPage);
     document.getElementById('pacotes-internacionais')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Componente de Botões de Ordenação
+  const SortButtons = ({ sortConfig, onSort, type }) => {
+    const getSortIcon = (field) => {
+      if (sortConfig.field !== field) {
+        return <ArrowUpDown className="w-4 h-4" />;
+      }
+      return sortConfig.direction === 'asc' 
+        ? <ArrowUp className="w-4 h-4" />
+        : <ArrowDown className="w-4 h-4" />;
+    };
+
+    const getSortLabel = (field) => {
+      if (sortConfig.field !== field) return '';
+      return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+    };
+
+    return (
+      <div className="flex justify-center gap-3 mb-6">
+        <button
+          onClick={() => onSort('nome', type)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer shadow-sm"
+        >
+          {getSortIcon('nome')}
+          <span className="font-medium">Nome{getSortLabel('nome')}</span>
+        </button>
+        <button
+          onClick={() => onSort('preco', type)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50 transition-colors cursor-pointer shadow-sm"
+        >
+          {getSortIcon('preco')}
+          <span className="font-medium">Preço{getSortLabel('preco')}</span>
+        </button>
+      </div>
+    );
   };
 
   // Componente de Paginação Reutilizável
@@ -279,11 +366,20 @@ export default function Packages() {
           Descubra destinos incríveis pelo Brasil com toda comodidade e segurança.
         </p>
         
+        {/* Botões de Ordenação - Nacionais */}
+        {!isLoading && sortedNacionais.length > 0 && (
+          <SortButtons 
+            sortConfig={sortNacional}
+            onSort={handleSort}
+            type="nacional"
+          />
+        )}
+        
         {/* Informações da paginação - Nacionais */}
-        {!isLoading && nacionais.length > 0 && (
+        {!isLoading && sortedNacionais.length > 0 && (
           <div className="flex justify-between items-center text-sm text-gray-600 mb-6">
             <span>
-              Mostrando {startIndexNacional + 1} a {Math.min(endIndexNacional, nacionais.length)} de {nacionais.length} pacotes nacionais
+              Mostrando {startIndexNacional + 1} a {Math.min(endIndexNacional, sortedNacionais.length)} de {sortedNacionais.length} pacotes nacionais
             </span>
             <span>Página {currentPageNacional} de {totalPagesNacional}</span>
           </div>
@@ -339,11 +435,20 @@ export default function Packages() {
           Viva experiências únicas em destinos ao redor do mundo com a Decola Tour.
         </p>
         
+        {/* Botões de Ordenação - Internacionais */}
+        {!isLoading && sortedInternacionais.length > 0 && (
+          <SortButtons 
+            sortConfig={sortInternacional}
+            onSort={handleSort}
+            type="internacional"
+          />
+        )}
+        
         {/* Informações da paginação - Internacionais */}
-        {!isLoading && internacionais.length > 0 && (
+        {!isLoading && sortedInternacionais.length > 0 && (
           <div className="flex justify-between items-center text-sm text-gray-600 mb-6">
             <span>
-              Mostrando {startIndexInternacional + 1} a {Math.min(endIndexInternacional, internacionais.length)} de {internacionais.length} pacotes internacionais
+              Mostrando {startIndexInternacional + 1} a {Math.min(endIndexInternacional, sortedInternacionais.length)} de {sortedInternacionais.length} pacotes internacionais
             </span>
             <span>Página {currentPageInternacional} de {totalPagesInternacional}</span>
           </div>

@@ -85,15 +85,19 @@ export async function buscarTodosUsuarios() {
 }
 
 /**
- * Buscar dados completos para relatório
+ * Buscar dados completos para relatório incluindo dados mock
  */
 export async function buscarDadosCompletos() {
   try {
+    // Import dinâmico para evitar dependência circular
+    const { fetchMetricasComValoresReais, fetchFaturamentoMensalComValoresReais, 
+            fetchDestinosPopularesComMocks, fetchClientesFrequentesComValoresReais } = await import('./dashboard');
+    
     const [metricas, faturamento, destinos, clientes, promocoes] = await Promise.all([
-      buscarMetricasGerais(),
-      buscarFaturamentoMensal(),
-      buscarDestinosPopulares(),
-      buscarClientesFrequentes(),
+      fetchMetricasComValoresReais(), // Usando função que inclui mocks
+      fetchFaturamentoMensalComValoresReais(), // Usando função que inclui mocks
+      fetchDestinosPopularesComMocks(), // Usando função que inclui mocks
+      fetchClientesFrequentesComValoresReais(), // Usando função que inclui mocks
       buscarPromocoesAtivas()
     ]);
 
