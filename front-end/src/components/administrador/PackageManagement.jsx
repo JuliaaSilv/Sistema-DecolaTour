@@ -10,20 +10,6 @@ import PackageFormModal from './PackageFormModal';
 import PackageViewModal from './PackageViewModal';
 import { obterTipoUsuario } from '../../api/auth';
 
-// Dados mockados - substituir por dados reais da API
-const mockPackages = [
-  {
-    id: 1,
-    nome: "Foz do Iguaçu",
-    destino: "Foz do Iguaçu, Brasil",
-    preco: 2110,
-    categoria: "completo",
-    status: "ativo",
-    reservas: 24,
-    dataUltimaReserva: "2024-07-20",
-    imagem: "/packages/foz.jpg"
-  }
-];
 
 const PackageManagement = () => {
   const { toasts, showSuccess, showError, showWarning, removeToast } = useToast();
@@ -70,10 +56,10 @@ const PackageManagement = () => {
         console.log('PackageManagement - Dados brutos do backend:', data);
         console.log('PackageManagement - Quantidade de pacotes:', data.length);
         
-        // Se não há dados do backend, usa dados mockados temporariamente
+        // Verifica se há dados do backend
         if (!data || data.length === 0) {
-          console.log('PackageManagement - Nenhum pacote encontrado no backend, usando dados mockados');
-          setPackages(mockPackages);
+          console.log('PackageManagement - Nenhum pacote encontrado no backend');
+          setPackages([]);
           return;
         }
         
@@ -127,20 +113,18 @@ const PackageManagement = () => {
           };
         });
         console.log('PackageManagement - Pacotes adaptados:', adaptedPackages);
-        setPackages(adaptedPackages);
+        setPackages(adaptedPackages || []);
       } else {
         console.error('PackageManagement - Erro ao carregar pacotes, status:', response.status);
         const errorText = await response.text();
         console.error('PackageManagement - Erro detalhado:', errorText);
         setError('Erro ao carregar pacotes do servidor');
-        // Fallback para dados mockados se não conseguir carregar do backend
-        setPackages(mockPackages);
+        setPackages([]);
       }
     } catch (error) {
       console.error('PackageManagement - Erro de conexão:', error);
       setError('Erro de conexão com o servidor');
-      // Fallback para dados mockados
-      setPackages(mockPackages);
+      setPackages([]);
     } finally {
       setIsLoading(false);
     }
@@ -358,7 +342,7 @@ const PackageManagement = () => {
               <span>{error}</span>
             </div>
             <p className="text-sm text-red-600 mt-1">
-              Alguns dados podem estar sendo exibidos offline.
+              Verifique sua conexão e tente novamente.
             </p>
           </CardContent>
         </Card>

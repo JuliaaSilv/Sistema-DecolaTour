@@ -149,18 +149,11 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try 
     {
+        // Aplicar migrations pendentes (substitui EnsureCreated)
+        await context.Database.MigrateAsync();
 
-        context.Database.EnsureDeleted(); // Use com cuidado
-
-        context.Database.EnsureCreated();
-
-        // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir
-        if (!context.TiposUsuario.Any())
-        {
-            // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
-            string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
-            context.Database.ExecuteSqlRaw(script);
-        }
+        // Inserir dados iniciais apenas se não existirem (seed)
+        await SeedDatabaseAsync(context);
     }
     catch (Exception ex)
     {
@@ -193,3 +186,23 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
+// Método para inserir dados iniciais (seed) apenas se não existirem
+static async Task SeedDatabaseAsync(AppDbContext context)
+{
+    // Verifica se a tabela TB_TIPO_USUARIO está vazia antes de inserir
+    if (!context.TiposUsuario.Any())
+    {
+        Console.WriteLine("Inserindo dados iniciais no banco...");
+        
+        // Após criar o banco roda o script de insert inicial com alguns dados de exemplos.
+        string script = File.ReadAllText("Scripts/01-Scripts inicial de Insert.sql");
+        await context.Database.ExecuteSqlRawAsync(script);
+        
+        Console.WriteLine("Dados iniciais inseridos com sucesso!");
+    }
+    else
+    {
+        Console.WriteLine("Dados iniciais já existem, pulando seed...");
+    }
+}

@@ -1,17 +1,16 @@
-import { FileText, Download, Calendar as CalendarIcon } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { useState } from "react";
 import Button from "./ui/Button";
 import Card from "./ui/Card";
 import CardContent from "./ui/CardContent";
 import { cn } from "../../lib/utils";
-import { exportarParaExcel, exportarParaPDF, exportarRelatorioMensal } from "../../services/exportService";
+import { exportarParaExcel, exportarParaPDF } from "../../services/exportService";
 import useToast from "../../hooks/useToast";
 import { ToastContainer } from "../common/Toast";
 
 export default function ExportButtons() {
   const [carregandoExcel, setCarregandoExcel] = useState(false);
   const [carregandoPDF, setCarregandoPDF] = useState(false);
-  const [carregandoMensal, setCarregandoMensal] = useState(false);
   const { toasts, showSuccess, showError, showInfo, removeToast } = useToast();
 
   const handleExportarExcel = async () => {
@@ -44,20 +43,6 @@ export default function ExportButtons() {
     }
   };
 
-  const handleExportarMensal = async () => {
-    try {
-      setCarregandoMensal(true);
-      toast.info('Iniciando geração do relatório mensal...', 2000);
-      
-      const resultado = await exportarRelatorioMensal();
-      toast.success(`Relatório mensal gerado com sucesso! Arquivo: ${resultado.arquivo}`, 4000);
-    } catch (error) {
-      console.error('Erro ao exportar relatório mensal:', error);
-      toast.error('Erro ao gerar relatório mensal. Verifique sua conexão e tente novamente.', 5000);
-    } finally {
-      setCarregandoMensal(false);
-    }
-  };
   return (
     <>
       <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
@@ -83,14 +68,6 @@ export default function ExportButtons() {
               >
                 <Download className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                 {carregandoPDF ? 'Gerando...' : 'PDF'}
-              </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center disabled:opacity-50 text-sm md:text-base py-2 px-3 md:py-2 md:px-4"
-                onClick={handleExportarMensal}
-                disabled={carregandoMensal}
-              >
-                <CalendarIcon className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                {carregandoMensal ? 'Gerando...' : 'Mensal'}
               </Button>
             </div>
           </div>

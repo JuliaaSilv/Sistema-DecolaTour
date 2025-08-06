@@ -59,10 +59,13 @@ namespace agencia.Migrations
                 name: "USUARIO_ID1",
                 table: "TB_DOCUMENTOS");
 
-            migrationBuilder.RenameColumn(
-                name: "ORIGEM",
-                table: "TB_PACOTES",
-                newName: "CATEGORIAS");
+            // Verificar se a coluna ORIGEM existe antes de renomear
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TB_PACOTES' AND COLUMN_NAME = 'ORIGEM')
+                BEGIN
+                    EXEC sp_rename 'TB_PACOTES.ORIGEM', 'CATEGORIAS', 'COLUMN'
+                END
+            ");
 
             migrationBuilder.AddColumn<int>(
                 name: "HistoricoPacoteId",
@@ -324,10 +327,13 @@ namespace agencia.Migrations
                 name: "HistoricoPacoteId",
                 table: "ImagensPacote");
 
-            migrationBuilder.RenameColumn(
-                name: "CATEGORIAS",
-                table: "TB_PACOTES",
-                newName: "ORIGEM");
+            // Verificar se a coluna CATEGORIAS existe antes de renomear de volta
+            migrationBuilder.Sql(@"
+                IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TB_PACOTES' AND COLUMN_NAME = 'CATEGORIAS')
+                BEGIN
+                    EXEC sp_rename 'TB_PACOTES.CATEGORIAS', 'ORIGEM', 'COLUMN'
+                END
+            ");
 
             migrationBuilder.AddColumn<int>(
                 name: "ID_RESERVA1",

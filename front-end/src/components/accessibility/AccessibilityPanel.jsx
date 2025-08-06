@@ -7,6 +7,12 @@ import ScreenReaderPanel from "./ScreenReaderButton";
 export default function AccessibilityPanel({ onClose }) {
   const { fontSize, setFontSize, contrastMode, setContrastMode } = useAccessibility();
 
+  // Aplicar classe de contraste diretamente no modal
+  let contrastClass = '';
+  if (contrastMode === 'high') contrastClass = 'contrast-high';
+  if (contrastMode === 'yellow') contrastClass = 'contrast-yellow';
+  if (contrastMode === 'yellowwhite') contrastClass = 'contrast-yellowwhite';
+
   // Fechar com ESC
   useEffect(() => {
     const handleEscape = (event) => {
@@ -30,14 +36,14 @@ export default function AccessibilityPanel({ onClose }) {
     <>
       {/* Overlay invisível que cobre toda a tela para capturar cliques */}
       <div 
-        className="fixed inset-0 z-[9998]"
+        className={`fixed inset-0 z-[9998] ${contrastClass}`}
         onClick={onClose}
         aria-hidden="true"
       />
       
       {/* Painel de acessibilidade - próximo ao botão no canto inferior esquerdo */}
       <div
-        className="fixed bottom-20 left-4 z-[9999] bg-white dark:bg-gray-800 shadow-2xl rounded-xl p-6 w-80 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4 border border-gray-200 dark:border-gray-700"
+        className={`fixed bottom-20 left-4 z-[9999] bg-white dark:bg-gray-800 shadow-2xl rounded-xl p-6 w-80 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4 border border-gray-200 dark:border-gray-700 ${contrastClass}`}
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
