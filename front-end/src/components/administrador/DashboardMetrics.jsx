@@ -135,7 +135,7 @@ export default function DashboardMetrics() {
                   <span className={`text-xs md:text-sm font-medium ${metric.trend === "up" ? "text-green-600" : "text-red-600"}`}>
                     {metric.change}
                   </span>
-                  <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">vs mês anterior</span>
+                  <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">vs ano anterior</span>
                 </div>
               </div>
               <div className={`p-2 md:p-3 rounded-full ${metric.bgColor} flex-shrink-0 ml-2`}>

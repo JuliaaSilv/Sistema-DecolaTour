@@ -20,8 +20,7 @@ export default function RevenueChart() {
 				
 				const formattedData = response.map(item => ({
 					month: item.mes,
-					revenue: item.valor || 0,
-					target: (item.valor || 0) * 1.1
+					revenue: item.valor || 0
 				}));
 				
 				setData(formattedData);
@@ -114,7 +113,8 @@ export default function RevenueChart() {
 					<ResponsiveContainer width="100%" height="100%">
 						<BarChart
 							data={data}
-							margin={{ top: 20, right: 10, left: 10, bottom: 40 }}
+							margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+							barCategoryGap="30%"
 						>
 							<CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
 							<XAxis 
@@ -123,39 +123,44 @@ export default function RevenueChart() {
 								fontSize={12}
 								angle={-45}
 								textAnchor="end"
-								height={60}
+								height={70}
 								interval={0}
+								tick={{ fontSize: 12, fill: '#6b7280' }}
 							/>
 							<YAxis
 								stroke="#6b7280"
-								fontSize={10}
-								tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+								fontSize={11}
+								tick={{ fontSize: 11, fill: '#6b7280' }}
+								tickFormatter={(value) => {
+									if (value >= 1000) {
+										return `${(value / 1000).toFixed(0)}K`;
+									}
+									return value.toString();
+								}}
+								width={60}
 							/>
 							<Tooltip
 								formatter={(value, name) => [
 									`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-									name === "revenue" ? "Receita" : "Meta",
+									"Receita Total"
 								]}
-								labelStyle={{ color: "#374151" }}
+								labelFormatter={(label) => `Mês: ${label}`}
+								labelStyle={{ color: "#374151", fontWeight: "bold" }}
 								contentStyle={{
 									backgroundColor: "white",
 									border: "1px solid #e5e7eb",
 									borderRadius: "8px",
 									boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-									fontSize: "12px"
+									fontSize: "14px",
+									padding: "12px"
 								}}
-							/>
-							<Bar
-								dataKey="target"
-								fill="#e5e7eb"
-								radius={[4, 4, 0, 0]}
-								name="Meta"
 							/>
 							<Bar
 								dataKey="revenue"
 								fill="#FF6B35"
 								radius={[4, 4, 0, 0]}
 								name="Receita"
+								maxBarSize={80}
 							/>
 						</BarChart>
 					</ResponsiveContainer>

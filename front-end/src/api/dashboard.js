@@ -151,6 +151,15 @@ export const fetchMetricasComValoresReais = async () => {
     // Buscar métricas básicas do backend
     const metricasBasicas = await fetchMetricasGerais();
     
+    // Para calcular a receita total, vamos usar a soma dos últimos 6 meses
+    // que são exibidos no gráfico de receita mensal
+    const dadosFaturamentoMensal = await fetchFaturamentoMensalComValoresReais();
+    
+    // Calcular receita total como soma de todos os meses do gráfico
+    const receitaTotalDoGrafico = dadosFaturamentoMensal.reduce((total, mes) => {
+      return total + (mes.valor || 0);
+    }, 0);
+    
     // Reservas mock para adicionar às métricas (APENAS CONFIRMADAS PARA RECEITA)
     const mockReservations = [
       {
@@ -235,27 +244,14 @@ export const fetchMetricasComValoresReais = async () => {
       }
     ];
     
-    // Buscar todas as reservas para calcular faturamento real
-    const reservas = await fetchReservas();
-    
-    // Combinar reservas da API com reservas mock
-    const todasReservas = [...reservas, ...mockReservations];
-    
-    // Calcular faturamento total real (APENAS RESERVAS CONFIRMADAS)
-    let faturamentoReal = 0;
-    for (const reserva of todasReservas) {
-      // APENAS reservas confirmadas OU com pagamento pago contribuem para a receita
-      // Alcides e Anna Júlia têm pagamento "pago", logo são confirmadas
-      if (reserva.status === 'confirmada' || reserva.statusPagamento === 'pago' || reserva.pagamento === 'pago') {
-        const valorReal = await calcularValorRealReserva(reserva);
-        faturamentoReal += valorReal;
-      }
-    }
-    
-    // Calcular faturamento mensal (últimos 30 dias, APENAS CONFIRMADAS)
+    // Calcular faturamento mensal (últimos 30 dias) para a métrica separada
     let faturamentoMensal = 0;
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() - 30);
+    
+    // Buscar todas as reservas para calcular faturamento mensal
+    const reservas = await fetchReservas();
+    const todasReservas = [...reservas, ...mockReservations];
     
     for (const reserva of todasReservas) {
       const dataReserva = new Date(reserva.dataReserva);
@@ -268,8 +264,8 @@ export const fetchMetricasComValoresReais = async () => {
     return {
       ...metricasBasicas,
       totalReservas: (metricasBasicas.totalReservas || 0) + mockReservations.length, // Adicionar reservas mock
-      faturamento: faturamentoReal,
-      faturamentoMensal: faturamentoMensal
+      faturamento: receitaTotalDoGrafico, // ✅ RECEITA TOTAL = SOMA DOS 6 MESES DO GRÁFICO
+      faturamentoMensal: faturamentoMensal // Faturamento dos últimos 30 dias
     };
     
   } catch (error) {
@@ -288,36 +284,156 @@ export const fetchFaturamentoMensalComValoresReais = async () => {
     // Buscar dados básicos do backend para manter a estrutura por mês
     const faturamentoBasico = await fetchFaturamentoMensal();
     
-    // Reservas mock confirmadas para adicionar aos gráficos
+    // Reservas mock confirmadas para adicionar aos gráficos (incluindo meses anteriores)
     const mockReservationsConfirmadas = [
+      // Agosto 2025 (atual)
       {
         id: 1008,
-        dataReserva: '2025-02-05',
+        dataReserva: '2025-08-05',
         valor: 3200.00,
+        valorTotal: 3200.00,
+        pessoas: 2,
         status: 'confirmada'
       },
       {
         id: 1007,
-        dataReserva: '2025-02-03',
-        valor: 9750.00,
+        dataReserva: '2025-08-03',
+        valor: 4875.00,
+        valorTotal: 9750.00,
+        pessoas: 2,
         status: 'confirmada'
       },
       {
         id: 1006,
-        dataReserva: '2025-02-01',
+        dataReserva: '2025-08-01',
         valor: 1890.00,
+        valorTotal: 1890.00,
+        pessoas: 1,
         status: 'confirmada'
       },
+      // Julho 2025
       {
         id: 1005,
-        dataReserva: '2025-01-30',
-        valor: 15800.00,
+        dataReserva: '2025-07-30',
+        valor: 7900.00,
+        valorTotal: 15800.00,
+        pessoas: 2,
         status: 'confirmada'
       },
       {
         id: 1004,
-        dataReserva: '2025-01-25',
-        valor: 4200.00,
+        dataReserva: '2025-07-25',
+        valor: 2100.00,
+        valorTotal: 4200.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 1003,
+        dataReserva: '2025-07-15',
+        valor: 2550.00,
+        valorTotal: 7650.00,
+        pessoas: 3,
+        status: 'confirmada'
+      },
+      {
+        id: 1002,
+        dataReserva: '2025-07-10',
+        valor: 2890.00,
+        valorTotal: 2890.00,
+        pessoas: 1,
+        status: 'confirmada'
+      },
+      // Junho 2025
+      {
+        id: 1001,
+        dataReserva: '2025-06-28',
+        valor: 4133.33,
+        valorTotal: 12400.00,
+        pessoas: 3,
+        status: 'confirmada'
+      },
+      {
+        id: 1000,
+        dataReserva: '2025-06-20',
+        valor: 2835.00,
+        valorTotal: 5670.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 999,
+        dataReserva: '2025-06-12',
+        valor: 2973.33,
+        valorTotal: 8920.00,
+        pessoas: 3,
+        status: 'confirmada'
+      },
+      // Maio 2025
+      {
+        id: 998,
+        dataReserva: '2025-05-25',
+        valor: 3390.00,
+        valorTotal: 6780.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 997,
+        dataReserva: '2025-05-18',
+        valor: 5600.00,
+        valorTotal: 11200.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 996,
+        dataReserva: '2025-05-08',
+        valor: 3450.00,
+        valorTotal: 3450.00,
+        pessoas: 1,
+        status: 'confirmada'
+      },
+      // Abril 2025
+      {
+        id: 995,
+        dataReserva: '2025-04-22',
+        valor: 4900.00,
+        valorTotal: 9800.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 994,
+        dataReserva: '2025-04-15',
+        valor: 2280.00,
+        valorTotal: 4560.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      // Março 2025
+      {
+        id: 993,
+        dataReserva: '2025-03-30',
+        valor: 6850.00,
+        valorTotal: 13700.00,
+        pessoas: 2,
+        status: 'confirmada'
+      },
+      {
+        id: 992,
+        dataReserva: '2025-03-20',
+        valor: 2630.00,
+        valorTotal: 7890.00,
+        pessoas: 3,
+        status: 'confirmada'
+      },
+      {
+        id: 991,
+        dataReserva: '2025-03-10',
+        valor: 2615.00,
+        valorTotal: 5230.00,
+        pessoas: 2,
         status: 'confirmada'
       }
     ];
@@ -342,23 +458,36 @@ export const fetchFaturamentoMensalComValoresReais = async () => {
           faturamentoPorMes[chaveData] = 0;
         }
         
+        // A função calcularValorRealReserva já integra:
+        // 1. valorTotal se disponível
+        // 2. Valor dos pagamentos realizados 
+        // 3. Cálculo: (valor × pessoas) + taxas se > R$ 1.000
         const valorReal = await calcularValorRealReserva(reserva);
         faturamentoPorMes[chaveData] += valorReal;
       }
     }
     
-    // Atualizar os dados básicos com valores reais
-    const faturamentoComValoresReais = faturamentoBasico.map(item => {
-      const chaveData = item.chave || item.mes; // Adaptar para diferentes formatos de resposta do backend
-      const valorReal = faturamentoPorMes[chaveData] || 0;
-      
-      return {
-        ...item,
-        valor: valorReal
-      };
-    });
+    // Garantir que temos dados para os últimos 6 meses
+    const hoje = new Date();
+    const mesesCompletos = [];
+    const nomesMeses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
     
-    return faturamentoComValoresReais;
+    for (let i = 5; i >= 0; i--) {
+      const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      const chaveData = `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+      const nomeMes = nomesMeses[data.getMonth()];
+      
+      mesesCompletos.push({
+        chave: chaveData,
+        mes: nomeMes,
+        valor: faturamentoPorMes[chaveData] || 0
+      });
+    }
+    
+    return mesesCompletos;
     
   } catch (error) {
     console.error("Erro ao calcular faturamento mensal com valores reais:", error);
