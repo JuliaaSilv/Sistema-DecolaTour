@@ -29,8 +29,8 @@ namespace agencia.Service
         {
             _logger.LogInformation($"Processando pagamento PIX para reserva {request.ReservaId}");
             
-            // Simular delay de processamento
-            await Task.Delay(_random.Next(1000, 3000));
+            // Simular delay de processamento reduzido
+            await Task.Delay(500);
 
             // Lógica fake para PIX: aprova se a chave não for "teste@falha.com"
             bool aprovado = request.DadosPix?.ChavePix != "teste@falha.com";
@@ -39,8 +39,8 @@ namespace agencia.Service
             {
                 var comprovante = await GerarComprovanteAsync(pagamento, request);
                 
-                // Simular webhook em 3-5 segundos
-                int delayWebhook = _random.Next(3, 6);
+                // PIX com webhook rápido para testes
+                int delayWebhook = 2;
                 _ = Task.Run(async () => await SimularWebhookAsync(pagamento.Id, delayWebhook));
 
                 return new RespostaPagamentoDTO
@@ -71,8 +71,8 @@ namespace agencia.Service
         {
             _logger.LogInformation($"Processando pagamento cartão para reserva {request.ReservaId}");
             
-            // Simular delay de processamento
-            await Task.Delay(_random.Next(2000, 4000));
+            // Simular delay de processamento reduzido
+            await Task.Delay(500);
 
             var dadosCartao = request.DadosCartao;
             
@@ -102,8 +102,8 @@ namespace agencia.Service
             {
                 var comprovante = await GerarComprovanteAsync(pagamento, request);
                 
-                // Para cartão, webhook mais rápido (1-3 segundos)
-                int delayWebhook = _random.Next(1, 4);
+                // Para cartão, webhook rápido para testes
+                int delayWebhook = 2;
                 _ = Task.Run(async () => await SimularWebhookAsync(pagamento.Id, delayWebhook));
 
                 return new RespostaPagamentoDTO
@@ -136,15 +136,15 @@ namespace agencia.Service
         {
             _logger.LogInformation($"Processando pagamento boleto para reserva {request.ReservaId}");
             
-            // Simular delay de processamento
-            await Task.Delay(_random.Next(500, 1500));
+            // Simular delay de processamento reduzido
+            await Task.Delay(500);
 
             // Lógica fake para boleto: sempre aprova a geração
-            // Mas simula pagamento só em 10-15 segundos (via webhook)
+            // Mas simula pagamento em 2 segundos (via webhook)
             var comprovante = await GerarComprovanteAsync(pagamento, request);
             
-            // Boleto tem delay maior para simular pagamento
-            int delayWebhook = _random.Next(10, 16);
+            // Boleto com delay reduzido para testes
+            int delayWebhook = 2;
             _ = Task.Run(async () => await SimularWebhookAsync(pagamento.Id, delayWebhook));
 
             return new RespostaPagamentoDTO

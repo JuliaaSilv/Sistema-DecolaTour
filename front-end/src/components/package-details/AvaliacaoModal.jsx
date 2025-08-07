@@ -88,7 +88,7 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
           <h2 className="text-2xl font-bold text-gray-800">Avaliar Pacote</h2>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 cursor-pointer"
             disabled={isLoading}
           >
             <X size={20} className="text-gray-600" />
@@ -155,7 +155,7 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
               disabled={isLoading}
             >
               Cancelar
@@ -163,7 +163,7 @@ const AvaliacaoModal = ({ isOpen, onClose, pacoteId, reservaId, numeroReserva, o
             <button
               type="submit"
               disabled={isLoading || nota === 0 || !comentario.trim()}
-              className="flex-1 px-4 py-3 bg-[#F28C38] text-white rounded-xl hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 bg-[#F28C38] text-white rounded-xl hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <>

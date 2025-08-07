@@ -109,6 +109,20 @@ export default function RevenueChart() {
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="p-4 md:p-6">
+				<style>
+					{`
+						.recharts-bar-rectangle:hover {
+							fill: #E55B2B !important;
+							filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+							transform: translateY(-2px);
+							transition: all 0.3s ease;
+							cursor: pointer;
+						}
+						.recharts-bar-rectangle {
+							transition: all 0.3s ease;
+						}
+					`}
+				</style>
 				<div className="h-64 md:h-80 lg:h-96">
 					<ResponsiveContainer width="100%" height="100%">
 						<BarChart
@@ -154,6 +168,7 @@ export default function RevenueChart() {
 									fontSize: "14px",
 									padding: "12px"
 								}}
+								cursor={{ fill: 'rgba(255, 107, 53, 0.1)' }}
 							/>
 							<Bar
 								dataKey="revenue"

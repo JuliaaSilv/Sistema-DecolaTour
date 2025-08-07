@@ -21,9 +21,13 @@ import {
   Camera,
   Download,
   Share2,
+  Star,
 } from "lucide-react";
 import { fetchMinhaReservaPorId, fetchViajantesReserva, fetchPacoteDetalhes, fetchPagamentosReserva } from "../api/reservas";
 import { estaLogado } from "../api/auth";
+import AvaliacaoModal from "../components/package-details/AvaliacaoModal";
+import useToast from "../hooks/useToast";
+import ToastContainer from "../components/common/ToastContainer";
 
 const ReservaDetalhes = () => {
   const { id } = useParams();
@@ -36,12 +40,16 @@ const ReservaDetalhes = () => {
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(!reserva);
   const [error, setError] = useState(null);
+  const [isModalAvaliacaoOpen, setIsModalAvaliacaoOpen] = useState(false);
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
   useEffect(() => {
     if (!estaLogado()) {
       navigate('/login');
       return;
     }
+
+
 
     if (!reserva && id) {
       carregarDadosCompletos();
@@ -116,28 +124,58 @@ const ReservaDetalhes = () => {
     }
   };
 
-  // Função para calcular data de volta (exemplo: 7 dias após data de ida)
   const calcularDataVolta = (dataIda, duracaoDias = 7) => {
     if (!dataIda) return null;
     
-    const dataIdaObj = new Date(dataIda);
-    const dataVolta = new Date(dataIdaObj);
-    dataVolta.setDate(dataIdaObj.getDate() + duracaoDias);
-    
-    return dataVolta;
+    try {
+      
+      // Se a data já está formatada como dd/mm/yyyy, trabalhar com ela diretamente
+      if (typeof dataIda === 'string' && dataIda.includes('/')) {
+        const [dia, mes, ano] = dataIda.split('/').map(Number);
+        
+        // Criar data com os valores extraídos
+        const dataObj = new Date(ano, mes - 1, dia); // mes - 1 porque Date usa 0-11 para meses
+        
+        // Somar os dias
+        dataObj.setDate(dataObj.getDate() + parseInt(duracaoDias));
+        
+        // Retornar no formato dd/mm/yyyy
+        return dataObj.toLocaleDateString('pt-BR');
+      }
+      
+      // Fallback para outros formatos
+      const dataIdaObj = new Date(dataIda);
+      
+      if (isNaN(dataIdaObj.getTime())) {
+        return null;
+      }
+      
+      const dataVolta = new Date(dataIdaObj);
+      dataVolta.setDate(dataIdaObj.getDate() + parseInt(duracaoDias));
+      
+      return dataVolta.toLocaleDateString('pt-BR');
+    } catch (error) {
+      return null;
+    }
   };
 
   const formatarData = (data) => {
-    if (!data) return 'Não informado';
+    if (!data) return "Não informado";
+    
+    // Usar a mesma lógica do ReservaCard para consistência
+    if (data.includes && data.includes("/")) return data;
     
     try {
-      return new Date(data).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit', 
-        year: 'numeric'
-      });
+      const date = new Date(data);
+      
+      // Verificar se a data é válida
+      if (isNaN(date.getTime())) {
+        return 'Data inválida';
+      }
+      
+      return date.toLocaleDateString("pt-BR");
     } catch (error) {
-      return 'Data inválida';
+      return data; // Retorna a data original se não conseguir formatar
     }
   };
 
@@ -203,6 +241,32 @@ const ReservaDetalhes = () => {
     }
   };
 
+  const handleAbrirModalAvaliacao = () => {
+    setIsModalAvaliacaoOpen(true);
+  };
+
+  const handleAvaliacaoSuccess = () => {
+    showSuccess('Avaliação enviada com sucesso!');
+    setIsModalAvaliacaoOpen(false);
+  };
+
+  const podeAvaliar = () => {
+    const statusConfirmado = reserva?.status?.toLowerCase() === 'confirmada';
+    
+    // Verificar diferentes possibilidades para o ID do pacote
+    const pacoteId = reserva?.pacoteId || reserva?.PacoteId || reserva?.idPacote || reserva?.packageId;
+    const temPacoteId = !!pacoteId;
+    
+    // SOLUÇÃO: Se não temos pacoteId mas a reserva está confirmada, 
+    // vamos permitir avaliar usando o ID da própria reserva como referência
+    if (statusConfirmado && !temPacoteId) {
+      return true;
+    }
+    
+    // Verifica se a reserva está confirmada e se tem algum identificador de pacote
+    return statusConfirmado && temPacoteId;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
@@ -257,7 +321,7 @@ const ReservaDetalhes = () => {
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={handleVoltar}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Voltar</span>
@@ -285,7 +349,7 @@ const ReservaDetalhes = () => {
                 {pacoteDetalhes?.titulo || reserva.tituloPacote || 'Pacote de Viagem'}
               </p>
               <p className="text-sm text-gray-500 mt-1">
-                {pacoteDetalhes?.destino || 'Destino não informado'}
+                {pacoteDetalhes?.destino || reserva.destino || 'Destino não informado'}
               </p>
             </div>
             
@@ -455,7 +519,22 @@ const ReservaDetalhes = () => {
                               <span className="text-sm font-medium text-gray-700">Data de Volta</span>
                             </div>
                             <span className="text-sm text-gray-600">
-                              {formatarData(calcularDataVolta(reserva.dataViagem, pacoteDetalhes?.duracaoDias || 7))}
+                              {(() => {
+                                const duracaoPacote = pacoteDetalhes?.duracaoDias || reserva.duracaoDias || 7;
+                                const dataVolta = calcularDataVolta(reserva.dataViagem, duracaoPacote);
+                                return dataVolta || 'Não calculada';
+                              })()}
+                            </span>
+                          </div>
+                          
+                          {/* Duração da viagem */}
+                          <div className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200">
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-3 h-3 text-blue-600" />
+                              <span className="text-sm font-medium text-blue-700">Duração</span>
+                            </div>
+                            <span className="text-sm text-blue-600 font-medium">
+                              {pacoteDetalhes?.duracaoDias || reserva.duracaoDias || 7} dias
                             </span>
                           </div>
                         </div>
@@ -511,7 +590,7 @@ const ReservaDetalhes = () => {
           </div>
 
           {/* Coluna Direita */}
-          <div className="space-y-6">
+          <div className="flex flex-col space-y-6">
 
             {/* Resumo Financeiro */}
             <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg">
@@ -597,9 +676,52 @@ const ReservaDetalhes = () => {
                 </div>
               </div>
             </div>
+
+            {/* Deixar Avaliação */}
+            {podeAvaliar() && (
+              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-2xl p-6 shadow-lg flex-1 flex items-center justify-center">
+                <div className="text-center w-full">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="p-3 bg-orange-100 rounded-full">
+                      <Star className="w-6 h-6 text-orange-600" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    Como foi sua experiência?
+                  </h3>
+                  
+                  <p className="text-gray-600 mb-4 text-sm">
+                    Compartilhe sua experiência com outros viajantes e nos ajude a melhorar nossos serviços!
+                  </p>
+                  
+                  <button
+                    onClick={handleAbrirModalAvaliacao}
+                    className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Star className="w-5 h-5" />
+                    Deixar Avaliação
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
+
+      {/* Modal de Avaliação */}
+      <AvaliacaoModal
+        isOpen={isModalAvaliacaoOpen}
+        onClose={() => setIsModalAvaliacaoOpen(false)}
+        pacoteId={reserva?.pacoteId || reserva?.PacoteId || reserva?.idPacote || reserva?.packageId || reserva?.id} // Usar ID da reserva como fallback
+        reservaId={reserva?.id}
+        numeroReserva={reserva?.id}
+        onSuccess={handleAvaliacaoSuccess}
+      />
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

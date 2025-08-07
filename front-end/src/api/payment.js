@@ -258,7 +258,7 @@ export async function buscarReservaPorId(id) {
 /**
  * Monitora o status de um pagamento
  */
-export async function monitorarStatusPagamento(pagamentoId, callback, maxTentativas = 30) {
+export async function monitorarStatusPagamento(pagamentoId, callback, maxTentativas = 10) {
   let tentativas = 0;
   
   const verificarStatus = async () => {
@@ -287,13 +287,13 @@ export async function monitorarStatusPagamento(pagamentoId, callback, maxTentati
       }
 
       tentativas++;
-      // Tenta novamente em 2 segundos
-      setTimeout(verificarStatus, 2000);
+      // Tenta novamente em 500ms para ser mais responsivo
+      setTimeout(verificarStatus, 500);
     } catch (error) {
       console.error('Erro ao monitorar status:', error);
       tentativas++;
       if (tentativas < maxTentativas) {
-        setTimeout(verificarStatus, 2000);
+        setTimeout(verificarStatus, 500);
       } else {
         callback({ erro: 'Erro ao monitorar pagamento' });
       }
