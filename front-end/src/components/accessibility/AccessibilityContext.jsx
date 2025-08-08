@@ -13,6 +13,7 @@ export function AccessibilityProvider({ children }) {
     
     // CSS custom property - esta é a chave para funcionar
     document.documentElement.style.setProperty('--accessibility-font-size', `${fontSize}rem`);
+    document.documentElement.style.setProperty('--accessibility-scale', fontSize);
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
@@ -21,6 +22,7 @@ export function AccessibilityProvider({ children }) {
     }
     
     console.log('CSS custom property definida:', `${fontSize}rem`);
+    console.log('CSS scale definida:', fontSize);
   }, [fontSize]);
 
   const value = {

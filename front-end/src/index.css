@@ -5,19 +5,50 @@
   transition: background 0.2s, color 0.2s;
 }
 
-/* Font-size para acessibilidade - forçar aplicação */
+/* Font-size para acessibilidade - aplicação mais inteligente */
 :root {
   --accessibility-font-size: 1rem;
+  --accessibility-scale: 1;
 }
 
-/* Aplicar font-size no root com !important para sobrescrever Tailwind */
+/* Aplicar font-size no root */
 #root {
   font-size: var(--accessibility-font-size) !important;
 }
 
-/* Forçar herança de font-size para todos os elementos filhos do root */
-#root *:not([data-accessibility-panel]):not([data-accessibility-panel] *) {
-  font-size: inherit !important;
+/* Preservar hierarquia de títulos e elementos importantes */
+#root h1:not([data-accessibility-panel] *) {
+  font-size: calc(2.25rem * var(--accessibility-scale)) !important;
+}
+
+#root h2:not([data-accessibility-panel] *) {
+  font-size: calc(1.875rem * var(--accessibility-scale)) !important;
+}
+
+#root h3:not([data-accessibility-panel] *) {
+  font-size: calc(1.5rem * var(--accessibility-scale)) !important;
+}
+
+#root h4:not([data-accessibility-panel] *) {
+  font-size: calc(1.25rem * var(--accessibility-scale)) !important;
+}
+
+#root h5:not([data-accessibility-panel] *) {
+  font-size: calc(1.125rem * var(--accessibility-scale)) !important;
+}
+
+#root h6:not([data-accessibility-panel] *) {
+  font-size: calc(1rem * var(--accessibility-scale)) !important;
+}
+
+/* Elementos de texto comum herdam o font-size base */
+#root p:not([data-accessibility-panel] *),
+#root span:not([data-accessibility-panel] *),
+#root div:not([data-accessibility-panel] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+#root li:not([data-accessibility-panel] *),
+#root td:not([data-accessibility-panel] *),
+#root th:not([data-accessibility-panel] *) {
+  font-size: inherit;
 }
 
 /* Resetar font-size apenas para elementos de acessibilidade */
