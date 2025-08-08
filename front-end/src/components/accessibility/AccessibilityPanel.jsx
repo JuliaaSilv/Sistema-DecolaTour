@@ -48,6 +48,7 @@ export default function AccessibilityPanel({ onClose }) {
         aria-modal="true"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
+        data-accessibility-panel="true"
       >
       <div className="flex justify-between items-center mb-2">
         <span className="font-bold text-gray-800 dark:text-gray-100">Acessibilidade</span>
@@ -62,17 +63,32 @@ export default function AccessibilityPanel({ onClose }) {
         <div className="flex gap-2">
           <button
             className="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900"
-            onClick={() => setFontSize(f => Math.max(0.8, f - 0.1))}
+            onClick={() => {
+              setFontSize(f => {
+                const newSize = Math.max(0.8, f - 0.1);
+                console.log('Diminuindo fonte:', f, '->', newSize);
+                return newSize;
+              });
+            }}
             aria-label="Diminuir fonte"
           >A-</button>
           <button
             className="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900"
-            onClick={() => setFontSize(1)}
+            onClick={() => {
+              console.log('Resetando fonte para:', 1);
+              setFontSize(1);
+            }}
             aria-label="Fonte normal"
           >A</button>
           <button
             className="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900"
-            onClick={() => setFontSize(f => Math.min(1.5, f + 0.1))}
+            onClick={() => {
+              setFontSize(f => {
+                const newSize = Math.min(1.5, f + 0.1);
+                console.log('Aumentando fonte:', f, '->', newSize);
+                return newSize;
+              });
+            }}
             aria-label="Aumentar fonte"
           >A+</button>
         </div>

@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { fetchEnderecos, createEndereco, updateEndereco, deleteEndereco } from '../api/enderecos';
 import useToast from '../hooks/useToast';
+import useConfirm from '../hooks/useConfirm';
 import ToastContainer from './ui/ToastContainer';
+import ConfirmModal from './ui/ConfirmModal';
 
 export default function EnderecoManager() {
-  const { showSuccess, showError } = useToast();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
+  const { isOpen: confirmOpen, config: confirmConfig, confirm, handleConfirm, handleCancel } = useConfirm();
   const [enderecos, setEnderecos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -85,7 +88,15 @@ export default function EnderecoManager() {
   };
 
   const handleDelete = async (enderecoId) => {
-    if (window.confirm('Tem certeza que deseja remover este endereço?')) {
+    const confirmed = await confirm({
+      title: "Remover endereço",
+      message: "Tem certeza que deseja remover este endereço? Esta ação não pode ser desfeita.",
+      confirmText: "Remover",
+      cancelText: "Cancelar",
+      variant: "danger"
+    });
+
+    if (confirmed) {
       try {
         await deleteEndereco(enderecoId);
         loadEnderecos();
@@ -355,7 +366,16 @@ export default function EnderecoManager() {
           </div>
         </div>
       )}
-      <ToastContainer toasts={[]} onRemoveToast={() => {}} />
+
+      {/* Modal de Confirmação */}
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        {...confirmConfig}
+      />
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

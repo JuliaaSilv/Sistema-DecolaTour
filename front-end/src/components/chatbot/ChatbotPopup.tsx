@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const dicas = [
   "Dica do dia: Sempre leve protetor solar em viagens para praias.",
@@ -10,7 +11,7 @@ const dicas = [
 
 const ChatbotPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { sender: "bot", text: "Olá! Eu sou o Theo. Como posso te ajudar hoje?" },
     {
       sender: "botSuggestions",
@@ -33,6 +34,14 @@ const ChatbotPopup = () => {
     valorTotal?: number;
     titulo: string;
     Categorias?: string[];
+  };
+
+  type Message = {
+    sender: string;
+    text?: string;
+    suggestions?: string[];
+    packages?: Pacote[];
+    packagesCategory?: string;
   };
 
 
@@ -82,16 +91,25 @@ const handleSend = async (userText: string) => {
         const pacotes: Pacote[] = response.data || [];
 
         if (pacotes.length > 0) {
-          pacotesTexto =
-            `🎯 Encontrei ${pacotes.length > 3 ? '3' : pacotes.length} pacote(s) para "${categoriaSelecionada}":\n\n` +
-            pacotes
-              .slice(0, 3)
-              .map(
-                (p, index) =>
-                  `${index + 1}. 📦 ${p.titulo}\n   📍 ${p.destino}\n   💰 R$ ${p.valorTotal?.toFixed(2) || "Consulte"}\n`
-              )
-              .join("\n") + 
-            `\n💡 Gostaria de saber mais sobre algum desses pacotes?`;
+          // Adicionar mensagem com pacotes como objetos para renderização especial
+          setMessages((prev) => [
+            ...prev.filter((msg) => msg.sender !== "botSuggestions"),
+            { 
+              sender: "bot", 
+              text: `🎯 Encontrei ${pacotes.length > 3 ? '3' : pacotes.length} pacote(s) para "${categoriaSelecionada}":` 
+            },
+            { 
+              sender: "botPackages", 
+              packages: pacotes.slice(0, 3),
+              packagesCategory: categoriaSelecionada
+            },
+            { 
+              sender: "bot", 
+              text: "Gostaria de saber mais sobre algum desses pacotes?" 
+            }
+          ]);
+          setIsTyping(false);
+          return; // Sair da função aqui para não continuar com a API do Gemini
         } else {
           pacotesTexto = `🔍 Você mencionou "${categoriaSelecionada}", mas não encontrei pacotes disponíveis nesta categoria no momento.\n\n💡 Que tal tentar outras categorias como: praia, aventura, cultura ou internacional?`;
         }
@@ -232,6 +250,62 @@ ${pacotesTexto ? "\n\n📋 PACOTES ENCONTRADOS:\n" + pacotesTexto : ""}\n\nHist�
                     ))}
                   </div>
                 </div>
+) : msg.sender === "botPackages" ? (
+  <div key={idx} className="space-y-4 animate-fadeIn">
+    {msg.packages?.map((pacote, i) => (
+      <div
+        key={pacote.id}
+        className="bg-white border border-gray-100 rounded-2xl p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      >
+        <div className="flex items-start justify-between gap-4">
+          {/* Conteúdo principal */}
+          <div className="flex-1">
+            {/* Número + título */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-md">
+                {i + 1}
+              </div>
+              <Link
+                to={`/packages/${pacote.id}`}
+                className="text-lg font-bold text-gray-900 hover:text-blue-700 transition-colors duration-200"
+                onClick={() => setIsOpen(false)}
+              >
+                {pacote.titulo}
+              </Link>
+            </div>
+
+            {/* Informações */}
+            <div className="space-y-2 ml-12">
+              <div className="flex items-center gap-2 text-gray-600">
+                <span className="text-xl">📍</span>
+                <span className="text-sm">{pacote.destino}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">💰</span>
+                <span className="text-green-600 font-semibold text-lg">
+                  R$ {pacote.valorTotal?.toFixed(2) || "Consulte"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Imagem */}
+          {pacote.imagemUrl && (
+            <div className="flex-shrink-0">
+              <img
+                src={pacote.imagemUrl}
+                alt={pacote.titulo}
+                className="w-20 h-20 rounded-xl object-cover shadow-sm border border-gray-100"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
               ) : (
                 <div
                   key={idx}

@@ -4,6 +4,28 @@
   color: #222 !important;
   transition: background 0.2s, color 0.2s;
 }
+
+/* Font-size para acessibilidade - forçar aplicação */
+:root {
+  --accessibility-font-size: 1rem;
+}
+
+/* Aplicar font-size no root com !important para sobrescrever Tailwind */
+#root {
+  font-size: var(--accessibility-font-size) !important;
+}
+
+/* Forçar herança de font-size para todos os elementos filhos do root */
+#root *:not([data-accessibility-panel]):not([data-accessibility-panel] *) {
+  font-size: inherit !important;
+}
+
+/* Resetar font-size apenas para elementos de acessibilidade */
+[data-accessibility-panel="true"],
+[data-accessibility-panel="true"] * {
+  font-size: 1rem !important;
+}
+
 @import "tailwindcss";
 
 /* Configuração da fonte Standard CT EXT Medium (usando Inter como substituta) */
@@ -21,43 +43,99 @@ body {
 }
 
 /* High contrast mode for accessibility */
-.contrast-high, .contrast-high * {
-  background-color: #000 !important;
-  color: #fff !important;
-  border-color: #fff !important;
-  box-shadow: none !important;
+.contrast-high {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+.contrast-high *:not([style*="display: none"]):not([style*="opacity: 0"]):not(.sr-only):not([aria-hidden="true"]):not([data-preserve-styles]) {
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: #e0e0e0 !important;
+  /* NÃO sobrescrever font-size */
 }
 
 .contrast-high a, .contrast-high button, .contrast-high input, .contrast-high select, .contrast-high textarea {
-  background-color: #111 !important;
-  color: #fff !important;
-  border-color: #fff !important;
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border-color: #e0e0e0 !important;
+  border-width: 1px !important;
+}
+
+.contrast-high img, .contrast-high svg, .contrast-high video {
+  filter: contrast(2) brightness(0.8) !important;
+}
+
+/* Preserve visibility for essential elements */
+.contrast-high [style*="visibility: hidden"],
+.contrast-high [style*="display: none"],
+.contrast-high .hidden,
+.contrast-high [aria-hidden="true"] {
+  display: none !important;
+  visibility: hidden !important;
 }
 
 /* High contrast yellow/black mode for accessibility */
-.contrast-yellow, .contrast-yellow * {
-  background-color: #000 !important;
-  color: #ffe600 !important;
-  border-color: #ffe600 !important;
-  box-shadow: none !important;
+.contrast-yellow {
+  background-color: #1a1a1a !important;
+  color: #ffeb3b !important;
+}
+
+.contrast-yellow *:not([style*="display: none"]):not([style*="opacity: 0"]):not(.sr-only):not([aria-hidden="true"]):not([data-preserve-styles]) {
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: #ffeb3b !important;
+  /* NÃO sobrescrever font-size */
 }
 
 .contrast-yellow a, .contrast-yellow button, .contrast-yellow input, .contrast-yellow select, .contrast-yellow textarea {
-  background-color: #222 !important;
-  color: #ffe600 !important;
-  border-color: #ffe600 !important;
+  background-color: #2d2d2d !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+  border-width: 1px !important;
+}
+
+.contrast-yellow img, .contrast-yellow svg, .contrast-yellow video {
+  filter: contrast(2) sepia(1) hue-rotate(35deg) saturate(2) !important;
+}
+
+/* Preserve visibility for essential elements */
+.contrast-yellow [style*="visibility: hidden"],
+.contrast-yellow [style*="display: none"],
+.contrast-yellow .hidden,
+.contrast-yellow [aria-hidden="true"] {
+  display: none !important;
+  visibility: hidden !important;
 }
 
 /* High contrast white/yellow mode for accessibility */
-.contrast-yellowwhite, .contrast-yellowwhite * {
-  background-color: #fff !important;
-  color: #ffe600 !important;
-  border-color: #ffe600 !important;
-  box-shadow: none !important;
+.contrast-yellowwhite {
+  background-color: #f8f9fa !important;
+  color: #d68910 !important;
+}
+
+.contrast-yellowwhite *:not([style*="display: none"]):not([style*="opacity: 0"]):not(.sr-only):not([aria-hidden="true"]):not([data-preserve-styles]) {
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: #d68910 !important;
 }
 
 .contrast-yellowwhite a, .contrast-yellowwhite button, .contrast-yellowwhite input, .contrast-yellowwhite select, .contrast-yellowwhite textarea {
-  background-color: #ffe600 !important;
-  color: #222 !important;
-  border-color: #ffe600 !important;
+  background-color: #d68910 !important;
+  color: #ffffff !important;
+  border-color: #d68910 !important;
+  border-width: 1px !important;
+}
+
+.contrast-yellowwhite img, .contrast-yellowwhite svg, .contrast-yellowwhite video {
+  filter: contrast(2) sepia(1) hue-rotate(35deg) saturate(2) !important;
+}
+
+/* Preserve visibility for essential elements */
+.contrast-yellowwhite [style*="visibility: hidden"],
+.contrast-yellowwhite [style*="display: none"],
+.contrast-yellowwhite .hidden,
+.contrast-yellowwhite [aria-hidden="true"] {
+  display: none !important;
+  visibility: hidden !important;
 }

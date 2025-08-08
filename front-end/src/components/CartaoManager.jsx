@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { FaCreditCard, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { fetchCartoes, createCartao, updateCartao, deleteCartao } from '../api/cartoes';
 import useToast from '../hooks/useToast';
+import useConfirm from '../hooks/useConfirm';
 import ToastContainer from './ui/ToastContainer';
+import ConfirmModal from './ui/ConfirmModal';
 
 export default function CartaoManager() {
-  const { showSuccess, showError } = useToast();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
+  const { isOpen: confirmOpen, config: confirmConfig, confirm, handleConfirm, handleCancel } = useConfirm();
   const [cartoes, setCartoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -76,11 +79,19 @@ export default function CartaoManager() {
   };
 
   const handleDelete = async (cartaoId) => {
-    if (window.confirm('Tem certeza que deseja remover este cartão?')) {
+    const confirmed = await confirm({
+      title: "Remover cartão",
+      message: "Tem certeza que deseja remover este cartão? Esta ação não pode ser desfeita.",
+      confirmText: "Remover",
+      cancelText: "Cancelar",
+      variant: "danger"
+    });
+
+    if (confirmed) {
       try {
         await deleteCartao(cartaoId);
         loadCartoes();
-        showSuccess('Cartão removido com sucesso!');
+        showSuccess('Cartão removido com sucesso! 🗑️');
       } catch (error) {
         console.error('Erro ao remover cartão:', error);
         showError('Erro ao remover cartão: ' + error.message);
@@ -304,7 +315,16 @@ export default function CartaoManager() {
           </div>
         </div>
       )}
-      <ToastContainer toasts={[]} onRemoveToast={() => {}} />
+
+      {/* Modal de Confirmação */}
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        {...confirmConfig}
+      />
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

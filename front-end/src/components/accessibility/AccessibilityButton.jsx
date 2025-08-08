@@ -16,6 +16,7 @@ export default function AccessibilityButton() {
         onClick={() => setOpen((v) => !v)}
         onKeyDown={e => (e.key === "Enter" || e.key === " ") && setOpen((v) => !v)}
         style={{ position: 'fixed', bottom: '1rem', left: '1rem' }}
+        data-accessibility-panel="true"
       >
         <MdAccessibilityNew className="w-6 h-6 text-orange-600 dark:text-orange-400" />
       </button>

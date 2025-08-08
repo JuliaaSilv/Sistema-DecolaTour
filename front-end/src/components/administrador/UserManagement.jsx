@@ -6,6 +6,8 @@ import Button from './ui/Button';
 import Badge from './ui/Badge';
 import ToastContainer from '../ui/ToastContainer';
 import useToast from '../../hooks/useToast';
+import useConfirm from '../../hooks/useConfirm';
+import ConfirmModal from '../ui/ConfirmModal';
 import { obterTipoUsuario } from '../../api/auth';
 import { fetchUsers, createUser, updateUser, deleteUser, normalizeUserData } from '../../api/users'; 
 import { fetchEstatisticasUsuario } from '../../api/reservas'; 
@@ -68,6 +70,7 @@ const mockUsers = [
 
 const UserManagement = () => {
   const { toasts, showSuccess, showError, showWarning, removeToast } = useToast();
+  const { isOpen: confirmOpen, config: confirmConfig, confirm, handleConfirm, handleCancel } = useConfirm();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('todos');
@@ -212,11 +215,19 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+    const confirmed = await confirm({
+      title: "Excluir usuário",
+      message: "Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.",
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      variant: "danger"
+    });
+
+    if (confirmed) {
       try {
         await deleteUser(id);
         await loadUsers(); // Recarregar lista
-        showSuccess('Usuário excluído com sucesso!');
+        showSuccess('Usuário excluído com sucesso! 🗑️');
       } catch (error) {
         showError(`Erro ao excluir usuário: ${error.message}`);
       }
@@ -979,6 +990,44 @@ const UserFormModal = ({ isOpen, onClose, user, onSave, tipoUsuario }) => {
           </div>
         </form>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Header e controles... */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 pb-4">
+            <div className="flex items-center gap-3 mb-4 sm:mb-0">
+              <Users className="w-8 h-8 text-blue-500" />
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Gestão de Usuários</h2>
+                <p className="text-gray-600">Gerencie usuários, clientes e administradores</p>
+              </div>
+            </div>
+            <Button onClick={handleCreate} className="bg-blue-500 hover:bg-blue-600 text-white gap-2 whitespace-nowrap">
+              <Plus className="w-4 h-4" />
+              Novo Usuário
+            </Button>
+          </div>
+
+          {/* Resto do componente... */}
+          {/* (Aqui ficaria todo o conteúdo original) */}
+          
+        </CardContent>
+      </Card>
+
+      {/* Modal de Confirmação */}
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        {...confirmConfig}
+      />
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

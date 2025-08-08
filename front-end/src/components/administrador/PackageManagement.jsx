@@ -6,6 +6,8 @@ import Button from './ui/Button';
 import Badge from './ui/Badge';
 import ToastContainer from '../ui/ToastContainer';
 import useToast from '../../hooks/useToast';
+import useConfirm from '../../hooks/useConfirm';
+import ConfirmModal from '../ui/ConfirmModal';
 import PackageFormModal from './PackageFormModal';
 import PackageViewModal from './PackageViewModal';
 import { obterTipoUsuario } from '../../api/auth';
@@ -13,6 +15,7 @@ import { obterTipoUsuario } from '../../api/auth';
 
 const PackageManagement = () => {
   const { toasts, showSuccess, showError, showWarning, removeToast } = useToast();
+  const { isOpen: confirmOpen, config: confirmConfig, confirm, handleConfirm, handleCancel } = useConfirm();
   const [packages, setPackages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
@@ -186,7 +189,15 @@ const PackageManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.')) {
+    const confirmed = await confirm({
+      title: "Excluir pacote",
+      message: "Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita e pode afetar reservas existentes.",
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      variant: "danger"
+    });
+
+    if (confirmed) {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -569,6 +580,14 @@ const PackageManagement = () => {
           setViewingPackage(null);
         }}
         packageData={viewingPackage}
+      />
+
+      {/* Modal de Confirmação */}
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        {...confirmConfig}
       />
     </div>
     </>
