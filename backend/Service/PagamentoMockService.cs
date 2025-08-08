@@ -198,41 +198,38 @@ namespace agencia.Service
 
         public async Task SimularWebhookAsync(int pagamentoId, int delaySegundos = 5)
         {
-            try
-            {
-                _logger.LogInformation($"Webhook simulado iniciado para pagamento {pagamentoId}. Delay: {delaySegundos}s");
-                
-                await Task.Delay(delaySegundos * 1000);
+            _logger.LogInformation($"Webhook simulado iniciado para pagamento {pagamentoId}. Delay: {delaySegundos}s");
+            await Task.Delay(delaySegundos * 1000);
 
-                // 90% de chance de aprovar o pagamento
-                bool aprovado = _random.NextDouble() > 0.1;
-                
-                var novoStatus = aprovado ? StatusPagamento.Pago : StatusPagamento.Rejeitado;
-                
-                // Buscar e atualizar o pagamento diretamente via repositório
-                var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(pagamentoId);
-                if (pagamento != null)
-                {
-                    pagamento.StatusPagamento = novoStatus;
-                    await _pagamentoRepository.AtualizaPagamentoAsync(pagamento);
-                    
-                    _logger.LogInformation($"Webhook executado para pagamento {pagamentoId}. Novo status: {novoStatus}");
-                    
-                    // Enviar email de notificação se disponível
-                    await _emailService.EnviarStatusPagamentoAsync(
-                        "cliente@exemplo.com", // Aqui você pode pegar o email do cliente da reserva
-                        novoStatus.ToString(),
-                        pagamento
-                    );
-                }
-                else
-                {
-                    _logger.LogWarning($"Pagamento {pagamentoId} não encontrado para webhook");
-                }
-            }
-            catch (Exception ex)
+            // 90% de chance de aprovar o pagamento
+            bool aprovado = _random.NextDouble() > 0.1;
+            var novoStatus = aprovado ? StatusPagamento.Pago : StatusPagamento.Rejeitado;
+
+            // Buscar e atualizar o pagamento diretamente via repositório
+            var pagamento = await _pagamentoRepository.BuscarPagamentoPorIdAsync(pagamentoId);
+            if (pagamento != null)
             {
-                _logger.LogError(ex, $"Erro ao executar webhook simulado para pagamento {pagamentoId}");
+                pagamento.StatusPagamento = novoStatus;
+                await _pagamentoRepository.AtualizaPagamentoAsync(pagamento);
+                _logger.LogInformation($"Webhook executado para pagamento {pagamentoId}. Novo status: {novoStatus}");
+                
+                // COMENTADO: Envio de email removido para garantir redirecionamento
+                // try
+                // {
+                //     await _emailService.EnviarStatusPagamentoAsync(
+                //         "cliente@exemplo.com", // Aqui você pode pegar o email do cliente da reserva
+                //         novoStatus.ToString(),
+                //         pagamento
+                //     );
+                // }
+                // catch
+                // {
+                //     // Erro ao enviar email não impede o fluxo nem o redirecionamento
+                // }
+            }
+            else
+            {
+                _logger.LogWarning($"Pagamento {pagamentoId} não encontrado para webhook");
             }
         }
 

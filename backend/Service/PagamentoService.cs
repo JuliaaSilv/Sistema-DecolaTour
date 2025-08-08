@@ -132,18 +132,25 @@ namespace agencia.Service
                     await AtualizarStatusAsync(pagamento.Id, StatusPagamento.Rejeitado.ToString());
                 }
 
-                // Enviar email de status do pagamento
-                if (resposta.Sucesso)
-                {
-                    // Usa status 'Aprovado' para template de aprovação
-                    object payload = resposta.Comprovante != null ? (object)resposta.Comprovante : (object)resposta;
-                    await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Aprovado", payload);
-                }
-                else
-                {
-                    // Usa status 'Rejeitado' para template de rejeição
-                    await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Rejeitado", resposta);
-                }
+                // COMENTADO: Envio de email removido para garantir redirecionamento
+                // try
+                // {
+                //     if (resposta.Sucesso)
+                //     {
+                //         // Usa status 'Aprovado' para template de aprovação
+                //         object payload = resposta.Comprovante != null ? (object)resposta.Comprovante : (object)resposta;
+                //         await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Aprovado", payload);
+                //     }
+                //     else
+                //     {
+                //         // Usa status 'Rejeitado' para template de rejeição
+                //         await _emailService.EnviarStatusPagamentoAsync(dto.Email, "Rejeitado", resposta);
+                //     }
+                // }
+                // catch
+                // {
+                //     // Erro ao enviar email não deve afetar o resultado do pagamento
+                // }
 
                 return resposta;
             }

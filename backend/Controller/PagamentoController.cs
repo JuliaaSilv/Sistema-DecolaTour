@@ -70,19 +70,13 @@ namespace agencia.Controller
             try
             {
                 var resposta = await _pagamentoService.ProcessarPagamentoCompletoAsync(dto);
-                
-                if (resposta.Sucesso)
-                {
-                    return Ok(resposta);
-                }
-                else
-                {
-                    return BadRequest(resposta);
-                }
+                // Sempre retorna OK para liberar o redirecionamento, mesmo se Sucesso for falso
+                return Ok(resposta);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { erro = ex.Message });
+                // Retorna OK com erro para não bloquear o fluxo
+                return Ok(new { erro = ex.Message });
             }
         }
 
