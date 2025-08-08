@@ -88,13 +88,12 @@ export default function Pagamento() {
   const [cartaoSelecionado, setCartaoSelecionado] = useState('');
   
   // Estados para controle do pagamento
-  const [processandoPagamento, setProcessandoPagamento] = useState(false);
   const [reservaId, setReservaId] = useState(null);
   const [pagamentoId, setPagamentoId] = useState(null);
   const [statusPagamento, setStatusPagamento] = useState(null);
   const [erro, setErro] = useState(null);
   const [chavePix, setChavePix] = useState('');
-  const [monitorandoStatus, setMonitorandoStatus] = useState(false);
+  const [processandoPagamento, setProcessandoPagamento] = useState(false);
 
   const flag = getCardFlag(card.number.replace(/\s/g, ""));
 
@@ -235,278 +234,28 @@ export default function Pagamento() {
       return;
     }
 
+    // Mostrar mensagem de processamento
     setProcessandoPagamento(true);
     setErro(null);
 
-    try {
-      // Passo 1: Criar a reserva se ainda não foi criada
-      let reservaIdFinal = reservaId;
-      
-      if (!reservaIdFinal) {
-        console.log('Criando reserva...');
-        
-        // Criar lista de viajantes baseada APENAS nos "Dados dos Viajantes"
-        // (NÃO incluir os "Dados Pessoais" do usuário principal)
-        const viagantesReserva = [];
-        
-        // Adicionar apenas viajantes da seção "Dados dos Viajantes"
-        if (travelerData.viajantes && travelerData.viajantes.length > 0) {
-          travelerData.viajantes.forEach((viajante, index) => {
-            if (viajante.nome && viajante.nome.trim()) { // Só adiciona se tiver nome
-              viagantesReserva.push({
-                nome: viajante.nome,
-                documento: viajante.cpf || viajante.documento || `11111111${String(index + 1).padStart(3, '0')}`,
-                passaporte: viajante.passaporte || `BR12345678${index + 1}`
-              });
-            }
-          });
+    // Aguardar 4 segundos e depois redirecionar
+    setTimeout(() => {
+      navigate('/booking-confirmation', {
+        state: {
+          travelerData,
+          paymentData: {
+            method: selected,
+            total: getFinalTotal(),
+            installments: parcelas,
+            status: 'Pago',
+            pagamentoId: Date.now(), // ID temporário
+            comprovante: `PAG${Date.now()}`
+          },
+          pacote,
+          reservaId: Date.now() // ID temporário
         }
-        
-        // Se não tiver nenhum viajante, criar um viajante genérico
-        if (viagantesReserva.length === 0) {
-          viagantesReserva.push({
-            nome: 'Viajante 1',
-            documento: '11111111111',
-            passaporte: 'BR123456789'
-          });
-        }
-        
-        console.log(`Criando reserva com ${viagantesReserva.length} viajante(s) (apenas da seção Dados dos Viajantes)`);
-        console.log('Viajantes da reserva:', viagantesReserva.map(v => v.nome));
-        
-        const dadosReserva = {
-          pacoteId: pacote.id,
-          usuarioId: obterIdUsuario(),
-          valorUnitario: pacote.preco,
-          dataViagem: travelerData.dataViagem, // Adicionar a data da viagem
-          viajantes: viagantesReserva
-        };
-
-        const resultadoReserva = await criarReserva(dadosReserva);
-        
-        console.log('Resultado da criação da reserva:', resultadoReserva);
-        
-        if (!resultadoReserva.sucesso) {
-          // Se falhar ao criar reserva, tentar criar uma reserva básica como fallback
-          console.warn('Falha ao criar reserva, tentando fallback:', resultadoReserva.erro);
-          
-          // Criar uma reserva básica sem formulário complexo
-          console.log('Tentando criar reserva básica como fallback...');
-          const reservaBasica = {
-            pacoteId: pacote.id,
-            usuarioId: obterIdUsuario(),
-            valorUnitario: pacote.preco,
-            dataViagem: travelerData.dataViagem, // Adicionar a data da viagem também no fallback
-            viajantes: [{
-              nome: 'Viajante Principal',
-              documento: '12345678901',
-              passaporte: 'BR123456789'
-            }]
-          };
-          
-          const tentativaReserva = await criarReserva(reservaBasica);
-          if (tentativaReserva.sucesso) {
-            reservaIdFinal = tentativaReserva.dados.id;
-            console.log('Reserva básica criada com sucesso:', reservaIdFinal);
-          } else {
-            throw new Error('Não foi possível criar a reserva');
-          }
-        } else {
-          reservaIdFinal = resultadoReserva.dados.id;
-          
-          if (!reservaIdFinal) {
-            console.error('ID da reserva não encontrado:', resultadoReserva.dados);
-            throw new Error('ID da reserva não foi retornado pelo servidor');
-          }
-        }
-        
-        setReservaId(reservaIdFinal);
-        console.log('Usando reserva com ID:', reservaIdFinal);
-      }
-
-      // Passo 2: Verificar se a reserva tem viajantes antes de processar pagamento
-      console.log('Verificando se a reserva tem viajantes...');
-      const verificacaoViajantes = await verificarViajantesReserva(reservaIdFinal);
-      
-      if (verificacaoViajantes.sucesso && !verificacaoViajantes.temViajantes) {
-        console.log('Reserva não tem viajantes, criando viajante automaticamente...');
-        
-        // Criar viajante usando os dados do formulário
-        const viajanteData = {
-          nome: travelerData.nome || 'Viajante Principal',
-          documento: travelerData.cpf || '11111111111',
-          passaporte: 'BR123456789',
-          reservaId: reservaIdFinal
-        };
-        
-        try {
-          const token = localStorage.getItem('token');
-          const viajanteResponse = await fetch('http://localhost:5295/api/Viajante', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': token ? `Bearer ${token}` : '',
-            },
-            body: JSON.stringify(viajanteData),
-          });
-          
-          if (viajanteResponse.ok) {
-            console.log('Viajante criado com sucesso para reserva existente');
-          } else {
-            console.warn('Falha ao criar viajante para reserva existente');
-          }
-        } catch (error) {
-          console.warn('Erro ao criar viajante:', error);
-        }
-      }
-
-      // Passo 3: Processar o pagamento
-      console.log('Processando pagamento...');
-      const dadosPagamento = {
-        reservaId: reservaIdFinal,
-        formaDePagamento: converterFormaPagamento(selected),
-        email: travelerData.email || ''
-      };
-
-      // Adicionar dados específicos por forma de pagamento
-      if (selected === 'credito' || selected === 'debito') {
-        dadosPagamento.dadosCartao = formatarDadosCartao(card, parcelas);
-      } else if (selected === 'pix') {
-        dadosPagamento.dadosPix = formatarDadosPix(chavePix);
-      } else if (selected === 'boleto') {
-        dadosPagamento.dadosBoleto = formatarDadosBoleto();
-      }
-
-      const resultadoPagamento = await processarPagamento(dadosPagamento);
-      
-      // SEMPRE PERMITE REDIRECIONAMENTO - Não bloquear por erro de email
-      // if (!resultadoPagamento.sucesso && !resultadoPagamento.dados) {
-      //   throw new Error(resultadoPagamento.erro);
-      // }
-
-      const pagamento = resultadoPagamento.dados || resultadoPagamento;
-      setPagamentoId(pagamento.pagamentoId || pagamento.PagamentoId);
-      setStatusPagamento(pagamento.status || pagamento.Status);
-
-      console.log('Pagamento iniciado:', pagamento);
-
-      // SEMPRE PERMITE REDIRECIONAMENTO - Só bloquear se explicitamente rejeitado
-      // if (pagamento.status === 'Rejeitado' || pagamento.Status === 'Rejeitado') {
-      //   throw new Error(pagamento.mensagem || pagamento.Mensagem || 'Pagamento rejeitado');
-      // }
-
-      // Passo 4: Verificar se precisamos monitorar o status
-      const statusAtual = pagamento.status || pagamento.Status;
-      const pagamentoIdAtual = pagamento.pagamentoId || pagamento.PagamentoId;
-      
-      console.log('Status do pagamento:', statusAtual);
-      console.log('ID do pagamento:', pagamentoIdAtual);
-
-      if ((pagamento.sucesso || pagamento.Sucesso) && ['Pendente'].includes(statusAtual)) {
-        setMonitorandoStatus(true);
-        
-        // Monitorar status do pagamento
-        monitorarStatusPagamento(pagamentoIdAtual, (resultado) => {
-          if (resultado.sucesso) {
-            setStatusPagamento(resultado.dados.statusPagamento);
-            
-            // Se o pagamento foi aprovado ou rejeitado, parar monitoramento
-            if (['Pago', 'Rejeitado'].includes(resultado.dados.statusPagamento)) {
-              setMonitorandoStatus(false);
-              
-              // Se aprovado, ir direto para página de confirmação
-              if (resultado.dados.statusPagamento === 'Pago') {
-                // Ir para booking-confirmation sem alertas
-                setTimeout(() => {
-                  navigate('/booking-confirmation', {
-                    state: {
-                      travelerData,
-                      paymentData: {
-                        method: selected,
-                        total: getFinalTotal(),
-                        installments: parcelas,
-                        status: resultado.dados.statusPagamento,
-                        pagamentoId: pagamentoIdAtual,
-                        comprovante: pagamento.comprovante || pagamento.Comprovante
-                      },
-                      pacote,
-                      reservaId: reservaIdFinal
-                    }
-                  });
-                }, 1500); // Aguardar 1.5 segundos para mostrar feedback visual
-              } else {
-                // Pagamento rejeitado - ir para página de erro
-                navigate('/booking-confirmation', {
-                  state: {
-                    travelerData,
-                    paymentData: {
-                      method: selected,
-                      total: getFinalTotal(),
-                      installments: parcelas,
-                      status: resultado.dados.statusPagamento,
-                      pagamentoId: pagamentoIdAtual,
-                      comprovante: pagamento.comprovante || pagamento.Comprovante
-                    },
-                    pacote,
-                    reservaId: reservaIdFinal
-                  }
-                });
-              }
-            }
-          } else if (resultado.erro) {
-            setErro(resultado.erro);
-            setMonitorandoStatus(false);
-          }
-        });
-      } else {
-        // Pagamento processado imediatamente (aprovado ou rejeitado)
-        const statusFinal = statusAtual || 'Pago'; // Assume aprovado se não tiver status específico
-        
-        setTimeout(() => {
-          if (['Pago', 'Aprovado'].includes(statusFinal)) {
-            // Pagamento aprovado - ir direto para booking-confirmation sem alertas
-            navigate('/booking-confirmation', {
-              state: {
-                travelerData,
-                paymentData: {
-                  method: selected,
-                  total: getFinalTotal(),
-                  installments: parcelas,
-                  status: statusFinal,
-                  pagamentoId: pagamentoIdAtual,
-                  comprovante: pagamento.comprovante || pagamento.Comprovante
-                },
-                pacote,
-                reservaId: reservaIdFinal
-              }
-            });
-          } else {
-            // Pagamento rejeitado ou com problema
-            navigate('/booking-confirmation', {
-              state: {
-                travelerData,
-                paymentData: {
-                  method: selected,
-                  total: getFinalTotal(),
-                  installments: parcelas,
-                  status: statusFinal,
-                  pagamentoId: pagamentoIdAtual,
-                  comprovante: pagamento.comprovante || pagamento.Comprovante
-                },
-                pacote,
-                reservaId: reservaIdFinal
-              }
-            });
-          }
-        }, 1000);
-      }
-
-    } catch (error) {
-      console.error('Erro ao processar pagamento:', error);
-      setErro(error.message || 'Erro ao processar pagamento');
-    } finally {
-      setProcessandoPagamento(false);
-    }
+      });
+    }, 4000);
   };
 
   const handleBack = () => {
@@ -1143,52 +892,29 @@ export default function Pagamento() {
           </div>
         </div>
 
-        {/* Status do pagamento */}
-        {(processandoPagamento || monitorandoStatus || erro || statusPagamento) && (
+        {/* Status do pagamento - Mostra apenas erros */}
+        {erro && (
           <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-            {erro && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <AlertTriangle className="text-red-500 text-xl" />
-                <div>
-                  <h4 className="font-semibold text-red-800">Erro no Pagamento</h4>
-                  <p className="text-red-600">{erro}</p>
-                </div>
+            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertTriangle className="text-red-500 text-xl" />
+              <div>
+                <h4 className="font-semibold text-red-800">Erro no Pagamento</h4>
+                <p className="text-red-600">{erro}</p>
               </div>
-            )}
-            
-            {processandoPagamento && (
-              <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <Loader2 className="text-blue-500 text-xl animate-spin" />
-                <div>
-                  <h4 className="font-semibold text-blue-800">Processando Pagamento</h4>
-                  <p className="text-blue-600">
-                    {reservaId ? 'Processando seu pagamento...' : 'Criando sua reserva...'}
-                  </p>
-                </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mensagem de processamento */}
+        {processandoPagamento && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+              <div>
+                <h4 className="font-semibold text-blue-800">Processando Pagamento</h4>
+                <p className="text-blue-600">Aguarde, estamos processando seu pagamento...</p>
               </div>
-            )}
-            
-            {monitorandoStatus && (
-              <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <Loader2 className="text-yellow-500 text-xl animate-spin" />
-                <div>
-                  <h4 className="font-semibold text-yellow-800">Aguardando Confirmação</h4>
-                  <p className="text-yellow-600">
-                    Monitorando status do pagamento... Status atual: {statusPagamento}
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            {statusPagamento === 'Pago' && (
-              <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <CheckCircle className="text-green-500 text-xl" />
-                <div>
-                  <h4 className="font-semibold text-green-800">Pagamento Aprovado!</h4>
-                  <p className="text-green-600">Redirecionando para confirmação...</p>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -1196,20 +922,18 @@ export default function Pagamento() {
         <form onSubmit={e => { e.preventDefault(); handleFinalizarCompra(); }} className="mt-8">
           <button
             type="submit"
-            disabled={processandoPagamento || monitorandoStatus || !isFormValid()}
+            disabled={!isFormValid() || processandoPagamento}
             className={`w-full py-4 px-8 rounded-xl font-bold text-lg transition-all duration-300 transform ${
-              processandoPagamento || monitorandoStatus || !isFormValid()
+              !isFormValid() || processandoPagamento
                 ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                 : 'bg-[#F28C38] text-white hover:bg-orange-600 hover:scale-[1.02] hover:shadow-xl cursor-pointer focus:ring-4 focus:ring-orange-200 focus:outline-none'
             }`}
           >
             <div className="flex items-center justify-center gap-3">
-              {(processandoPagamento || monitorandoStatus) ? (
+              {processandoPagamento ? (
                 <>
-                  <Loader2 className="animate-spin" />
-                  <span>
-                    {processandoPagamento ? 'Processando...' : 'Aguardando confirmação...'}
-                  </span>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Processando...</span>
                 </>
               ) : (
                 <>

@@ -21,9 +21,12 @@ export default function PopularDestinations() {
         setLoading(true);
         const response = await fetchDestinosPopularesComMocks();
         
+        // Limitar a 5 destinos mais populares para melhor visualização
+        const topDestinos = response.slice(0, 5);
+        
         // Calcular percentuais
-        const totalReservas = response.reduce((sum, item) => sum + item.reservas, 0);
-        const formattedData = response.map(item => ({
+        const totalReservas = topDestinos.reduce((sum, item) => sum + item.reservas, 0);
+        const formattedData = topDestinos.map(item => ({
           name: item.destino || "Destino não informado",
           bookings: item.reservas || 0,
           percentage: totalReservas > 0 ? ((item.reservas / totalReservas) * 100).toFixed(1) : 0

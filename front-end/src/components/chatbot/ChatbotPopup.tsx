@@ -218,7 +218,7 @@ ${pacotesTexto ? "\n\nðŸ“‹ PACOTES ENCONTRADOS:\n" + pacotesTexto : ""}\n\nHistÃ
       ) : (
         <>
           <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-5 py-3 flex justify-between items-center rounded-t-2xl shadow-md">
-            <span className="font-bold text-lg select-none">Theo</span>
+            <span className="font-bold text-base select-none">Theo</span>
             <button
               onClick={() => setIsOpen(false)}
               className="text-white text-xl font-bold cursor-pointer"
